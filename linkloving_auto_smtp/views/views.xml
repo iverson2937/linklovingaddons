@@ -41,6 +41,76 @@
             </field>
         </record>
 
+        <record id="view_load_subscribe_search" model="ir.ui.view">
+            <field name="name">email.send.statistics .search</field>
+            <field name="model">email.send.statistics</field>
+            <field name="arch" type="xml">
+                <search string="Blog Post">
+
+                    <filter string="已退订" name="unsubcribed"
+                            domain="[('request_type', '=', 'subscribe'),('is_subscribe', '=', 'True')]"/>
+
+                    <group expand="0" string="Group By">
+                        <filter string="邮件标题分类" name="title_group_type" domain="[]" context="{'group_by': 'name'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="menu_sales_email_load_subscribe_action" model="ir.actions.act_window">
+            <field name="name">邮件统计</field>
+            <field name="res_model">email.send.statistics</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_load_subscribe_search"/>
+            <field name="domain">[]</field>
+            <field name="context">
+                {
+                }
+            </field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    邮件统计详情
+                </p>
+            </field>
+        </record>
+
+
+        <!--email.send.statistics-->
+        <record model="ir.ui.view" id="view_load_subscribe_form">
+            <field name="name">email.send.statistics .form</field>
+            <field name="model">email.send.statistics</field>
+            <field name="arch" type="xml">
+                <form create="1" delete="1">
+                    <sheet>
+                        <group>
+
+                            <field name="name"/>
+                            <field name="request_type"/>
+                            <field name="is_subscribe" attrs="{'invisible': [('request_type','=','read')]}"/>
+                            <field name="email"/>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_load_subscribe_tree" model="ir.ui.view">
+            <field name="name">email.send.statistics .tree</field>
+            <field name="model">email.send.statistics</field>
+            <field name="arch" type="xml">
+                <tree create="1">
+                    <field name="name"/>
+                    <field name="email"/>
+                    <field name="request_type"/>
+                    <field name="is_subscribe"/>
+
+                </tree>
+            </field>
+        </record>
+
 
         <record id="menu_sales_email_inbox_action" model="ir.actions.act_window">
             <field name="name">收件箱</field>
@@ -76,6 +146,12 @@
                   parent="menu_sales_email"
                   groups=""
                   sequence="2" name="发件箱"/>
+
+        <menuitem action="menu_sales_email_load_subscribe_action"
+                  id="menu_sales_email_load_subscribe"
+                  parent="menu_sales_email"
+                  groups=""
+                  sequence="3" name="邮件退订与查看率"/>
 
 
         <!--<menuitem id="linkloving_auto_smtp_menu_mail_message"-->

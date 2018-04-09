@@ -19,13 +19,10 @@
                                 modifiers="{'invisible': ['|', ['user_can_approve', '=', false], ['state', '!=', 'progress']]}"/>
                         <button string="拒绝" name="to_approve" type="object" class="oe_highlight"
                                 context="{'default_reject':True}"
-                                attrs="{'invisible': ['|',('user_can_reject', '=', False),('state','!=','progress')]}"
-                                modifiers="{'invisible': ['|', ['user_can_reject', '=', false], ['state', '!=', 'progress']]}"/>
-                        <field name="stage_id" widget="statusbar" readonly="1" on_change="1" can_create="true"
-                               can_write="true" modifiers="{'readonly': true}"/>
-                        <field name="state" invisible="1" modifiers="{'invisible': true}"/>
-                        <field name="status" widget="statusbar" statusbar_visible="eol" readonly="1"
-                               modifiers="{'readonly': true}"/>
+                                attrs="{'invisible': ['|',('user_can_reject', '=', False),('state','!=','progress')]}"/>
+                        <!--<field name="stage_id" widget="statusbar" readonly="1" attrs="{'invisible':[('state','=','progress')]}"/>-->
+                        <field name="state" widget="statusbar"/>
+
                     </header>
                     <sheet>
                         <field name="product_variant_count" invisible="1"
@@ -349,6 +346,12 @@
 
                             </page>
                             <page string="审核流程">
+                                <group>
+                                    <field name="flow_jason" widget="workflow"/>
+
+                                </group>
+                            </page>
+                            <page string="demo">
                                 <div class="approve_process_container">
                                     <div class="approve_process_circle">创建人</div>
                                     <div class="approve_state">提交</div>

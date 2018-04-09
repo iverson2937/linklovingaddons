@@ -213,10 +213,11 @@ odoo.define('linkloving_pdm.document_manage', function (require) {
                                 type: cur_type
                             }
                         }).then(function (ret) {
-                            var default_code = self.product_info.default_code.trim()
-                            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v' + ret +
-                                '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + ret
-                            console.log(ret);
+                            var default_code = self.product_info.default_code.trim();
+                            var default_version = ret.version;
+                            var remote_file = cur_type.toUpperCase() + '/' + default_code.split('.').join('/') + '/v' + default_version +
+                                '/' + cur_type.toUpperCase() + '_' + default_code.split('.').join('_') + '_v' + default_version
+                            console.log(default_code);
                             $.ajax({
                                 type: "GET",
                                 url: PROXY_URL + "uploadfile",//http://localhost:8088/uploadfile?id=" + this.product_id + "&remotefile=" + remote_file,

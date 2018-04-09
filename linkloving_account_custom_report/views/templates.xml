@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+
+        <record id="account_account_report_wizard_form" model="ir.ui.view">
+            <field name="name">account.account.report.wizard.form</field>
+            <field name="model">account.account.report.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="fiscal_year_id" options="{'no_create':True}"/>
+                            <field name="period_id_start" domain="[('fiscal_year_id','=',fiscal_year_id)]"
+                                   required="1" string="开始区间"/>
+                            <field name="account_ids" widget="radio" string="类型" options="{'no_create':True}"/>
+                        </group>
+                        <group>
+                            <field name=""/>
+                            <field name="period_id_end" options="{'no_create':True}" string="结束区间"
+                                   required="1"
+                                   domain="[('fiscal_year_id','=',fiscal_year_id)]"/>
+                        </group>
+                    </group>
+
+
+                    <footer>
+                        <button name="print_report" type="object" string="导出" class="oe_highlight"/>
+                        or
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id='action_account_account_report_wizard_form' model='ir.actions.act_window'>
+            <field name='name'>会计报告</field>
+            <field name='res_model'>account_account_report_wizard</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>form</field>
+            <field name='target'>new</field>
+        </record>
+
+
+    </data>
+</odoo>

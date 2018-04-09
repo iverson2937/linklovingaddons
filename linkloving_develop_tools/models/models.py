@@ -83,15 +83,22 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
         year = datetime.date.today().year
     if not period:
         period = 0
-    if month <= 0:
-        year = year - 1
-        month = 12 + month
         # 获取当月第一天的星期和当月的总天数
     firstDayWeekDay, monthRange = calendar.monthrange(year, month)
 
+    if month - period <= 0:
+        year = year - 1
+        month = 12 + month
+
+
     # 获取当月的第一天
+
     firstDay = datetime.date(year=year, month=month - period, day=1).strftime('%Y-%m-%d')
 
+    print year, month, monthRange
+    if month > 12:
+        month = month - 12
+        year = year + 1
     lastDay = datetime.date(year=year, month=month, day=monthRange).strftime('%Y-%m-%d')
     print firstDay, lastDay
 
@@ -100,6 +107,12 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
 
 class CreateOrderPointWizard(models.TransientModel):
     _name = "create.order.point"
+
+    def compute_shipping_date(self):
+        sale_orders = self.env['sale.order'].search([('validity_date', '=', False)])
+        for order in sale_orders:
+            if not order.validity_date:
+                order.validity_date = order.confirmation_date
 
     def compute_period_for_account_move(self):
         periods = self.env['account.period'].search([])
@@ -312,6 +325,18 @@ class CreateOrderPointWizard(models.TransientModel):
         login_password()
         click_and_login()
 
+    def check_fiscal_year(self):
+        for ex in self.env['hr.expense.sheet'].search([]):
+            import calendar
+            date1_start, date1_end = getMonthFirstDayAndLastDay(month=1)
+            print date1_start
+            print date1_end
+            if ex.create_date < date1_start:
+                print ex.create_date
+                ex.fiscal_year_id = 1
+            else:
+                ex.fiscal_year_id = 2
+
     def compute_sale_qty(self):
         this_month = datetime.datetime.now().month
         last1_month = this_month - 1
@@ -325,6 +350,9 @@ class CreateOrderPointWizard(models.TransientModel):
                 last1_month_qty = product_id.count_amount(date1_start, date1_end)
                 last2_month_qty = product_id.count_amount(date2_start, date2_end)
                 last3_month_qty = product_id.count_amount(date3_start, date3_end)
+                print last1_month_qty,
+                print last2_month_qty,
+                print last3_month_qty
                 product.last1_month_qty = last1_month_qty
                 product.last2_month_qty = last2_month_qty
                 product.last3_month_qty = last3_month_qty

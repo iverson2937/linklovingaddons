@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 
 import requests
 from psycopg2._psycopg import OperationalError
@@ -51,6 +52,15 @@ class LinklovingCompanies(http.Controller):
         request.params["db"] = db_name
         cr = registry(db_name).cursor()
         request.env.cr = cr
+
+    @http.route('/linkloving_web/get_report', auth='none', type='json', csrf=False)
+    def get_report(self):
+        return request.env["sub.company.report"].sudo().get_report()
+
+    @http.route('/linkloving_web/get_sub_company_report', auth='none', type='json', csrf=False)
+    def get_sub_company_report(self):
+        so_id = request.jsonrequest.get("so_id")
+        return request.env["sub.company.report"].sudo().get_sub_company_report(so_id=so_id)
 
     @http.route('/linkloving_web/view_feedback_detail', auth='none', type='json', csrf=False)
     def view_feedback_detail(self):
@@ -116,6 +126,8 @@ class LinklovingCompanies(http.Controller):
                         }
                     order_line_info = line_dic.get(line.get("default_code"))
                     move_info = move_dic.get(line.get("default_code"))
+                    if not move_info:
+                        raise UserError(u'请检查子系统中对应的出货单是否正常!')
                     tmp_list.append((0, 0, {
                         'product_id': p_id.id,
                         'cancel_qty': line.get("cancel_qty"),
@@ -208,32 +220,22 @@ class LinklovingCompanies(http.Controller):
                 "code": -5,
                 "msg": u"%s此采购单在%s账套中找不到" % (po_name, db)
             }
-        picking_to_in = po.picking_ids.filtered(lambda x: x.state not in ["done", "cancel"])  # 对应子系统入库的单子
-        if len(picking_to_in) != 1:
-            return {
-                "code": -6,
-                "msg": u"%s此采购单出货单异常" % (po_name)
-            }
-        op_to_do = request.env["stock.pack.operation"]
-        for op in picking_to_in.pack_operation_product_ids:
-            if op.product_id.id == p_obj.id:  # 找到对应的产品
-                op_to_do = op
-                break
-        op_to_do.qty_done = product_qty
-        try:
-            confirmation = request.env["stock.backorder.confirmation"].sudo().create({
-                'pick_id': picking_to_in.id
-            })
-            if picking_to_in.state != 'assigned':
-                picking_to_in.force_assign()
-            confirmation.process()
-            picking_to_in.to_stock()
+        picking_to_in = po.picking_ids.filtered(
+            lambda x: x.state not in ["done", "cancel"] and x.picking_type_code == 'internal')  # 对应子系统入库的单子
+        if picking_to_in:
+            self.picking_tranfer_in_auto(picking_to_in, po_name, p_obj, product_qty)
             picking_to_in.write({
                 'feedback_name_from_sub': vals.get("feedback_name_from_sub"),
                 'feedback_id_from_sub': vals.get("feedback_id_from_sub")
             })
-        except Exception, e:
-            raise e
+        picking_to_in2 = po.picking_ids.filtered(
+            lambda x: x.state not in ["done", "cancel"] and x.picking_type_code == 'incoming')  # 对应子系统入库的单子
+        if picking_to_in2:
+            self.picking_tranfer_in_auto(picking_to_in2, po_name, p_obj, product_qty)
+            picking_to_in2.write({
+                'feedback_name_from_sub': vals.get("feedback_name_from_sub"),
+                'feedback_id_from_sub': vals.get("feedback_id_from_sub")
+            })
         return {
             "code": 1,
             "vals": {
@@ -241,6 +243,30 @@ class LinklovingCompanies(http.Controller):
                 'picking_name_from_main': picking_to_in.name,
             }
         }
+
+    def picking_tranfer_in_auto(self, pickings_to_do, po_name, p_obj, product_qty):
+        for picking_to_in in pickings_to_do:
+            if len(picking_to_in) != 1:
+                return {
+                    "code": -6,
+                    "msg": u"%s此采购单出货单异常" % (po_name)
+                }
+            op_to_do = request.env["stock.pack.operation"]
+            for op in picking_to_in.pack_operation_product_ids:
+                if op.product_id.id == p_obj.id:  # 找到对应的产品
+                    op_to_do = op
+                    break
+            op_to_do.qty_done = product_qty
+            try:
+                confirmation = request.env["stock.backorder.confirmation"].sudo().create({
+                    'pick_id': picking_to_in.id
+                })
+                if picking_to_in.state != 'assigned':
+                    picking_to_in.force_assign()
+                confirmation.process()
+                picking_to_in.to_stock()
+            except Exception, e:
+                raise e
 
     @http.route('/linkloving_web/precost_price', auth='none', type='json', csrf=False, methods=['POST'])
     def precost_price(self, **kw):
@@ -302,11 +328,21 @@ class LinklovingCompanies(http.Controller):
             # order_line_return = []  #往回传的line信息
             for line in order_line_vals:
                 default_code = line["default_code"]
+                if not default_code:
+                    return {
+                        "code": -6,
+                        "msg": u'料号异常不能为空 %s' % json.dumps(line)
+                    }
                 p_obj = request.env["product.product"].sudo().search([("default_code", "=", default_code)])
                 if not p_obj:
                     return {
                         "code": -4,
                         "msg": u"%s此料号在%s账套中找不到" % (default_code, db)
+                    }
+                if len(p_obj) > 1:
+                    return {
+                        "code": -5,
+                        "msg": u'%s 此料号在子系统中对应了多个产品' % (json.dumps(line))
                     }
                 # price_after_dis = p_obj.pre_cost_cal() / discount_to_sub
                 one_line_val = {
@@ -329,9 +365,10 @@ class LinklovingCompanies(http.Controller):
                 # 'order_line': order_line_return,
             }
         except Exception, e:
+
             return {
                 "code": -1,
-                "msg": u"创建订单出现异常, %s" % e.name if hasattr(e, "name") else '',
+                "msg": u"创建订单出现异常, %s" % (e.name if hasattr(e, "name") else e),
             }
 
     @http.route('/linkloving_web/get_stand_price', auth='none', type='json', csrf=False, methods=['POST'])

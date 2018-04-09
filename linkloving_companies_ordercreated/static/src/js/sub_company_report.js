@@ -57,6 +57,16 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
         },
         initTable: function (data) {
             var self = this;
+            //self.$('.date-red').on('click', function (ev) {
+            //    var params = self.$("#table").bootstrapTable("getOptions");
+            //    params.queryParams = function () {
+            //        return {
+            //
+            //        }
+            //    }
+            //    console.log("getOptions");
+            //    self.$("#table").bootstrapTable("refresh");
+            //});
             var formatter_func = function (value, row, index) {
                 if (value) {
                     if (value["sub_ip"]) {
@@ -159,10 +169,21 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                     'class': "font_35_header",
                 }], coloums
             ], data);
+            options = $.extend(options, {
+                url: '/linkloving_web/get_report',
+                query: {},
+            })
             self.$('#table').bootstrapTable(options);
         },
         options_init: function (filename, coloums, data) {
+            var self = this;
             return {
+                contentType: 'application/json',
+                method: 'post',
+                toolbar: '#toolbar',
+                //pagination: true,
+                //paginationLoop: true,
+                //sidePagination: 'client',
                 cache: false,
                 sortable: true,
                 showToggle: true,
@@ -170,9 +191,8 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 striped: true,
                 showColumns: true,
                 showExport: true,
-
+                showRefresh: true,
                 editable: true,
-
                 iconsPrefix: 'fa', // glyphicon of fa (font awesome)
                 exportTypes: ['excel', 'png'],
                 exportOptions: {
@@ -182,7 +202,7 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 icons: {
                     paginationSwitchDown: 'glyphicon-collapse-down icon-chevron-down',
                     paginationSwitchUp: 'glyphicon-collapse-up icon-chevron-up',
-                    refresh: 'glyphicon-refresh icon-refresh',
+                    refresh: 'fa fa-refresh',
                     toggle: 'fa-lg fa-list-ul',
                     columns: 'fa-th',
                     detailOpen: 'glyphicon-plus icon-plus',
@@ -191,15 +211,19 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
                 },
                 columns: coloums,
                 data: data,//data.order_line,
-
                 onEditableSave: function(field, row, oldValue, $el) {
                     console.log(row)
-                    return new Model("purchase.order")
-                        .call("write",[row.po.id, {report_remark:row.report_remark}])
+                    if (field === 'report_remark') {
+                        return new Model("purchase.order")
+                            .call("sudo_write", [row.po.id, {report_remark: row.report_remark}])
                         .then(function (result) {
-
                         })
+                    }
                 },
+                onRefresh: function () {
+                    console.log('onRefresh')
+                    //self.$('#table').bootstrapTable('refresh');
+                }
             }
         },
         initTableSubCompany: function (data) {
@@ -209,6 +233,11 @@ odoo.define('linkloving_companies_ordercreated.sub_company_report', function (re
             }
             var colomns = self.initSubColumns(data);
             var options = self.options_init('生产跟踪单' + data.so_name, colomns, data.order_line);
+            options = $.extend(options, {
+                    url: "get_sub_company_report",
+                    query: {so_id: self.so_id},
+                }
+            )
             self.$('#table').bootstrapTable(options);
         },
         initSubColumns: function (data) {

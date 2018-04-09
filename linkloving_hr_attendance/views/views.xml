@@ -1,59 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
-    <!-- explicit list view definition -->
-    <!--
-    <record model="ir.ui.view" id="linklovinr_hr_attendance.list">
-      <field name="name">linklovinr_hr_attendance list</field>
-      <field name="model">linklovinr_hr_attendance.linklovinr_hr_attendance</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
-    -->
+    <record id='hr_attendance_form' model='ir.ui.view'>
+            <field name='name'>ll.hr.attendance.wizard.form</field>
+            <field name='model'>ll.hr.attendance.wizard</field>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <form name='Print Reports'>
+                    <group>
+                        <group>
+                            <field name='start_date' string="开始时间" required='1'/>
+                            <field name='end_date' string="结束时间" required='1'/>
+                        </group>
 
-    <!-- actions opening views on models -->
-    <!--
-    <record model="ir.actions.act_window" id="linklovinr_hr_attendance.action_window">
-      <field name="name">linklovinr_hr_attendance window</field>
-      <field name="res_model">linklovinr_hr_attendance.linklovinr_hr_attendance</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    -->
+                    </group>
 
-    <!-- server action to the one above -->
-    <!--
-    <record model="ir.actions.server" id="linklovinr_hr_attendance.action_server">
-      <field name="name">linklovinr_hr_attendance server</field>
-      <field name="model_id" ref="model_linklovinr_hr_attendance_linklovinr_hr_attendance"/>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
+                    <footer>
+                        <button name='print_report' type='object' string='导出' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
     </record>
-    -->
+    <record id='export_hr_attendance' model='ir.actions.act_window'>
+            <field name='name'>考勤</field>
+            <field name='res_model'>ll.hr.attendance.wizard</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>form</field>
+            <!--<field name="context">{'expense':True}</field>-->
+            <field name="view_id" ref="hr_attendance_form"/>
+            <field name='target'>new</field>
+    </record>
+    <record model="ir.actions.act_window" id="hr_attendance_devices">
+            <field name="name">考勤机</field>
+            <field name="res_model">linkloving.ble.device</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
 
-    <!-- Top menu item -->
-    <!--
-    <menuitem name="linklovinr_hr_attendance" id="linklovinr_hr_attendance.menu_root"/>
-    -->
-    <!-- menu categories -->
-    <!--
-    <menuitem name="Menu 1" id="linklovinr_hr_attendance.menu_1" parent="linklovinr_hr_attendance.menu_root"/>
-    <menuitem name="Menu 2" id="linklovinr_hr_attendance.menu_2" parent="linklovinr_hr_attendance.menu_root"/>
-    -->
-    <!-- actions -->
-    <!--
-    <menuitem name="List" id="linklovinr_hr_attendance.menu_1_list" parent="linklovinr_hr_attendance.menu_1"
-              action="linklovinr_hr_attendance.action_window"/>
-    <menuitem name="Server to list" id="linklovinr_hr_attendance" parent="linklovinr_hr_attendance.menu_2"
-              action="linklovinr_hr_attendance.action_server"/>
-    -->
-  </data>
+    <record id="view_attendance_tree_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.tree</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+
+            <!--<tree string="Employee attendances">-->
+            <xpath expr="//field[@name='check_in']" position="replace">
+                <field name="new_check_in" string="签到"/>
+            </xpath>
+            <xpath expr="//field[@name='check_out']" position="after">
+                <field name="device_version" string="设备uuid"/>
+            </xpath>
+            <!--</tree>-->
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.form</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='check_in']" position="replace">
+                <field name="new_check_in" string="签到"/>
+            </xpath>
+
+        </field>
+    </record>
+
+      <record id="view_attendance_device_tree" model="ir.ui.view">
+        <field name="name">linkloving.ble.device.tree</field>
+        <field name="model">linkloving.ble.device</field>
+        <field name="arch" type="xml">
+            <tree string="1">
+                  <field name="device_name" string="设备名"/>
+                  <field name="company_name" string="公司名"/>
+            </tree>
+        </field>
+    </record>
+
+
+
+      <menuitem id="menu_hr_attendance_devices" name="考勤机" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="25" action="hr_attendance_devices"/>
+      <menuitem id="menu_hr_attendance_report" name="导出考勤" parent="hr_attendance.menu_hr_attendance_manage_attendances"
+                  sequence="30" action="export_hr_attendance"/>
 </odoo>

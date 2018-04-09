@@ -93,6 +93,14 @@
                         <button string="反推bom的生产速度" name="huansuan_speed" type="object"
                                 default_focus="1"
                                 class="btn-primary"/>
+                        <button string="计算年" name="check_fiscal_year" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
+
+                        <button string="计算旧单子交货日期" name="compute_shipping_date" type="object"
+                                default_focus="1"
+                                class="btn-primary"/>
+
                     </footer>
                 </form>
             </field>

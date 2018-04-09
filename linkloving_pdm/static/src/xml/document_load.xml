@@ -14,27 +14,28 @@
     </t>
 
     <t t-name="document_load_detail">
-         <script>
-            $(function () { $("[data-toggle='tooltip']").tooltip(); });
-        </script>
-        <ul id="document_tab" class="nav nav-tabs" data-now-tab="sip">
-            <t t-set="i" t-value="1"/>
-            <t t-foreach="result" t-as="item">
-                <li t-att-class="i ==1 ? 'active': ''">
-                    <a t-att-href="'#'+item.type" data-toggle="tab" class="tab_toggle_a" t-att-data="item.type" t-att-load_type="item.upload_type">
-                         <t t-esc="item.name"/>
-                    </a>
-                </li>
-                <t t-set="i" t-value="2"/>
-            </t>
-        </ul>
-            <div class="create_document">
+        <div class="approval_ul_wraper">
+             <script>
+                $(function () { $("[data-toggle='tooltip']").tooltip(); });
+            </script>
+            <ul id="document_tab" class="nav nav-tabs" data-now-tab="sip">
+                <t t-set="i" t-value="1"/>
+                <t t-foreach="result" t-as="item">
+                    <li t-att-class="i ==1 ? 'active': ''">
+                        <a t-att-href="'#'+item.type" data-toggle="tab" class="tab_toggle_a" t-att-data="item.type" t-att-load_type="item.upload_type">
+                             <t t-esc="item.name"/>
+                        </a>
+                    </li>
+                    <t t-set="i" t-value="2"/>
+                </t>
+            </ul>
 
+            <div class="create_document">
                 <input type="checkbox" id="top_all_checkbox" class="document_all_checkbox">全选</input>
                 <button class="btn btn-primary create_document_btn">创建</button>
-
                 <button style="display:none;" class="btn btn-primary delect_hide delect_document_checked">批量删除</button>
             </div>
+        </div>
 
         <div id="myTabContent" class="tab-content">
             <t t-set="j" t-value="1"/>
@@ -160,6 +161,33 @@
                 <t t-set="j" t-value="2"/>
             </t>
         </div>
+
+
+
+        <div class="tabcontent_right">
+            <!--<div class="my_collections">-->
+            <!--<div class="coll_head">我的收藏</div>-->
+            <!--<div class="coll_body">-->
+            <!--<div>需要优先审核的</div>-->
+            <!--<div>包装相关的文件们</div>-->
+            <!--<div>设计部的文件们</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <div class="documents_labels">
+                <div class="labels_head">文件标签</div>
+                <div class="labels_body">
+                    <div data-id="all_type" class="search_tag_type_list">全部</div>
+
+                    <t t-foreach="result" t-as="item_tag">
+                       <div t-att-data-id="item_tag.tag_name" class="search_tag_type_list"><t t-esc="item_tag.tag_name"/><span style="float: right;"><t t-esc="item_tag.tag_num"/></span></div>
+                    </t>
+
+
+
+                </div>
+            </div>
+        </div>
+
 
         <!--上传文件界面-->
         <div class="load_container">

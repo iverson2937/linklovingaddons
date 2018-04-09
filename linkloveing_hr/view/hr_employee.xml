@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="hr_timesheet_employee_extd_form" model="ir.ui.view">
-            <field name="name">hr.timesheet.employee.extd_form</field>
-            <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//notebook/page[@name='public']/group/group[2]/field[@name='parent_id']"
-                       position="replace">
-                    <field name="parent_id" options="{'no_create': True}"/>
-                </xpath>
-                <xpath expr="//field[@name='address_id']" position="after">
-                    <field name="pre_payment_reminding" string="Remaining"/>
-                </xpath>
+        <!--<record id="hr_timesheet_employee_extd_form" model="ir.ui.view">-->
+        <!--<field name="name">hr.timesheet.employee.extd_form</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<xpath expr="//notebook/page[@name='public']/group/group[2]/field[@name='parent_id']"-->
+        <!--position="replace">-->
+        <!--<field name="parent_id" options="{'no_create': True}"/>-->
+        <!--</xpath>-->
+        <!--<xpath expr="//field[@name='address_id']" position="after">-->
+        <!--<field name="pre_payment_reminding" string="Remaining"/>-->
+        <!--</xpath>-->
 
-                <xpath expr="//notebook/page[1]/group[1]" position="after">
-                    <group>
-                        <group>
-                            <field name="signature" widget="image"/>
-                        </group>
-                        <group>
+        <!--<xpath expr="//notebook/page[1]/group[1]" position="after">-->
+        <!--<group>-->
+        <!--<group>-->
+        <!--<field name="signature" widget="image"/>-->
+        <!--</group>-->
+        <!--<group>-->
+        <!--<field name="purchase_signature" widget="image"/>-->
+        <!--</group>-->
 
-                        </group>
 
-
-                    </group>
-                </xpath>
-            </field>
-        </record>
+        <!--</group>-->
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
 
 
         <record model="ir.actions.act_window" id="factory_operator_list_action">

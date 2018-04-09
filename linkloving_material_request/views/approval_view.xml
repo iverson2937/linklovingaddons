@@ -81,6 +81,7 @@
 
                         <button string="领料" type="object" name="btn_click_show_product_line" class="oe_highlight"
                                 attrs="{'invisible': [('picking_state','!=','approved_finish')]}"
+                                groups="linkloving_mrp_extend.group_charge_warehouse"
                         />
 
 
@@ -116,7 +117,8 @@
                             </div>
                         </group>
                         <group>
-                            <field name="picking_type" widget="radio" required="1"/>
+                            <field name="picking_type" widget="radio" required="1"
+                                   attrs="{'readonly': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}"/>
 
                             <field name="review_i_approvaled_val" invisible="1"/>
                             <field name="btn_show" invisible="1"/>
@@ -125,16 +127,21 @@
                         <hr/>
                         <group>
                             <group>
-                                <field name="my_create_uid" string="申请人" required="1"/>
+                                <field name="my_create_uid" string="申请人" required="1"
+                                       attrs="{'readonly': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}"/>
                                 <field name="Materials_development_way" invisible="1"/>
-                                <field name="picking_cause" required="1"/>
+                                <field name="picking_cause" required="1"
+                                       attrs="{'readonly': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}"/>
                             </group>
                             <group>
-                                <field name="my_create_date" string="单据日期" required="1"/>
-                                <field name="delivery_date" required="1"/>
+                                <field name="my_create_date" string="单据日期" required="1"
+                                       attrs="{'readonly': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}"/>
+                                <field name="delivery_date" required="1"
+                                       attrs="{'readonly': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}"/>
                                 <field name="who_review_now"
                                        attrs="{'invisible': [('picking_state', 'in', ('approved_finish'))]}"/>
-                                <field name="remark"/>
+                                <field name="remark"
+                                       attrs="{'readonly': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}"/>
 
                                 <field name="stock_picking_ids" invisible="1"/>
 
@@ -142,12 +149,14 @@
                         </group>
                         <group>
                             <field name="reference_product_template_ids" string="参考产品" options="{'no_create': True}"
+                                   attrs="{'readonly': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}"
                                    domain="[('bom_ids', '!=', False)]" widget="many2many_tags"/>
                         </group>
                         <group>
                             <notebook>
                                 <page string="订单行">
-                                    <field name="line_ids" mode="tree,kanban">
+                                    <field name="line_ids" mode="tree,kanban"
+                                           attrs="{'readonly': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}">
                                         <form string="Sales Order Lines">
                                             <group>
                                                 <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
@@ -221,13 +230,14 @@
 
 
                                     <button name="open_product_select_window" string="批量添加产品" type="object"
-                                            class="btn-primary oe_edit_only"/>
+                                            class="btn-primary oe_edit_only"
+                                            attrs="{'invisible': [('picking_state', 'not in', ['canceled','to_submit','Refused'])]}"/>
 
 
                                 </page>
                                 <page string="审核记录">
                                     <field name="review_process_line_ids">
-                                        <tree>
+                                        <tree create="0" delete="0">
                                             <field name="review_order_seq" string="顺序" invisible="1"/>
                                             <field name="last_review_line_id" string="上一级审核" invisible="1"/>
 

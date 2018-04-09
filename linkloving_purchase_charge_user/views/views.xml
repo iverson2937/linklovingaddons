@@ -28,6 +28,7 @@
                     <field name="po_user_id"/>
                 </xpath>
 
+
             </field>
         </record>
 
@@ -53,6 +54,9 @@
                 <xpath expr="//field[@name='category_id']" position="after">
                     <!-- Add new fields here -->
                     <field name="po_user_id"/>
+                </xpath>
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="default_order">po_user_id desc</attribute>
                 </xpath>
             </field>
         </record>

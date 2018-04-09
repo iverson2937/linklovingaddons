@@ -104,3 +104,12 @@ class LinklovingPdm(http.Controller):
         if token:
             response.set_cookie('fileToken', token)
         return response
+
+    @http.route('/get_default_version', type='json', auth='public', website=True, csrf=False)
+    def get_default_version(self, **kw):
+
+        print kw.get('id'), kw.get('type')
+        attachs = request.env["product.attachment.info"].search([('product_tmpl_id', '=', int(kw.get('id'))),
+                                                              ('type', '=', kw.get('type'))])
+
+        return {'data': max(attachs.mapped("version")) + 1 if attachs.mapped("version") else 1}

@@ -25,7 +25,10 @@ class AccountEmployeePayment(models.Model):
     employee_id = fields.Many2one('hr.employee',
                                   default=lambda self: self.env['hr.employee'].search([('user_id', '=', self.env.uid)],
                                                                                       limit=1))
-    payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'account.employee.payment')])
+    payment_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'account.employee.payment'),
+                                                                       ('payment_type', '=', 'outbound')])
+    return_ids = fields.One2many('account.payment', 'res_id', domain=[('res_model', '=', 'account.employee.payment'),
+                                                                      ('payment_type', '=', 'inbound')])
     payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
 
     def _get_paid_amount(self):
@@ -75,7 +78,6 @@ class AccountEmployeePayment(models.Model):
     remark = fields.Text(string='Remark')
     address_home_id = fields.Many2one('res.partner', related='employee_id.address_home_id')
     bank_account_id = fields.Many2one('res.partner.bank', related='employee_id.bank_account_id')
-    return_ids = fields.One2many('account.employee.payment.return', 'payment_id')
 
     # FIXME:USE BETTER WAY TO HIDE THE BUTTON
     def _get_is_show(self):

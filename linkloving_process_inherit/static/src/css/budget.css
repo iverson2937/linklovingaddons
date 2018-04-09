@@ -1,0 +1,24 @@
+/*.o_web_client > .o_main .o_main_content {*/
+    /*overflow: scroll;*/
+/*}*/
+
+/*.department > div {*/
+    /*padding: 5px 45px;*/
+/*}*/
+
+
+.delete i{
+    cursor: pointer;
+}
+.add_tr{
+    cursor: pointer;
+    width: fit-content;
+}
+.top_calc_rule span{
+    font-weight: bold;
+    margin-right: 20px;
+}
+.top_calc_rule label{
+    font-weight: 100;
+    margin-right: 10px;
+}

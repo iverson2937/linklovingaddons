@@ -16,6 +16,7 @@
                         <group>
                             <field name="raw_material_approve_id" options="{'no_create':True}"/>
                             <field name="finished_material_approve_id" options="{'no_create':True}"/>
+                            <field name="wood_material_approve_id" options="{'no_create':True}"/>
                         </group>
                     </group>
 

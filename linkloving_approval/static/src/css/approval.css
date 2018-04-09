@@ -1,34 +1,40 @@
-.approval_page_container{
-    width:96%;
+.approval_page_container {
+    width: 96%;
     min-width: 1300px;
-    margin:0px auto;
+    margin: 0px auto;
     padding: 10px;
     background: white;
     position: relative;
 }
-.approval_page_container .active>a{
-    background-color: #337ab7!important;
-    color:white!important;
+
+.approval_page_container .active > a {
+    background-color: #337ab7 !important;
+    color: white !important;
 }
-.approval_page_container>ul>li>a{
-    border:1px solid #dddede!important;
+
+.approval_page_container > ul > li > a {
+    border: 1px solid #dddede !important;
     color: #000;
 }
-.approval_page_container #myTabContent{
+
+.approval_page_container #myTabContent {
     padding-top: 18px;
 }
-.approval_page_container .tab_message_display{
+
+.approval_page_container .tab_message_display {
     overflow: hidden;
-    width: 70%;
+    width: 68%;
     display: inline-block;
     margin-left: 15px;
     /*padding-top: 20px;*/
 }
-.approval_page_container .tab_message_display>div{
+
+.approval_page_container .tab_message_display > div {
     /*float: left;*/
     margin-right: 30px;
 }
-.approval_page_container .tab_pane_display{
+
+.approval_page_container .tab_pane_display {
     border: 1px solid #dddede;
     padding: 10px 20px;
     position: relative;
@@ -36,7 +42,8 @@
     margin-bottom: 15px;
     min-width: 900px;
 }
-.approval_page_container .tab_pane_display .document_review_list{
+
+.approval_page_container .tab_pane_display .document_review_list {
     /*position: absolute;*/
     /*top: 0px;*/
     /*right: 90px;*/
@@ -44,9 +51,10 @@
     /*padding-left: 60px;*/
     /*background: pink;*/
     width: 90%;
-    height:100%;
+    height: 100%;
 }
-.approval_page_container .tab_pane_display .document_review_list>span{
+
+.approval_page_container .tab_pane_display .document_review_list > span {
     width: 45px;
     color: green;
     float: left;
@@ -57,62 +65,73 @@
     height: 32px;
     margin-bottom: 3px;
 }
-.approval_page_container .tab_pane_display .document_review_list>.document_yellow{
-    color: darkorange!important;
+
+.approval_page_container .tab_pane_display .document_review_list > .document_yellow {
+    color: darkorange !important;
 }
-.approval_page_container .tab_pane_display .document_review_list>.document_red{
-    color: red!important;
+
+.approval_page_container .tab_pane_display .document_review_list > .document_red {
+    color: red !important;
 }
-.approval_page_container .tab_pane_display .document_review_list>div{
+
+.approval_page_container .tab_pane_display .document_review_list > div {
     padding-left: 3px;
     padding-right: 3px;
     line-height: 30px;
     text-align: center;
-    border:1px solid black;
+    border: 1px solid black;
     float: left;
     margin-bottom: 3px;
 }
-.approval_ul_wraper{
+
+.approval_ul_wraper {
     margin-bottom: 50px;
     z-index: 999;
-    top:153px;
-    padding-top:40px;
+    top: 153px;
+    padding-top: 40px;
     background: white;
-    width: calc((100% - 219px)*0.78);
+    width: calc((100% - 219px) * 0.78);
     min-width: 880px;
 }
-#myTabContent_Approval{
+
+#myTabContent_Approval {
     /*margin-top: 33px;*/
     display: inline-block;
     min-width: 800px;
     width: 70%;
 }
-.nav-tabs > li > a{
+
+.nav-tabs > li > a {
     border: 1px solid #dddede;
 }
 
-.approval_page_container .tab_pane_display .tab_message_display>div{
+.approval_page_container .tab_pane_display .tab_message_display > div {
     margin-bottom: 8px;
     margin-top: 8px;
 }
-.approval_page_container .tab_pane_display .document_btns{
+
+.approval_page_container .tab_pane_display .document_btns {
     position: absolute;
     top: 7px;
     right: 7px;
 }
-.approval_page_container .create_document{
+
+.approval_page_container .create_document {
     margin-top: 18px;
 }
-.approval_pagination{
+
+.approval_pagination {
     width: 175px;
     float: right;
 }
-.approval_product_name{
+
+.approval_product_name {
     cursor: pointer;
     color: #497db6;
     text-decoration: underline;
 }
-.approval_tab_pane_type{
+
+.approval_tab_pane_type {
     padding: 2px;
     color: #409ffd;
     width: auto;
@@ -121,36 +140,44 @@
     border-radius: 8px;
     display: inline-block;
 }
-.get_version_history{
+
+.get_version_history {
     display: block;
     margin-top: 10px;
 }
 
-#div_file_checkbox{
+#div_file_checkbox {
     display: inline-block;
     vertical-align: top;
     margin-top: 8px;
 }
-.item_second_line{
+
+.item_second_line {
     color: #bec7d0;
 }
-.item_second_line>span:nth-child(2){
+
+.item_second_line > span:nth-child(2) {
     margin-left: 10px;
 }
-.item_third_line{
+
+.item_third_line {
     color: #8c9099;
 }
-.item_remark{
+
+.item_remark {
     color: #8c9099;
 }
-.tab_pane_display .item_right_content{
+
+.tab_pane_display .item_right_content {
     float: right;
     text-align: right;
 }
-.tab_pane_display .item_right_content .state{
+
+.tab_pane_display .item_right_content .state {
     color: #fca08b;
 }
-.tab_pane_display .item_right_content .reviewer{
+
+.tab_pane_display .item_right_content .reviewer {
     background-color: #f3f3f5;
     color: #3d9eff;
     border-radius: 6px;
@@ -158,7 +185,8 @@
     display: inline-block;
     padding: 1px 6px;
 }
-.item_right_content .document_download_new{
+
+.item_right_content .document_download_new {
     padding: 4px 10px;
     /*height:30px;*/
     border: 1px solid #dbe0e6;
@@ -166,7 +194,8 @@
     display: inline-block;
     cursor: pointer;
 }
-.item_right_content .approval_btn{
+
+.item_right_content .approval_btn {
     padding: 4px 12px;
     display: inline-block;
     background-color: #3d9eff;
@@ -174,73 +203,87 @@
     border-radius: 4px;
     cursor: pointer;
 }
-.versions{
+
+.versions {
     margin-top: 10px;
 }
-.this_version{
+
+.this_version {
     color: #bcc6d0;
 }
 
-.tabcontent_right{
+.tabcontent_right {
     display: inline-block;
     vertical-align: top;
     width: 28%;
     margin-left: 5px;
     max-width: 160px;
 }
-.my_collections .coll_head,.documents_labels .labels_head{
+
+.my_collections .coll_head, .documents_labels .labels_head {
     background-color: #ecf0f3;
     color: #89929b;
     padding: 2px 10px;
 }
+
 /*.my_collections{*/
-    /*display: inline-block;*/
-    /*vertical-align: top;*/
-    /*width: 28%;*/
-    /*margin-left: 5px;*/
-    /*max-width: 160px;*/
+/*display: inline-block;*/
+/*vertical-align: top;*/
+/*width: 28%;*/
+/*margin-left: 5px;*/
+/*max-width: 160px;*/
 /*}*/
-.my_collections .coll_body,.documents_labels .labels_body{
+.my_collections .coll_body, .documents_labels .labels_body {
     padding: 5px 10px;
     background-color: #f4f7fe;
     color: #89929b;
 }
 
-
-.document_modify_wraper1{
+.document_modify_wraper1 {
     padding: 3px;
     float: right;
     height: 25px;
     background-color: #3d9eff;
 }
-.item_toggle .get_more{
+
+.item_toggle .get_more {
     text-align: center;
     cursor: pointer;
 }
-.toggle_approval_process_wrap>.top{
+
+.item_toggle {
+    width: 83%;
+}
+
+.toggle_approval_process_wrap > .top {
     padding: 4px;
     text-align: left;
     background-color: #f0eeee;
     color: #8c9099;
 }
-.item_approval_process_detail{
+
+.item_approval_process_detail {
     padding-left: 50px;
     padding-top: 30px;
 }
-.item_approval_process_detail .item_obj>div{
+
+.item_approval_process_detail .item_obj > div {
     display: inline-block;
     vertical-align: top;
 }
-.item_obj_left{
+
+.item_obj_left {
     width: 50px;
     min-height: 50px;
     border-left: 1px solid #8c9099;
     position: relative;
 }
-.item_obj_right{
+
+.item_obj_right {
     margin-top: -8px;
 }
-.obj_circle{
+
+.obj_circle {
     display: inline-block;
     width: 5px;
     height: 5px;
@@ -250,16 +293,48 @@
     left: -2.6px;
     top: 0;
 }
-.item_obj_right>span{
+
+.item_obj_right > span {
     display: inline-block;
     vertical-align: top;
 }
-.item_obj_right>div{
+
+.item_obj_right > div {
     width: 60%;
     display: inline-block;
     word-break: break-all;
     word-wrap: break-word;
 }
-.toggle_approval_process_wrap{
+
+.toggle_approval_process_wrap {
     display: none;
+}
+
+.qa-message-content .pull-left {
+    float: none !important;
+}
+
+.search_tag_type_list {
+    cursor: pointer;
+}
+
+.view_text_style_no  {
+    color: #333333!important;
+}
+
+.view_text_style_down {
+    color: #999999!important;
+}
+
+.view_text_style_now  {
+    color: #409eff!important;
+}
+
+
+.message-item .qa-message-content img {
+    width: 244px !important;
+}
+
+.message-item .qa-message-content .show_img_auto {
+    width: auto!important;
 }

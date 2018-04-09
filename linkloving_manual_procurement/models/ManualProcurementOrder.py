@@ -242,8 +242,8 @@ class ProcurementOrderManualExtend(models.Model):
     def _prepare_purchase_order(self, partner):
         self.ensure_one()
         res = super(ProcurementOrderManualExtend, self)._prepare_purchase_order(partner)
-        if self.not_base_on_available:
-            res.update({
+        # if self.not_base_on_available:
+        res.update({
                 'date_order': fields.datetime.now(),
                 'handle_date': self.date_planned,
             })

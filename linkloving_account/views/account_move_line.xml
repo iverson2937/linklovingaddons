@@ -2,18 +2,50 @@
 <openerp>
     <data>
 
-        <!--
-                filter account move line
-          -->
+        <record id="account.view_move_line_tree_new" model="ir.ui.view">
+            <field name="name">account.move.line.tree</field>
+            <field name="model">account.move.line</field>
+            <field eval="1" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="Journal Items" create="false">
+                    <field name="date"/>
+                    <field name="move_id" required="0"/>
+                    <field name="journal_id" options='{"no_open":True}' invisible="1"/>
+                    <field name="name"/>
+                    <field name="statement_id" invisible="1"/>
+                    <field name="partner_id"/>
+                    <field name="account_id" options='{"no_open":True}' domain="[('company_id', '=', company_id)]"/>
+                    <field name="reconciled" invisible="1"/>
+                    <field name="amount" string="金额"/>
+                    <field name="current_balance"/>
+                    <field name="currency_id" readonly="True" invisible="1"/>
+                    <field name="remark"/>
+                    <field name="amount1" invisible="1"/>
+                    <field name="date_maturity"/>
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
 
         <record id="view_account_move_line_filter_inherit" model="ir.ui.view">
            <field name="name">account.move.line</field>
             <field name="model">account.move.line</field>
             <field name="inherit_id" ref="account.view_account_move_line_filter"/>
             <field name="arch" type="xml">
-               <xpath expr="//filter[@name='payable']" position="after">
-                    <filter string="Customer" domain="[('partner_id.customer','=',True)]" name="customer_filter"/>
-                   <filter string="Supplier" domain="[('partner_id.supplier','=',True)]" name="vendor_filter"/>
+                <xpath expr="//field[@name='tax_line_id']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='move_id']" position="replace">
+
+                </xpath>
+                <xpath expr="//field[@name='tax_ids']" position="replace">
+
+                </xpath>
+                <xpath expr="//field[@name='name']" position="replace">
+                   <field name="remark" string="备注" filter_domain="[('payment_id.remark','ilike',self)]"/>
+                    <field name="amount1" string="金额" filter_domain="[('payment_id.amount','=',self)]"/>
+                    <!--<filter string="Customer" domain="[('partner_id.customer','=',True)]" name="customer_filter"/>-->
+                    <!--<filter string="Supplier" domain="[('partner_id.supplier','=',True)]" name="vendor_filter"/>-->
                 </xpath>
             </field>
 

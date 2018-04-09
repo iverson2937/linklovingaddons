@@ -1,0 +1,42 @@
+<odoo>
+    <data>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="mrp_process_form_inherit" model="ir.ui.view">
+            <field name="name">mrp.process.form.inherit</field>
+            <field name="model">mrp.process</field>
+            <field name="inherit_id" ref="linkloving_process.mrp_process_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//group" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <notebook>
+                        <page string="工序动作">
+                            <field name="process_action_ids" context="{'default_process_id': active_id}">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="cost"/>
+                                    <field name="remark"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="action_mrp_process_action" model="ir.actions.act_window">
+            <field name="name">work.type</field>
+            <field name="res_model">mrp.process.action</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <menuitem id="menu_mrp_work_type_config" name="工序动作" parent="mrp.menu_mrp_configuration" sequence="33"
+                  action="action_mrp_process_action"/>
+
+
+    </data>
+</odoo>

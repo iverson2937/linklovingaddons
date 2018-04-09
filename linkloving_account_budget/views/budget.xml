@@ -12,6 +12,8 @@
                                 states="draft" string="确定"
                                 type="object" class="oe_highlight"
                                 help="Launch Configuration Wizard"/>
+                        <button name="create_budget_line" type="object" string="创建预算明细"
+                                atts="{'invisible':[('is_create_line','=',True)]}"/>
 
                         <field name="state" widget="statusbar"
                                readonly="1"/>
@@ -23,20 +25,22 @@
                             <label for="name"/>
                             <h1>
                                 <field name="name" placeholder="简单描述"/>
+                                <field name="is_create_line" invisible="1"/>
                             </h1>
                         </div>
                         <group>
 
 
                             <group>
-                                <field name="fiscal_year_id" options="{'no_create':True}"
-                                       attrs="{'readonly':[('state','=','done')]}"/>
-                                <field name="department_id" attrs="{'readonly':[('state','=','done')]}"
+                                <field name="fiscal_year_id" options="{'no_create':True}"/>
+                                <field name="department_id"
                                        options="{'no_create':True}"/>
+                                <field name="man_power"/>
 
                             </group>
                             <group>
                                 <field name="create_uid" readonly="1" string="创建人"/>
+                                <field name="sale_target"/>
                             </group>
                             <notebook colspan="2">
                                 <page string="预算明细">
@@ -69,10 +73,13 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="name"/>
+                    <field name="fiscal_year_id"/>
                     <field name="department_id"/>
-                    <field name="amount"/>
-                    <field name="balance"/>
-                    <field name="create_uid" string="创建人"/>
+                    <field name="man_power"/>
+                    <field name="total_employee"/>
+                    <field name="amount" sum="预算总计"/>
+                    <field name="amount_used" sum="已使用"/>
+                    <field name="balance" sum="余额总计"/>
                 </tree>
             </field>
         </record>
@@ -84,9 +91,23 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem id="menu_account_payment" name="预算" sequence="10"
-                  action="action_linkloving_account_budget"
+        <menuitem id="menu_account_budget_root" name="预算" sequence="10"
+
+                  groups="hr_expense.group_hr_expense_manager"
                   parent="hr_expense.menu_hr_expense_root"/>
+        <menuitem id="menu_account_budget_department" name="部门预算" sequence="10"
+                  action="action_linkloving_account_budget"
+                  groups="hr_expense.group_hr_expense_manager"
+                  parent="menu_account_budget_root"/>
+
+        <record id="account_budget_report" model="ir.actions.client">
+            <field name="name">预算报表</field>
+            <field name="tag">account_budget_report</field>
+        </record>
+        <menuitem id="menu_account_budget_report" name="预算报表" sequence="10"
+                  action="account_budget_report"
+                  groups="hr_expense.group_hr_expense_manager"
+                  parent="menu_account_budget_root"/>
 
 
     </data>

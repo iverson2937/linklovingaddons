@@ -27,9 +27,11 @@
         'security/ir.model.access.csv',
         'views/budget.xml',
         'views/hr_expense_sheet.xml',
+        'views/assets.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
 }

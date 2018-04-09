@@ -6,6 +6,7 @@ from odoo.exceptions import UserError
 
 class StockTransfer(models.Model):
     _name = 'stock.transfer'
+    _order = 'create_date desc'
     name = fields.Char('名称', default='New')
     picking_type_id = fields.Many2one('stock.picking')
     input_product_ids = fields.One2many('stock.transfer.line', 'transfer_id', domain=[('product_type', '=', 'input')])
@@ -88,6 +89,7 @@ class StockTransfer(models.Model):
 
 class StockTransferLine(models.Model):
     _name = 'stock.transfer.line'
+    _order = 'create_date desc'
     transfer_id = fields.Many2one('stock.transfer', on_delete="cascade")
     qty_available = fields.Float(related='product_id.qty_available')
     product_id = fields.Many2one('product.product')

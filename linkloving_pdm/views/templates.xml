@@ -1,12 +1,13 @@
 <openerp>
     <data>
         <record id="document_load_client" model="ir.actions.client">
-        <field name="name">文件上传/下载</field>
-        <field name="tag">document_manage</field>
-        <field name="target">current</field>
-    </record>
+            <field name="name">文件上传/下载</field>
+            <field name="tag">approval_core</field>
+            <field name="target">current</field>
+            <field name="context">{'product_view_new': [active_id]}</field>
+        </record>
 
-       <record id="product_template_only_form_view" model="ir.ui.view">
+        <record id="product_template_only_form_view" model="ir.ui.view">
             <field name="name">product.template.product.form</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_only_form_view"/>

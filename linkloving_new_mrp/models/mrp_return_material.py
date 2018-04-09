@@ -31,20 +31,20 @@ class ReturnOfMaterial1(models.Model):
 
     return_ids = fields.One2many('return.material.line', 'return_id', default=_default_return_line)
 
-    @api.multi
-    def do_return(self):
-        if self._context.get('is_checking'):
-            self.state = 'done'
-        if self.state == 'done':
-            for r in self.return_ids:
-                if r.return_qty == 0:
-                    continue
-                move = self.env['stock.move'].create(self._prepare_move_values(r))
-                r.return_qty = 0
-                move.action_done()
-            # Fix ME
-            # self.return_ids.create_scraps()
-            self.production_id.write({'state': 'done'})
-        else:
-            self.production_id.write({'state': 'waiting_warehouse_inspection'})
-        return True
+    # @api.multi
+    # def do_return(self):
+    #     if self._context.get('is_checking'):
+    #         self.state = 'done'
+    #     if self.state == 'done':
+    #         for r in self.return_ids:
+    #             if r.return_qty == 0:
+    #                 continue
+    #             move = self.env['stock.move'].create(self._prepare_move_values(r))
+    #             r.return_qty = 0
+    #             move.action_done()
+    #         # Fix ME
+    #         # self.return_ids.create_scraps()
+    #         self.production_id.write({'state': 'done'})
+    #     else:
+    #         self.production_id.write({'state': 'waiting_warehouse_inspection'})
+    #     return True

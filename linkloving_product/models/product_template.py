@@ -12,21 +12,6 @@ class ProductTemplate11(models.Model):
                                  string=u'客户')
     is_updated = fields.Boolean()
 
-    product_img_count = fields.Integer(compute='_compute_product_img_count', string=u'产品照片数量')
-
-    product_img_ids = fields.One2many('ir.attachment', 'product_ir_img_id', u'产品照片')
-
-    def _compute_product_img_count(self):
-        for product in self:
-            product.product_img_count = len(product.product_img_ids)
-
-    @api.multi
-    def action_view_product_img(self):
-        action = self.env.ref('base.action_attachment').read()[0]
-        action['domain'] = [('product_ir_img_id', 'in', self.ids)]
-        # action['domain'] = [('res_id', 'in', self.ids)]
-        return action
-
     @api.model
     def create(self, vals):
         if not self.env.user.has_group('linkloving_warehouse.group_document_control_user'):
@@ -119,25 +104,6 @@ class ProductTemplate11(models.Model):
                         version1 = '000'
                 full_code = '.'.join([categ_code, full_specs, version1])
                 self.default_code = full_code
-
-
-class ProductIrAttachment(models.Model):
-    _inherit = 'ir.attachment'
-
-    product_ir_img_id = fields.Many2one('product.template', string=u'产品照片')
-
-    name = fields.Char('Attachment Name')
-
-    @api.model
-    @api.returns('self', lambda value: value.id)
-    def create(self, vals):
-        if not (vals.get('res_model') or vals.get('res_id')):
-            if self.env.context.get('active_model') == 'product.template':
-                vals['product_ir_img_id'] = self.env.context.get('active_ids')[0] if self.env.context.get(
-                    'active_ids')  else ''
-                vals['name'] = vals.get('datas_fname')
-
-        return super(ProductIrAttachment, self).create(vals)
 
 
 class ProductProduct(models.Model):

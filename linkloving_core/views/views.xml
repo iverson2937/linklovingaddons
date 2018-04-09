@@ -5,17 +5,49 @@
             <xpath expr="." position="inside">
 
                 <script type="text/javascript" src="/linkloving_core/static/src/js/form_widget_extend.js"/>
+                <script type="text/javascript" src="/linkloving_core/static/src/js/date_format.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/product.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/tree_view.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/notify.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/search_input_bug.js"/>
 
+                <link rel="stylesheet" href="linkloving_core/static/src/css/bootstrap-table.min.css"/>
+
+                <script typ="text/javascript"
+                        src="/linkloving_core/static/src/js/bootstrap-table/bootstrap-table.js"/>
+                <script type="text/javascript"
+                        src="/linkloving_core/static/src/js/bootstrap-table/bootstrap-editable.js"/>
+                <script type="text/javascript"
+                        src="/linkloving_core/static/src/js/bootstrap-table/html2canvas.js"/>
+                <script type="text/javascript"
+                        src="/linkloving_core/static/src/js/bootstrap-table/bootstrap-table-export.min.js"/>
+                <script type="text/javascript"
+                        src="/linkloving_core/static/src/js/bootstrap-table/bootstrap-table-editable.js"/>
+                <script type="text/javascript"
+                        src="/linkloving_core/static/src/js/bootstrap-table/tableExport.js"/>
+                <script typ="text/javascript"
+                        src="/linkloving_core/static/src/js/bootstrap-table/bootstrap-table-zh-CN.min.js"/>
+
+                <script type="text/javascript" src="/linkloving_core/static/src/js/jquery.treegrid.js"/>
+                <script type="text/javascript"
+                        src="/linkloving_core/static/src/js/treegrid/bootstrap-table-treegrid.js"/>
+                <script type="text/javascript"
+                        src="/linkloving_core/static/src/js/bootstrap-table-sticky-header.js"/>
+
+                <link rel="stylesheet" href="/linkloving_core/static/src/css/jquery.treegrid.css"/>
+                <link rel="stylesheet" href="/linkloving_core/static/src/css/bootstrap-table-sticky-header.css"/>
+
+
                 <!--<script type="text/javascript" src="/linkloving_core/static/src/js/selectallm2m.js"/>-->
 
                 <!--<script type="text/javascript" src="/linkloving_core/static/src/js/multi_selection.js"/>-->
-
+                <script type="text/javascript" src="/linkloving_core/static/src/js/sticky.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/fix_table_top.js"/>
                 <link rel="stylesheet" href="/linkloving_core/static/src/css/core.css"/>
+
+
+                <script type="text/javascript" src="/linkloving_core/static/src/js/bootstrap-table-sticky-header.js.js"/>
+
 
             </xpath>
         </template>

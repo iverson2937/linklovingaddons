@@ -3,15 +3,20 @@
 from odoo import models, fields, api
 
 
-class MrpApprovelType(models.Model):
+class MrpApprovalType(models.Model):
     _name = 'mrp.approve.type'
     name = fields.Char(string='名称')
     description = fields.Char(string='描述')
     approve_type = fields.Selection([
         ('product', '产品')
-    ])
+    ], string=u'审核类型')
     stage_ids = fields.One2many('mrp.approve.stage', 'type_id')
     required_user_ids = fields.Many2many('res.users', compute='get_required_user_ids')
+
+    _sql_constraints = {
+        ('approve_type_uniq', 'unique(approve_type)',
+         '不可以创建相同审核类型的流程')
+    }
 
     @api.multi
     def get_required_user_ids(self):
@@ -57,8 +62,8 @@ class MrpApprovalRecord(models.Model):
     status = fields.Selection([
         ('none', 'Not Yet'),
         ('comment', 'Commented'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected')], string='Status',
+        ('approved', '通过'),
+        ('rejected', '拒绝')], string='Status',
         default='none', required=True)
     active = fields.Boolean(default=True)
 

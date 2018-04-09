@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <menuitem id="menu_material_request_approval"
+                  action="stock.action_inventory_form"
+                  parent="linkloving_approval.ll_approval_root"
+                  groups="linkloving_warehouse.group_stock_control_manager"
+                 name="物料转换审核"/>
+    </data>
+</odoo>

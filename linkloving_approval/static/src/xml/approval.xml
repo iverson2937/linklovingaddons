@@ -9,16 +9,19 @@
 
         </div>
     </t>
+
     <t t-name="approval_load_detail_file">
         <div class="approval_ul_wraper">
             <ul id="approval_tab" class="nav nav-tabs" data-now-tab="waiting_submit">
                <t t-set="i" t-value="1"/>
                 <t t-foreach="result" t-as="item">
-                    <li t-att-class="i ==1 ? 'active': ''">
-                        <a t-att-href="'#'+item[0]" data-toggle="tab" class="tab_toggle_a" t-att-data="item[0]">
-                             <t t-esc="item[1]"/>
-                        </a>
-                    </li>
+                    <t t-if="product_view_new_s==0">
+                        <li t-att-class="i ==1 ? 'active': ''">
+                            <a t-att-href="'#'+item[0]" data-toggle="tab" class="tab_toggle_a" t-att-data="item[0]">
+                                 <t t-esc="item[1]"/>
+                            </a>
+                        </li>
+                    </t>
                     <t t-set="i" t-value="2"/>
                 </t>
             </ul>
@@ -59,16 +62,15 @@
             <!--<div>设计部的文件们</div>-->
             <!--</div>-->
             <!--</div>-->
+
             <div class="documents_labels">
                 <div class="labels_head">文件标签</div>
                 <div class="labels_body">
                     <div data-id="all_type" class="search_tag_type_list">全部</div>
 
                     <t t-foreach="tag_type_list" t-as="item_tag">
-                       <div t-att-data-id="item_tag.tag_name" class="search_tag_type_list"><t t-esc="item_tag.tag_name"/><span style="float: right;"><t t-esc="item_tag.tag_num"/></span></div>
+                       <div t-att-data-id="item_tag.tag_name" t-att-class="'search_tag_type_list ' + item_tag.product_ax" t-att-data-name="item_tag.product_ax"><t t-esc="item_tag.tag_name"/><span style="float: right;"><t t-esc="item_tag.tag_num"/></span></div>
                     </t>
-
-
 
                 </div>
             </div>
@@ -103,7 +105,7 @@
                         }
                  </t>
 
-                <div class="tab_message_display view_show_attachment_info_info">
+                <div class="tab_message_display">
                     <div>
                         <div class="approval_tab_pane_type"><t t-esc="item_files.type"/></div>
                         <div style="display:inline-block"> <span t-att-product-id="item_files.product_id.id" t-att-default-code="item_files.product_id.default_code" class="approval_product_name"><t t-esc="item_files.product_id.name"/></span></div>
@@ -116,6 +118,9 @@
 
                     <div class="item_third_line" t-att-data-id="item_files.id">
                         文件名称：<span t-att-data-id="item_files.id" class="file_name"><t t-esc="item_files.file_name"/></span>
+                        <t t-if="item_files.file_is_update">
+                            <span style="background: #e8c2bc;">已修改</span>
+                        </t>
                     </div>
                     <!--<div>审核人：<span><t t-esc="item_files.review_id"/></span></div>-->
                     <t t-if="item_files.remote_path!=''">
@@ -146,7 +151,7 @@
                     <div>
                         <span class="state"><t t-esc="item_files.state[1]"/></span>
 
-                        <span class="reviewer">
+                        <span class="reviewer" t-if="item_files.state[0] != 'released' ">
                             <t t-if="item_files.review_id">
                                 <t t-esc="item_files.review_id"/>
                             </t>
@@ -161,16 +166,51 @@
 
                     </div>
                     <div>
-                        <t t-if="item_files.state[0] == 'released' || approval_type=='waiting_submit' ||approval_type=='waiting_approval'">
-                            <t t-if="item_files.is_show_outage == true ">
-                                <div class="document_download_new">
-                                    <span class="document_download" t-att-data="item_files.tag_is_remote_path">下载</span><span></span>
-                                </div>
-                           </t>
+
+                        <!--<button t-att-data-id="item_files.id" class="btn btn-default view_show_attachment_update_info_info">文件流程修改</button>-->
+
+                        <t t-if="item_files.state[0] != 'released' &amp;&amp; item_files.is_product_view">
+                            <t t-if="approval_type == 'waiting_submit' || approval_type == 'waiting_approval'">
+                                <button t-att-data-info="item_files.id" t-att-data-id="item_files.tag_flow_id" class="btn btn-default view_show_attachment_update_info_info">添加审核人</button>
+                            </t>
                         </t>
+
+                        <t t-if="res_product_view_new == true">
+                            <t t-if="item_files.state[0] == 'released' &amp;&amp; item_files.is_able_to_use== true">
+                                <t t-if="item_files.is_show_outage == true ">
+                                    <div class="document_download_new">
+                                        <span class="document_download" t-att-data="item_files.tag_is_remote_path">下载</span><span></span>
+                                    </div>
+                               </t>
+                            </t>
+                        </t>
+                        <t t-else="">
+                             <t t-if="approval_type=='waiting_submit' || approval_type=='waiting_approval'">
+                                <t t-if="item_files.is_show_outage == true">
+                                    <div class="document_download_new">
+                                        <span class="document_download" t-att-data="item_files.tag_is_remote_path">下载</span><span></span>
+                                    </div>
+                               </t>
+                             </t>
+                            <t t-if="item_files.state[0] == 'released'">
+                                <t t-if="item_files.is_show_outage == true &amp;&amp; item_files.is_able_to_use== true">
+                                    <div class="document_download_new">
+                                        <span class="document_download" t-att-data="item_files.tag_is_remote_path">下载</span><span></span>
+                                    </div>
+                               </t>
+                            </t>
+                        </t>
+
                         <t t-if="item_files.has_right_to_review == true || item_files.is_first_review == true">
                             <div class="approval_btn">
-                                <span class="document_manage_btn" t-att-data-suibian="item_files.is_show_action_deny" t-att-data-id="item_files.id">审核</span>
+                                <span class="document_manage_btn" t-att-data-suibian="item_files.is_show_action_deny" t-att-data-id="item_files.id" t-att-data-first="item_files.is_first_review">
+                                    <t t-if="item_files.is_first_review == true">
+                                        提交审核
+                                    </t>
+                                    <t t-else="">
+                                        审核
+                                    </t>
+                                </span>
                             </div>
                         </t>
                         <div class="versions" style="text-align:right">
@@ -183,29 +223,39 @@
                         </t>
 
 
-                        <!--<t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">-->
-                        <!--<t t-if="item_files.is_delect_view =='yes' &amp;&amp;  item_files.is_show_outage == true ">-->
-                        <!--<t t-if="item_files.type == 'Other' || item_files.type == 'Design'">-->
-                        <!--<a href="javascript:;" class="document_modify_wraper document_modify_2" >文件修改-->
-                        <!--</a>-->
-                        <!--&lt;!&ndash;<div class="document_modify_wraper document_modify_2">文件修改</div>&ndash;&gt;-->
-                        <!--</t>-->
-                        <!--<t t-else="">-->
-                        <!--<div href="javascript:;" class="document_modify_wraper1">文件修改-->
-                        <!--<input type="file" class="document_modify"/>-->
-                        <!--</div>-->
-                        <!--</t>-->
-                        <!--</t>-->
-                        <!--</t>-->
-                        <t t-if="item_files.has_right_to_review == true || item_files.is_first_review == true">
-                            <t t-if="item_files.is_delect_view =='yes'">
-                                <div class="delect_one_document" style="padding-top: 6px;">
-                                    <button class="btn btn-default delect_document_checked">删除</button>
-                                </div>
+                        <t t-if="item_files.state[0] == 'draft' || item_files.state[0] == 'waiting_release'||item_files.state[0] == 'deny'||item_files.state[0]=='cancel' ">
+                            <t t-if="item_files.is_delect_view =='yes' &amp;&amp;  item_files.is_show_outage == true ">
+
+                                <button t-att-data-id="item_files.id" class="btn btn-default view_show_attachment_info_info">文件修改</button>
+
+
+                                <!--<t t-if="item_files.type == 'Other' || item_files.type == 'Design'">-->
+                                <!--<a href="javascript:;" class="document_modify_wraper document_modify_2" >文件修改11-->
+                                <!--</a>-->
+                                <!--&lt;!&ndash;<div class="document_modify_wraper document_modify_2">文件修改</div>&ndash;&gt;-->
+                                <!--</t>-->
+                                <!--<t t-else="">-->
+                                <!--<div href="javascript:;" class="document_modify_wraper1">文件修改-->
+                                <!--<input type="file" class="document_modify"/>-->
+                                <!--</div>-->
+                                <!--</t>-->
+
+
                             </t>
                         </t>
 
-                        <t t-if="item_files.state[0] == 'released' ">
+
+                        <t t-if="item_files.has_right_to_review == true || item_files.is_first_review == true">
+                            <t t-if="item_files.is_delect_view =='yes'">
+                                <t t-if="item_files.state[0] == 'waiting_release' || item_files.state[0] == 'deny' || item_files.state[0] == 'cancel'">
+                                    <div class="delect_one_document" style="padding-top: 6px;">
+                                        <button class="btn btn-default delect_document_checked">删除</button>
+                                    </div>
+                                </t>
+                            </t>
+                        </t>
+
+                        <t t-if="item_files.state[0] == 'released' &amp;&amp; item_files.is_able_to_use== true">
                             <div class="stop_one_document" style="padding-top: 6px;">
                                  <t t-if="item_files.is_show_outage == true ">
                                      <button class="btn btn-default outage_document_file off" data="off" data-toggle="tooltip" data-placement="left" title="点击暂停使用">停用</button>
@@ -233,50 +283,80 @@
                             <div class="featurette">
                                 <div class="">
                                     <div class="qa-message-list">
-                                        <div class="message-item">
+
+                                        <t t-foreach="item_files.review_line" t-as="review_list">
+                                            <t t-js="ctx">
+                                            function change_time(date_planned){
+
+                                            date_planned = date_planned.replace(/\s/g,'T').replace(/\//g,'-');
+                                            var my_date = Date.parse(new Date(date_planned))
+                                            var newDate = new Date();
+                                            var time_offset = newDate.getTimezoneOffset() * 60000
+                                            var c_date = new Date(my_date - time_offset)
+                                            return moment(c_date).format('YYYY-MM-DD HH:mm:ss');
+                                            }
+                                            if (ctx.review_list.create_date){
+                                            ctx.review_list.create_date = change_time(ctx.review_list.create_date);
+                                            }
+                                            </t>
+
+                                             <div t-att-class="'message-item ' + review_list.view_text_style">
+                                                <div class="message-inner">
+                                                    <div class="message-head clearfix">
+                                                        <div class="user-detail">
+                                                            <h5 class="handle"><t t-esc="review_list.name"/></h5>
+                                                            <div class="post-meta">
+                                                                <div t-att-class="'asker-meta ' + review_list.view_text_style">
+                                                                    <div class="qa-message-when">
+
+                                                                         <t t-if="review_list.create_date">
+                                                                            <t t-esc="review_list.create_date"/>
+                                                                        </t>
+                                                                        <!--<t t-esc="review_list.create_date"/>-->
+                                                                    </div>
+                                                                    <div class="qa-message-who">
+                                                                        <t t-esc="review_list.state[1]"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="qa-message-content">
+                                                        <t t-esc="review_list.remark"/>
+                                                        <t t-raw="review_list.remark_content"/>
+
+                                                        <!--<p>asdasd<img src="http://localhost:8069/web/image/17535/image_medium" class="pull-left"/></p>-->
+
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                         </t>
+
+                                        <div t-att-class="'message-item ' + item_files.view_text_style">
                                             <div class="message-inner">
                                                 <div class="message-head clearfix">
                                                     <div class="user-detail">
-                                                        <h5 class="handle">王小白</h5>
+                                                        <h5 class="handle"><t t-esc="item_files.create_uid_name"/></h5>
                                                         <div class="post-meta">
-                                                            <div class="asker-meta">
+                                                            <!--<div class="asker-meta">-->
+                                                            <div t-att-class="'asker-meta ' + item_files.view_text_style">
                                                                 <div class="qa-message-when">
-                                                                    2018-1-1
+                                                                    <t t-esc="item_files.create_date"/>
                                                                 </div>
                                                                 <div class="qa-message-who">
-                                                                    待审核
+                                                                    创建文件待提交
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="qa-message-content">
-                                            Mohtashim is an MCA from AMU (Aligarah) and a Project Management Professional. He has more than 17 years of experience in Telecom and Datacom industries covering complete SDLC. He is managing in-house innovations, business planning, implementation, finance and the overall business development of Tutorials Point.
-                                                </div>
+                                                <!--<div class="qa-message-content">-->
+                                                <!--Mohtashim is an MCA from AMU (Aligarah) and a Project Management Professional. He has more than 17 years of experience in Telecom and Datacom industries covering complete SDLC. He is managing in-house innovations, business planning, implementation, finance and the overall business development of Tutorials Point.-->
+                                                <!--</div>-->
                                             </div>
                                         </div>
-                                        <div class="message-item">
-                                            <div class="message-inner">
-                                                <div class="message-head clearfix">
-                                                    <div class="user-detail">
-                                                        <h5 class="handle">王小白</h5>
-                                                        <div class="post-meta">
-                                                            <div class="asker-meta">
-                                                                <div class="qa-message-when">
-                                                                    2018-1-1
-                                                                </div>
-                                                                <div class="qa-message-who">
-                                                                    待审核
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="qa-message-content">
-                                            Mohtashim is an MCA from AMU (Aligarah) and a Project Management Professional. He has more than 17 years of experience in Telecom and Datacom industries covering complete SDLC. He is managing in-house innovations, business planning, implementation, finance and the overall business development of Tutorials Point.
-                                                </div>
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </div>
                             </div>

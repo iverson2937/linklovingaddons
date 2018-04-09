@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- ECO sequence -->
+        <record id="seq_eco" model="ir.sequence">
+            <field name="name">Engineering Change Order</field>
+            <field name="code">mrp.eco.order</field>
+            <field name="prefix">BECO</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_eco" model="ir.sequence">
+            <field name="name">Eco Effect Order</field>
+            <field name="code">eco.effect.order</field>
+            <field name="prefix">EEO</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -12,6 +12,7 @@ class PurchaseConfiguration(models.TransientModel):
     _inherit = 'purchase.config.settings'
 
     combine_rule = fields.Selection(selection=[('same_supplier', u'相同供应商'),
+                                               ('same_supplier_product', u'相同供应商和产品'),
                                                ('same_supplier_origin', u'相同供应商和源')],
                                     default='same_supplier',
                                     string=u'采购单合并规则')
@@ -39,15 +40,15 @@ class PurchaseOrder(models.Model):
 
     state = fields.Selection(selection_add=[('make_by_mrp', u'由MRP生成')])
 
-    @api.one
-    def write(self, vals):
-        res = super(PurchaseOrder, self).write(vals)
-        if 'state' not in vals.keys():
-            is_exception_order = self.partner_id == self.env.ref(
-                'linkloving_mrp_supplier_slover.res_partner_exception_supplier')
-            if is_exception_order:
-                self.check_product_has_supplier()
-        return res
+    # @api.one
+    # def write(self, vals):
+    #     res = super(PurchaseOrder, self).write(vals)
+    #     if 'state' not in vals.keys():
+    #         is_exception_order = self.partner_id == self.env.ref(
+    #             'linkloving_mrp_supplier_slover.res_partner_exception_supplier')
+    #         if is_exception_order:
+    #             self.check_product_has_supplier()
+    #     return res
 
     @api.depends('order_line.date_planned')
     def _compute_date_planned(self):
@@ -97,7 +98,7 @@ class linkloving_procurement_order(models.Model):
     def make_po(self):
         cache = {}
         res = []
-
+        combine_rule = self.env['purchase.config.settings'].get_default_combine_rule([]).get("combine_rule")
         for procurement in self:
             product_new_qty = procurement.product_qty if self.not_base_on_available else procurement.get_actual_require_qty()
             procurement_uom_po_qty = procurement.product_uom._compute_quantity(product_new_qty, procurement.product_id.uom_po_id)
@@ -117,20 +118,20 @@ class linkloving_procurement_order(models.Model):
                 supplier = suppliers[0]
             partner = supplier.name
 
-            gpo = procurement.rule_id.group_propagation_option
-            group = (gpo == 'fixed' and procurement.rule_id.group_id) or \
-                    (gpo == 'propagate' and procurement.group_id) or False
+            # gpo = procurement.rule_id.group_propagation_option
+            # group = (gpo == 'fixed' and procurement.rule_id.group_id) or \
+            #         (gpo == 'propagate' and procurement.group_id) or False
             domain = (
                 ('partner_id', '=', partner.id),
                 ('state', '=', 'make_by_mrp'),
-                ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
+                # ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
                 ('company_id', '=', procurement.company_id.id),
-                ('dest_address_id', '=', procurement.partner_dest_id.id))
-            rule = self.env['purchase.config.settings'].get_default_combine_rule([]).get("combine_rule")
-            if rule == 'same_supplier_origin':
+                # ('dest_address_id', '=', procurement.partner_dest_id.id)
+            )
+            if combine_rule == 'same_supplier_origin':
                 domain += (('origin', '=', self.origin),)
-            if group:
-                domain += (('group_id', '=', group.id),)
+            # if group:
+            #     domain += (('group_id', '=', group.id),)
 
             if domain in cache:
                 po = cache[domain]
@@ -149,19 +150,22 @@ class linkloving_procurement_order(models.Model):
                 # if po:
                 #     cache[domain] = po
 
-            if not po:
-                vals = procurement._prepare_purchase_order(partner)
-                # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
-                # vals["tax"]
-                vals['state'] = "make_by_mrp"
-                po = self.env['purchase.order'].create(vals)
-                name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (
-                procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
-                message = _(
-                    "This purchase order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (
-                          procurement.id, name)
-                po.message_post(body=message)
-                cache[domain] = po
+            if not po:  # 如果找不到对应的po
+                if combine_rule != 'same_supplier_product':
+                    vals = procurement._prepare_purchase_order(partner)
+                    # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
+                    # vals["tax"]
+                    vals['state'] = "make_by_mrp"
+                    po = self.env['purchase.order'].create(vals)
+                    name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (
+                        procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
+                    message = _(
+                            "This purchase order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (
+                                  procurement.id, name)
+                    po.message_post(body=message)
+                    cache[domain] = po
+                else:
+                    po = self.env['purchase.order']
             elif not po.origin or procurement.origin not in po.origin.split(', '):
                 # Keep track of all procurements
                 if po.origin:
@@ -205,7 +209,22 @@ class linkloving_procurement_order(models.Model):
                     })
                     break
             if not po_line:
-                vals = procurement._prepare_purchase_order_line(po, supplier)
+                new_po = po
+                if combine_rule == 'same_supplier_product':
+                    po_vals = procurement._prepare_purchase_order(partner)
+                    # tax_id = self.env["account.tax"].search([('type_tax_use', '<>', "purchase")], limit=1)[0].id
+                    # vals["tax"]
+                    po_vals['state'] = "make_by_mrp"
+                    new_po = self.env['purchase.order'].create(po_vals)
+                    name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (
+                        procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
+                    message = _(
+                            "This purchase order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (
+                                  procurement.id, name)
+                    po.message_post(body=message)
+                    cache[domain] = new_po
+
+                vals = procurement._prepare_purchase_order_line(new_po, supplier)
                 if vals.get("product_qty") > 0:
                     self.env['purchase.order.line'].create(vals)
         return res

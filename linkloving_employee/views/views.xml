@@ -1,0 +1,854 @@
+<openerp>
+    <data>
+
+
+        <!-- explicit list view definition -->
+        <!--
+        <record model="ir.ui.view" id="linkloving_employee.list">
+          <field name="name">linkloving_employee list</field>
+          <field name="model">linkloving_employee.linkloving_employee</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+              <field name="value"/>
+              <field name="value2"/>
+            </tree>
+          </field>
+        </record>
+        -->
+
+        <!-- actions opening views on models -->
+        <!--
+        <record model="ir.actions.act_window" id="linkloving_employee.action_window">
+          <field name="name">linkloving_employee window</field>
+          <field name="res_model">linkloving_employee.linkloving_employee</field>
+          <field name="view_mode">tree,form</field>
+        </record>
+        -->
+
+        <!-- server action to the one above -->
+        <!--
+        <record model="ir.actions.server" id="linkloving_employee.action_server">
+          <field name="name">linkloving_employee server</field>
+          <field name="model_id" ref="model_linkloving_employee_linkloving_employee"/>
+          <field name="code">
+            action = {
+              "type": "ir.actions.act_window",
+              "view_mode": "tree,form",
+              "res_model": self._name,
+            }
+          </field>
+        </record>
+        -->
+
+        <!-- Top menu item -->
+        <!--
+        <menuitem name="linkloving_employee" id="linkloving_employee.menu_root"/>
+        -->
+        <!-- menu categories -->
+        <!--
+        <menuitem name="Menu 1" id="linkloving_employee.menu_1" parent="linkloving_employee.menu_root"/>
+        <menuitem name="Menu 2" id="linkloving_employee.menu_2" parent="linkloving_employee.menu_root"/>
+        -->
+        <!-- actions -->
+        <!--
+        <menuitem name="List" id="linkloving_employee.menu_1_list" parent="linkloving_employee.menu_1"
+                  action="linkloving_employee.action_window"/>
+        <menuitem name="Server to list" id="linkloving_employee" parent="linkloving_employee.menu_2"
+                  action="linkloving_employee.action_server"/>
+        -->
+
+
+        <record id="hr_employee_group_manager" model="res.groups">
+            <field name="name">人事组</field>
+        </record>
+
+        <!--Hr Employee inherit search view-->
+        <record id="linkloving_employee_view_search" model="ir.ui.view">
+            <field name="name">hr.employee.search.view.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='job_id']" position="after">
+                    <filter name="is_draft" string="草稿" domain="[('employee_state', '=', 'draft')]"/>
+                    <filter name="is_submitted_ing" string="等待验证" domain="[('employee_state', '=', 'submitted_ing')]"/>
+                    <filter name="is_official" string="正式" domain="[('employee_state', '=', 'official')]"/>
+                    <separator/>
+                </xpath>
+
+                <xpath expr="//group[@expand='0']" position="inside">
+                    <separator/>
+                    <filter string="员工状态" domain="[]" context="{'group_by':'employee_state'}"/>
+                    <separator/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <!-- Employee -->
+        <record id="hr.view_employee_form" model="ir.ui.view">
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.employee</field>
+            <field name="arch" type="xml">
+                <form string="Employee">
+
+                    <header>
+
+                        <!--<button string="验证" type="object" name="btn_click_show_product_line" class="oe_highlight"-->
+                        <!--attrs="{'invisible': [('picking_state','!=','approved_finish')]}"-->
+                        <!--groups="linkloving_mrp_extend.group_charge_warehouse"/>-->
+
+                        <button string="退回草稿" type="object" name="btn_click_verification_draft_employee"
+                                groups="hr.group_hr_manager" class="oe_highlight"
+                                attrs="{'invisible': [('employee_state', 'in', ['draft'])]}"/>
+
+                        <!--<button string="设置为正式" type="object" name="btn_click_verification_employee"-->
+                        <!--groups="hr.group_hr_manager" class="oe_highlight"-->
+                        <!--attrs="{'invisible': [('employee_state', 'not in', ['draft'])]}"/>-->
+
+                        <button string="验证" type="object" name="btn_click_verification_employee"
+                                groups="hr.group_hr_manager"
+                                attrs="{'invisible': [('employee_state', 'not in', ['submitted_ing'])]}"
+                                class="oe_highlight"/>
+
+                        <button string="提交" type="object" name="btn_click_submit_employee"
+                                attrs="{'invisible': ['|',('employee_state', 'not in', ['draft']),('is_self','=',False)]}"
+                                class="oe_highlight"/>
+
+                        <button string="提交" type="object" name="btn_click_submit_employee" groups="hr.group_hr_manager"
+                                attrs="{'invisible': [('employee_state', 'not in', ['draft'])]}"
+                                class="oe_highlight"/>
+
+
+                        <!--<button string="创建民族" type="object" name="create_nation" class="oe_highlight"/>-->
+                        <!--<button string="测试权限" type="object" name="compute_is_view_more_msg11" class="oe_highlight"/>-->
+
+
+                        <field name="employee_state" widget="statusbar"/>
+                    </header>
+
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" groups="hr.group_hr_manager"
+                                    class="oe_stat_button" icon="fa-archive">
+                                <field name="active" widget="boolean_button"
+                                       options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
+                        <field name="image"
+                               attrs="{'readonly':[('employee_state','=','draft'),('is_self','=',True),('is_manager','=',False)]}"
+                               widget='image'
+                               class="oe_avatar"
+                               options='{"preview_image":"image_medium"}'/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"
+                                       attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"
+                                       placeholder="Employee's Name"/>
+                                <field name="is_view_more_msg" invisible="1"/>
+                                <field name="is_self" invisible="1"/>
+                                <field name="is_manager" invisible="1"/>
+                                <field name="create_date" invisible="1"/>
+
+                            </h1>
+                        </div>
+                        <field name="category_ids" invisible="1"
+                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"
+                               widget="many2many_tags" placeholder="e.g. Part Time"
+                               options="{'no_create_edit': True}" groups="hr.group_hr_user"/>
+                        <notebook>
+                            <page name="public" string="Public Information">
+                                <group>
+                                    <group>
+                                        <field name="english_name"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                        <field name="mobile_phone" required="1"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <field name="work_phone"/>
+                                        <field name="work_email" widget="email"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)],'required': [('is_create_account','=',True)]}"/>
+                                        <field name="address_id" domain="[('customer','=','1'),('is_company','=',True)]"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"
+                                               context="{'show_address': 1}"
+                                               options='{"always_reload": True, "highlight_first_line": True}'/>
+                                        <field name="work_location" invisible="1"/>
+
+                                        <!--<field name="work_card"-->
+                                        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
+
+                                        <field name="work_card" readonly="1"/>
+
+                                    </group>
+                                    <group>
+
+                                        <field name="company_id" groups="base.group_multi_company"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                        <field name="department_id" required="1"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                        <field name="job_id" required="1"/> <!--重写成了 工作头衔-->
+                                        <field name="parent_id"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                        <field name="coach_id" invisible="1"/>
+                                        <field name="calendar_id"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                    </group>
+                                </group>
+                                <field name="notes" placeholder="Other Information ..." colspan="4"
+                                       attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                            </page>
+                            <page string="Personal Information"
+                                  attrs="{'invisible': [('is_view_more_msg','=',False)]}">
+                                <!--attrs="{'invisible': [('is_view_more_msg','=',False),('is_create_account','=',True)]}">-->
+                                <group>
+                                    <group string="Citizenship &amp; Other Information">
+
+                                        <field name="nation" options="{'no_create':True}"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <field name="gender"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <field name="birthday"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <field name="identification_id"
+                                               attrs="{'required': [('is_view_more_msg','=',True)],'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+
+                                        <field name="bank_account_id" required="1"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"
+                                               context="{'default_partner_id': address_home_id}"/>
+
+                                        <field name="address_home_id" groups="account.group_account_manager"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"
+                                               context="{'show_address': 1}"
+                                               options='{"always_reload": True, "highlight_first_line": True}'
+                                        />
+                                        <field name="address_home_two"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <field name="now_address_home"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <field name="marital"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+
+                                        <field name="country_id" options='{"no_open": True, "no_create": True}'
+                                               invisible="1"/>
+                                        <field name="passport_id" groups="hr.group_hr_user" invisible="1"/>
+
+                                    </group>
+                                    <group string="紧急联络人">
+                                        <field name="emergency_contact_name"
+                                               attrs="{'required': [('is_view_more_msg','=',True)],'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <field name="emergency_contact_relation"
+                                               attrs="{'required': [('is_view_more_msg','=',True)],'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <field name="emergency_contact_way"
+                                               attrs="{'required': [('is_view_more_msg','=',True)],'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        <br/>
+                                        <br/>
+                                        <div class="o_horizontal_separator">银行账号</div>
+                                        <br/>
+                                        <field name="bank_card_num"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+
+                                        <field name="bank_card_opening_bank"
+                                               attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+
+                                    </group>
+
+                                    <group string="Status" invisible="1">
+                                    </group>
+
+                                    <group string="Birth" invisible="1">
+                                    </group>
+
+                                </group>
+
+                                <group string="工作经验">
+                                    <field name="work_experience_ids" nolabel="1"
+                                           attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}">
+                                        <tree editable="bottom">
+                                            <field name="name"/>
+                                            <field name="department"/>
+                                            <field name="position"/>
+                                            <field name="entry_time"/>
+                                            <field name="Leaving_time"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group string="教育经历">
+                                    <field name="education_experience_ids" nolabel="1"
+                                           attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}">
+                                        <tree editable="bottom">
+                                            <field name="name"/>
+                                            <field name="attainment"/>
+                                            <field name="major"/>
+                                            <field name="entry_time"/>
+                                            <field name="Leaving_time"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group string="附件">
+                                    <group>
+                                        <label string="身份证信息(正/反)"/>
+                                        <div class="o_row">
+                                            <field name="identification_A" widget='image' class="oe_avatar"
+                                                   attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                            <span>-</span>
+                                            <field name="identification_B" widget='image' class="oe_avatar"
+                                                   attrs="{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}"/>
+                                        </div>
+                                    </group>
+                                    <group>
+
+                                    </group>
+
+                                    <!--<group>-->
+                                    <!--<field name="identification_A" widget='image' class="oe_avatar"/>-->
+                                    <!--</group>-->
+                                    <!--<group>-->
+                                    <!--<field name="identification_B" widget='image' class="oe_avatar"/>-->
+                                    <!--</group>-->
+
+                                    <group>
+
+                                        <field name="bank_card" widget='image' class="oe_avatar"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+
+                                    </group>
+                                    <group>
+
+                                    </group>
+
+                                    <field name="certificate_image_ids" widget="many_two_many_img_widget"
+                                           attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+
+                                </group>
+
+
+                            </page>
+                            <page string="HR Settings" name="hr_settings"
+                                  attrs="{'invisible': [('is_view_more_msg','=',False)]}">
+                                <group>
+
+                                    <group string='合同信息'>
+
+                                        <field name="entry_date"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+
+                                        <!--<field name="probation_period"-->
+                                        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
+
+
+                                        <label for="probation_period"/>
+                                        <div class="o_row">
+                                            <!--<field name="probation_begin_date"-->
+                                            <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
+                                            <!--<span>-</span>-->
+                                            <!--<field name="probation_end_date"-->
+                                            <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
+
+                                            <field name="probation_date" readonly="1"/>
+                                            <field name="probation_period"
+                                                   attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+
+                                        </div>
+                                        <field name="mining_productivity"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                        <field name="contract_begin_date"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                        <field name="contract_end_date"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                        <field name="accumulation_fund"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                        <field name="insurance_type"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+
+                                    </group>
+
+
+                                    <group string='用户信息' name="active_group">
+
+                                        <field name="is_create_account" invisible="1"/>
+
+                                        <field name="user_id" string="相关用户"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+
+                                        <!--<label for="is_create_account"/>-->
+                                        <!--<div class="o_row" attrs="{'invisible': [('create_date','!=',False)]}">-->
+                                        <!--<field name="is_create_account" invisible="1"-->
+                                        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
+                                        <!--<span>同步开通员工的系统账号</span>-->
+                                        <!--</div>-->
+                                        <!--<field name="user_id" string=" "-->
+                                        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
+
+                                        <br/>
+                                        <br/>
+                                        <div class="o_horizontal_separator">费用信息</div>
+                                        <br/>
+                                        <field name="buy_balance" readonly="1"/>
+
+
+                                        <br/>
+                                        <br/>
+                                        <div class="o_horizontal_separator">设备信息</div>
+                                        <br/>
+                                        <field name="card_num"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+
+                                    </group>
+
+                                    <!--<group name="cost_info" string='费用信息'>-->
+                                    <!--&lt;!&ndash;attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>&ndash;&gt;-->
+                                    <!--</group>-->
+                                    <!--<group string='设备信息'>-->
+                                    <!--<field name="card_num"-->
+                                    <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>-->
+                                    <!--</group>-->
+
+                                    <group string="其他" invisible="1">
+                                        <field name="manager" groups="base.group_no_one"
+                                               attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"/>
+                                    </group>
+
+
+                                </group>
+                            </page>
+                        </notebook>
+
+                        <script type="text/javascript" src="/linkloving_employee/static/src/js/demo.js"/>
+
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="employee_extend_form_manager" model="ir.ui.view">
+            <field name="name">employee extend form 1</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr_contract.hr_hr_employee_view_form2"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='manager']" position="replace">
+                </xpath>
+
+                <xpath expr="//field[@name='children']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='bank_account_id']" position="attributes">
+                    <attribute name="attrs">
+                        {'invisible':1,'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='place_of_birth']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='remaining_leaves']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='medic_exam']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='vehicle']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='vehicle_distance']" position="attributes">
+                    <attribute name="attrs">
+                        {'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='work_phone']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('employee_state','!=','draft'),('is_manager','=',False)]}
+                    </attribute>
+                </xpath>
+
+
+                <xpath expr="//notebook/page[@name='hr_settings']/group/group[3]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//notebook/page[@name='hr_settings']/group/group[4]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='%(hr_holidays.act_hr_employee_holiday_request)d']" position="attributes">
+                    <attribute name="groups">hr.group_hr_manager</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!--<record id="hr_payroll.payroll_hr_employee_view_form" model="ir.ui.view">-->
+        <!--<field name="name">payroll.hr.employee.view.form</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<div name="button_box" position="inside">-->
+        <!--<button name="%(hr_payroll.act_hr_employee_payslip_list)d"-->
+        <!--class="oe_stat_button"-->
+        <!--icon="fa-money"-->
+        <!--type="action"-->
+        <!--groups="hr.group_hr_manager">-->
+        <!--<field name="payslip_count" widget="statinfo" string="Payslips"/>-->
+        <!--</button>-->
+        <!--</div>-->
+        <!--</field>-->
+        <!--</record>-->
+
+
+        <record id="hr_payroll_payroll_hr_employee_view_form" model="ir.ui.view">
+            <field name="name">payroll.hr.employee.view.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='%(hr_payroll.act_hr_employee_payslip_list)d']" position="attributes">
+                    <attribute name="groups">hr.group_hr_manager</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!--<record id="hr_attendance.view_employee_form_inherit_hr_attendance" model="ir.ui.view">-->
+        <!--<field name="name">hr.employee</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="priority">10</field>-->
+        <!--<field name="groups_id" eval="[(4,ref('hr_attendance.group_hr_attendance_user'))]"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<field name="name" position="replace">-->
+        <!--<div id="textbox">-->
+        <!--<field name="attendance_state" widget="hr_attendance_form_presence_indicator"/>-->
+        <!--<field name="name" placeholder="Employee's Name"/>-->
+        <!--</div>-->
+        <!--</field>-->
+        <!--<field name="user_id" position="after">-->
+        <!--<field name="barcode" groups="hr_attendance.group_hr_attendance_user" invisible="1"/>-->
+        <!--<field name="pin" invisible="1"-->
+        <!--groups="hr_attendance.group_hr_attendance_user,hr_attendance.group_hr_attendance_use_pin"/>-->
+        <!--<field name="manual_attendance" groups="hr_attendance.group_hr_attendance_user" invisible="1"/>-->
+        <!--</field>-->
+        <!--</field>-->
+        <!--</record>-->
+
+        <record id="hr_attendance_view_employee_form_inherit_hr_attendance" model="ir.ui.view">
+            <field name="name">hr.employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr_attendance.view_employee_form_inherit_hr_attendance"/>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='barcode']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='pin']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='manual_attendance']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+        <!--<record id="linkloving_auth_group.hr_employee_form_inherit" model="ir.ui.view">-->
+        <!--<field name="name">hr.employee.form</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="hr.view_employee_form"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<xpath expr="//field[@name='job_id']" position="replace">-->
+        <!--<field name="hr_job_ids"-->
+        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"-->
+        <!--widget="many2many_tags" options="{'no_create':True}" string="工作头衔"/>-->
+        <!--</xpath>-->
+
+        <!--</field>-->
+        <!--</record>-->
+
+        <!--<record id="hr_hr_employee_view_form_worker" model="ir.ui.view">-->
+        <!--<field name="name">hr.hr.employee.view.form2</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="linkloving_mrp_extend.hr_hr_employee_view_form_worker"/>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<xpath expr="//field[@name='is_worker']" position="attributes">-->
+        <!--<attribute name="attrs">-->
+        <!--{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}-->
+        <!--</attribute>-->
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
+
+        <record id="new_hr_timesheet_employee_extd_form" model="ir.ui.view">
+            <field name="name">hr.timesheet.employee.extd_form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[@name='public']/group/group[2]/field[@name='parent_id']"
+                       position="replace">
+                    <field name="parent_id"
+                           attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"
+                           options="{'no_create': True}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='buy_balance']" position="after">
+                    <field name="pre_payment_reminding" string="暂支余额"/>
+                </xpath>
+
+                <xpath expr="//notebook/page[3]/group[1]" position="after">
+                    <group>
+                        <group>
+                            <field name="signature"
+                                   attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"
+                                   widget="image"/>
+                        </group>
+                        <group>
+                            <field name="purchase_signature"
+                                   attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"
+                                   widget="image"/>
+                        </group>
+
+
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!--<record id="linkloveing_hr_hr_timesheet_employee_extd_form" model="ir.ui.view">-->
+        <!--<field name="name">hr.timesheet.employee.extd_form</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="inherit_id" ref="linkloveing_hr.hr_timesheet_employee_extd_form"/>-->
+        <!--<field name="arch" type="xml">-->
+
+
+        <!--<xpath expr="//field[@name='parent_id']" position="attributes">-->
+        <!--<attribute name="attrs">-->
+        <!--{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}-->
+        <!--</attribute>-->
+        <!--</xpath>-->
+
+        <!--<xpath expr="//field[@name='parent_id']" position="attributes">-->
+        <!--<attribute name="attrs">-->
+        <!--{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}-->
+        <!--</attribute>-->
+        <!--</xpath>-->
+
+
+        <!--<xpath expr="//field[@name='buy_balance']" position="after">-->
+        <!--<field name="pre_payment_reminding" string="暂支余额"/>-->
+        <!--</xpath>-->
+
+        <!--<xpath expr="//notebook/page[3]/group[1]" position="after">-->
+        <!--<group>-->
+        <!--<group>-->
+        <!--<field name="signature"-->
+        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"-->
+        <!--widget="image"/>-->
+        <!--</group>-->
+        <!--<group>-->
+        <!--<field name="purchase_signature"-->
+        <!--attrs="{'readonly':['|',('employee_state','!=','draft'),('is_self','=',True),('is_manager','=',False)]}"-->
+        <!--widget="image"/>-->
+        <!--</group>-->
+
+
+        <!--</group>-->
+        <!--</xpath>-->
+        <!--</field>-->
+        <!--</record>-->
+
+
+        <record model="ir.actions.client" id="to_employee_index_page_action">
+            <field name="name">员工首页</field>
+            <field name="tag">employee_index_manage</field>
+        </record>
+
+
+        <!--<record id="hr.hr_employee_action_subordinate_hierachy" model="ir.actions.act_window">-->
+        <!--<field name="name">Subordinate Hierarchy</field>-->
+        <!--<field name="type">ir.actions.act_window</field>-->
+        <!--<field name="res_model">hr.employee</field>-->
+        <!--&lt;!&ndash;<field name="domain">[('id','in',active_id)]</field>&ndash;&gt;-->
+        <!--<field name="view_type">tree</field>-->
+        <!--<field name="view_id" ref="hr.view_partner_tree2"/>-->
+        <!--</record>-->
+
+        <menuitem id="employee_index"
+                  name="员工首页"
+                  parent="hr.menu_hr_root"
+                  sequence="5"
+                  action="to_employee_index_page_action"/>
+
+        <!--<menuitem id="employee_index_hh"-->
+        <!--name="员工结构"-->
+        <!--parent="hr.menu_hr_root"-->
+        <!--sequence="6"-->
+        <!--action="hr.hr_employee_action_subordinate_hierachy"/>-->
+
+
+        <record id="hr.open_view_employee_list_my" model="ir.actions.act_window">
+            <field name="name">Employees</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{'default_is_view_more_msg': True,'is_create': 'yes'}</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="hr.view_employee_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a new employee.
+                </p>
+                <p>
+                    With just a quick glance on the Odoo employee screen, you
+                    can easily find all the information you need for each person;
+                    contact data, job position, availability, etc.
+                </p>
+            </field>
+        </record>
+
+
+        <!--<record id="hr.view_employee_tree" model="ir.ui.view">-->
+        <!--<field name="name">hr.employee.tree</field>-->
+        <!--<field name="model">hr.employee</field>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<tree string="Employees" decoration-bf="message_needaction==True">-->
+        <!--<field name="name"/>-->
+        <!--<field name="work_phone"/>-->
+        <!--<field name="work_email"/>-->
+        <!--<field name="company_id" groups="base.group_multi_company"/>-->
+        <!--<field name="department_id"/>-->
+        <!--<field name="job_id"/>-->
+        <!--<field name="parent_id"/>-->
+        <!--<field name="coach_id" invisible="1"/>-->
+        <!--<field name="message_needaction" invisible="1"/>-->
+        <!--</tree>-->
+        <!--</field>-->
+        <!--</record>-->
+
+
+        <record id="hr.hr_kanban_view_employees" model="ir.ui.view">
+            <field name="name">hr.employee.kanban</field>
+            <field name="model">hr.employee</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <kanban class="o_hr_employee_kanban">
+                    <field name="last_login"/>
+                    <field name="message_is_follower"/>
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                    <field name="message_needaction_counter"/>
+                    <templates>
+
+                        <t t-name="kanban-description">
+                            <div class="oe_group_description">
+                                asdasdasdasdasd
+                            </div>
+                        </t>
+
+
+                        <t t-name="kanban-tooltip">
+                            <ul class="oe_kanban_tooltip">
+                                <li>
+                                    <b>Category:</b>
+                                </li>
+                                <li>
+                                    <b>Request to:</b>
+                                </li>
+                            </ul>
+                        </t>
+
+                        <t t-name="kanban-box">
+
+                            <div class="oe_kanban_global_click">
+                                <field name="category_ids"/>
+                                <div class="o_kanban_image">
+                                    <img t-att-src="kanban_image('hr.employee', 'image_medium', record.id.value)"/>
+                                    <div class="o_employee_summary_icons">
+                                        <t t-if="record.message_needaction_counter.raw_value">
+                                            <span class='oe_kanban_mail_new' title='Unread Messages'>
+                                                <i class='fa fa-comments'/>
+                                                <t t-raw="record.message_needaction_counter.raw_value"/>
+                                            </span>
+                                        </t>
+                                        <span title='Messages'>
+                                            <i class='fa fa-comments'/>
+                                            <t t-esc="record.message_ids.raw_value.length"/>
+                                        </span>
+                                        <span title='Followers'>
+                                            <i class='fa fa-users'/>
+                                            <t t-esc="record.message_follower_ids.raw_value.length"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <strong>
+                                        <field name="name"/>
+                                    </strong>
+                                    <ul>
+                                        <li id="last_login"/>
+                                        <li t-if="record.job_id.raw_value">
+                                            <field name="job_id"/>
+                                        </li>
+                                        <li t-if="record.work_location.raw_value">
+                                            <field name="work_location"/>
+                                        </li>
+                                        <li t-if="record.work_email.raw_value">
+                                            <i class="fa fa-envelope"></i>
+                                            <field name="work_email"/>
+                                        </li>
+                                        <li t-if="record.work_phone.raw_value">
+                                            <i class="fa fa-phone"></i>
+                                            <field name="work_phone"/>
+                                        </li>
+                                        <li t-if="record.mobile_phone.raw_value">
+                                            <i class="fa fa-mobile"></i>
+                                            <field name="mobile_phone"/>
+                                        </li>
+                                    </ul>
+                                    <div class="o_kanban_button">
+                                        <button t-if="record.message_is_follower.raw_value" name="action_unfollow"
+                                                type="object" class="o_follow_btn o_following btn btn-sm btn-default">
+                                            <span class="o_unfollow">Unfollow</span>
+                                            <span class="o_following">Following</span>
+                                        </button>
+                                        <button t-if="!record.message_is_follower.raw_value" name="action_follow"
+                                                type="object" class="o_follow_btn o_follow btn btn-sm btn-primary">
+                                            Follow
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

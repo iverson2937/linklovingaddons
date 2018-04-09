@@ -37,15 +37,17 @@
             <!--<field name="type">ir.actions.act_window</field>-->
             <!--<field name="res_model">product.template</field>-->
             <!--<field name="view_type">form</field>-->
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">tree,form,kanban</field>
             <field name="context">{"search_default_filter_to_purchase":1, "is_show_procuremnt_create_btn":1,
                 "order_type":"purchase"}
             </field>
             <!--<field name="search_view_id" eval="False"/> &lt;!&ndash; Force empty &ndash;&gt;-->
             <field name="view_ids" eval="[(5,0,0),
-            (0,0,{'view_mode':'kanban', 'view_id': False}),
+
             (0,0,{'view_mode':'tree', 'view_id': ref('view_product_template_tree_purchase')}),
-            (0,0,{'view_mode':'form', 'view_id': False})]"/>
+            (0,0,{'view_mode':'form', 'view_id': False}),
+            (0,0,{'view_mode':'kanban', 'view_id': False}),
+            ]"/>
             <!--<field name="help" type="html">-->
             <!--<p class="oe_view_nocontent_create">-->
             <!--Click to define a new product.-->
@@ -120,7 +122,9 @@
                 </xpath>
 
                 <xpath expr="//field[@name='qty_available']" position="replace">
-                    <field name="incoming_qty" string="在产"/>
+                    <field name="mos_info" invisible="1"/>
+                    <field name="outgoing_qty" string="需求"/>
+                    <field name="incoming_qty" string="在产" info_field="mos_info" widget="popup_dialog_widget"/>
                     <field name="stock" string="库存"/>
                     <field name="forecast_qty"/>
 
@@ -268,6 +272,10 @@
                     <filter name="filter_is_virtual_lt_reordering" string="预测 &lt;最小存货"
                             domain="[('is_virtual_lt_reordering', '=', True)]"/>
                     <separator/>
+                    <filter name="filter_is_virtual_lt_reordering_max" string="预测 &lt;最大存货"
+                            domain="[('is_virtual_lt_reordering_max', '=', True)]"/>
+                    <separator/>
+
                     <filter name="filter_is_available_lt_required" string="库存 &lt;订单量"
                             domain="[('is_available_lt_required', '=', True)]"/>
                     <separator/>
@@ -275,6 +283,32 @@
                 </field>
 
             </field>
+        </record>
+
+
+        <record id="model_product_template_excel_export" model="ir.actions.server">
+            <field name="name">导出成本</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="state">code</field>
+            <field name="code">
+                action = {
+                'type': 'ir.actions.act_url',
+                'url': 'export/product_template?values=' + str(context.get('active_ids', [])),
+                'nodestroy': True
+                }
+            </field>
+        </record>
+
+        <record id="action_product_template_excel_export" model="ir.values">
+            <field name="name">导出成本</field>
+            <field name="action_id" ref="linkloving_warehouse.model_product_template_excel_export"/>
+            <field name="value"
+                   eval="'ir.actions.server,%d' %ref('linkloving_warehouse.model_product_template_excel_export')"/>
+            <field name="key">action</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="model">product.template</field>
+            <field name="key2">client_action_multi</field>
         </record>
     </data>
 </openerp>

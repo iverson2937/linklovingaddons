@@ -1,0 +1,290 @@
+<openerp>
+    <data>
+        <record id="view_eco_effect_order_form" model="ir.ui.view">
+            <field name="name">eco.effect.order.form</field>
+            <field name="model">eco.effect.order</field>
+            <field name="arch" type="xml">
+                <form string="影响的单据" edit="0">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="新建" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <field name="bom_id"/>
+                            <field name="effect_mo_line_ids">
+                                <tree>
+                                    <field name="production_id"/>
+                                    <!--<field name="sim_stock_move_id"/>-->
+                                    <!--<field name="from_qty"/>-->
+                                    <!--<field name="to_qty"/>-->
+                                </tree>
+                            </field>
+                            <field name="effect_po_line_ids">
+                                <tree>
+                                    <field name="purchase_id"/>
+                                    <field name="purchase_line_id"/>
+                                    <!--<field name="from_qty"/>-->
+                                    <!--<field name="to_qty"/>-->
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_eco_effect_line_tree_purchase" model="ir.ui.view">
+            <field name="name">eco.effect.line.tree</field>
+            <field name="model">eco.effect.line</field>
+            <field name="arch" type="xml">
+                <tree string="采购变更记录">
+                    <field name="purchase_id"/>
+                    <field name="purchase_line_id"/>
+                    <field name="bom_eco_id"/>
+                    <field name="from_qty"/>
+                    <field name="to_qty"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_eco_effect_line_tree_production" model="ir.ui.view">
+            <field name="name">eco.effect.line.tree</field>
+            <field name="model">eco.effect.line</field>
+            <field name="arch" type="xml">
+                <tree string="制造变更记录">
+                    <field name="production_id"/>
+                    <field name="sim_stock_move_id"/>
+                    <field name="bom_eco_id"/>
+                    <field name="from_qty"/>
+                    <field name="to_qty"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Inherit Form View to Modify it -->
+        <record id="view_mrp_bom_form_inherit" model="ir.ui.view">
+            <field name="name">mrp.bom.form</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='code']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="version" readonly="1"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!--mrp. bom.eco -->
+        <record id="view_mrp_bom_eco_tree" model="ir.ui.view">
+            <field name="name">mrp.bom.eco.tree</field>
+            <field name="model">mrp.bom.eco</field>
+            <field name="arch" type="xml">
+                <tree string="BOM ECO" create="0">
+                    <field name="bom_id"/>
+                    <field name="effectivity"/>
+                    <field name="user_id"/>
+                    <field name="old_version"/>
+                    <field name="effectivity_date" attrs="{'invisible': [('effectivity', '!=', 'date')]}"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_mrp_bom_eco_form" model="ir.ui.view">
+            <field name="name">mrp.bom.eco.form</field>
+            <field name="model">mrp.bom.eco</field>
+            <field name="arch" type="xml">
+                <form string="" edit="0" create="0">
+                    <!--<header>-->
+                    <!--<button name="action_change_apply" string="应用" class="oe_highlight" type="object" confirmed="是否将此修改应用到对应的BOM,并根据选项来决定是否更新MO"/>-->
+                    <!--&lt;!&ndash;<button name="action_view" string="ccc" class="oe_highlight" type="object"/>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<button name="action_view" string="ccc" class="oe_highlight" type="object"/>&ndash;&gt;-->
+                    <!--<field name="state" widget="statusbar" />-->
+                    <!--</header>-->
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="action_view_bom_effect_order" type="object"
+                                    icon="fa-flask" string="影响的单据">
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="bom_id"/>
+                                <field name="old_version"/>
+                                <field name="new_version"/>
+                                <field name="effectivity" required="1"/>
+                                <field name="effectivity_date"
+                                       attrs="{'invisible': [('effectivity', '!=', 'date')]}"/>
+                            </group>
+                            <group>
+                                <field name="user_id"/>
+                                <field name="company_id"/>
+                                <field name="note"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="物料变更明细">
+                                <field name="bom_change_ids">
+                                    <tree editable="bottom">
+                                        <field name="bom_id" required="1" options="{'no_create':True}"/>
+                                        <field name="operate_type" required="1"/>
+                                        <!--<field name="bom_line_id" attrs="{'invisible': [('operate_type', '=', 'add')],-->
+                                        <!--'required': [('operate_type', '!=', 'add')]}"/>-->
+                                        <field name="product_id" attrs="{'invisible': [('operate_type', '=', 'add')],
+                                                      'required': [('operate_type', '!=', 'add')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="new_product_id"
+                                               attrs="{'invisible': [('operate_type', 'not in', ['add'])],
+                                                    'required': [('operate_type', 'in', ['add'])]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="new_product_qty"
+                                               attrs="{'invisible': [('operate_type', 'not in', ['add', 'update'])],
+                                                    'required': [('operate_type', 'in', ['add', 'update'])]}"/>
+
+                                        <field name="effectivity"/>
+                                        <!--<field name="effectivity_date"-->
+                                        <!--attrs="{'invisible': [('effectivity', '!=', 'date')]}"/>-->
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="影响的MO">
+                                <field name="effect_mo_line_ids">
+                                    <tree>
+                                        <field name="production_id"/>
+                                        <field name="sim_stock_move_id"/>
+                                        <field name="from_qty"/>
+                                        <field name="to_qty"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="影响的PO">
+                                <field name="effect_po_line_ids">
+                                    <tree>
+                                        <field name="purchase_id"/>
+                                        <field name="purchase_line_id"/>
+                                        <field name="from_qty"/>
+                                        <field name="to_qty"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <!-- mrp. eco .order-->
+        <record id="view_mrp_eco_order_tree" model="ir.ui.view">
+            <field name="name">mrp.eco.order.tree</field>
+            <field name="model">mrp.eco.order</field>
+            <field name="arch" type="xml">
+                <tree string="ECO">
+                    <field name="name"/>
+                    <field name="effectivity"/>
+                    <field name="effectivity_date" attrs="{'invisible': [('effectivity', '!=', 'date')]}"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_mrp_eco_order_form" model="ir.ui.view">
+            <field name="name">mrp.eco.order.form</field>
+            <field name="model">mrp.eco.order</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <button name="action_change_apply" string="应用" class="oe_highlight" type="object"
+                                confirm="是否将此修改应用到对应的BOM,并根据选项来决定是否更新MO"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <button name="action_change_apply1" string="测试用(马婷别点--)" class="oe_highlight" type="object"
+                                confirm="是否将此修改应用到对应的BOM,并根据选项来决定是否更新MO"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <!--<button name="action_view" string="ccc" class="oe_highlight" type="object"/>-->
+                        <!--<button name="action_view" string="ccc" class="oe_highlight" type="object"/>-->
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="action_view_bom_eco" type="object"
+                                    attrs="{'invisible':[('bom_eco_count', '=', 0)]}" icon="fa-flask">
+                                <field string="变更的BOM" name="bom_eco_count" widget="statinfo"/>
+                            </button>
+                            <!--<button class="oe_stat_button" name="action_view_bom_effect_line" type="object"-->
+                            <!--icon="fa-flask" string="影响的单据">-->
+                            <!--</button>-->
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="......"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="effectivity" required="1"/>
+                                <field name="effectivity_date"
+                                       attrs="{'invisible': [('effectivity', '!=', 'date')]}"/>
+                                <field name="user_id"/>
+                            </group>
+                            <group>
+                                <field name="company_id"/>
+                                <field name="note"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="物料变更明细">
+                                <field name="eco_line_ids">
+                                    <tree editable="bottom">
+                                        <field name="bom_id" required="1" options="{'no_create':True}"/>
+                                        <field name="operate_type" required="1"/>
+                                        <!--<field name="bom_line_id" attrs="{'invisible': [('operate_type', '=', 'add')],-->
+                                        <!--'required': [('operate_type', '!=', 'add')]}"/>-->
+                                        <field name="product_id" attrs="{'invisible': [('operate_type', '=', 'add')],
+                                                      'required': [('operate_type', '!=', 'add')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="new_product_id"
+                                               attrs="{'invisible': [('operate_type', 'not in', ['add'])],
+                                                    'required': [('operate_type', 'in', ['add'])]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="new_product_qty"
+                                               attrs="{'invisible': [('operate_type', 'not in', ['add', 'update'])],
+                                                    'required': [('operate_type', 'in', ['add', 'update'])]}"/>
+
+                                        <field name="effectivity"/>
+                                        <!--<field name="effectivity_date"-->
+                                        <!--attrs="{'invisible': [('effectivity', '!=', 'date')]}"/>-->
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <!-- MRP.ECO -->
+        <record id="mrp_eco_action_main" model="ir.actions.act_window">
+            <field name="name">物料清单变更单</field>
+            <field name="res_model">mrp.eco.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p>
+                    Create Engineering Change Orders
+                </p>
+            </field>
+        </record>
+        <menuitem
+                id="menu_mrp_plm_boms_1"
+                name="物料清单变更单"
+                action="mrp_eco_action_main"
+                parent="mrp.menu_mrp_bom"
+                sequence="21"/>
+    </data>
+</openerp>

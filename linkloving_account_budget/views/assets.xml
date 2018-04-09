@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <template id="assets_backend" name="statistic" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/linkloving_account_budget/static/src/js/budget.js"/>
+                <link rel="stylesheet" href="/linkloving_account_budget/static/src/css/budget.css"/>
+            </xpath>
+        </template>
+    </data>
+</openerp>

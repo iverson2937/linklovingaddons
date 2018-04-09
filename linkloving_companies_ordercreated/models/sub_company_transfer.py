@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 
 import requests
 from requests import ConnectionError
@@ -55,26 +56,37 @@ class SubCompanyTransfer(models.Model):
     def action_transfer_out_automatic(self):
         origin_sale_id = self.feedback_id.production_id.origin_sale_id
         if origin_sale_id:
-            picking_to_out = origin_sale_id.picking_ids.filtered(lambda x: x.state not in ["done", "cancel"])
-            if picking_to_out.state != 'assigned':
-                picking_to_out.force_assign()
-            if len(picking_to_out) == 1:
-                op_to_do = self.env["stock.pack.operation"]
-                for op in picking_to_out.pack_operation_product_ids:
-                    if op.product_id.id == self.feedback_id.product_id.id:  # 找到对应的产品
-                        op_to_do = op
-                        break
-                if op_to_do:  # 若找到了
-                    op_to_do.qty_done = self.feedback_id.qty_produced
-                else:
-                    raise UserError(u'找不到对应的出货条目')
-            else:
-                raise UserError(u'找不到对应的出货单或者出货单数量状态异常')
+            picking_to_out = origin_sale_id.picking_ids.filtered(
+                lambda x: x.state not in ["done", "cancel"] and x.picking_type_code == 'internal')
+            if picking_to_out:
+                self.picking_transfer_out_auto(picking_to_out)
+            picking_to_out_2 = origin_sale_id.picking_ids.filtered(
+                lambda x: x.state not in ["done", "cancel"] and x.picking_type_code == 'outgoing')
+            if picking_to_out_2:
+                self.picking_transfer_out_auto(picking_to_out_2)
 
-            confirmation = self.env["stock.backorder.confirmation"].create({
-                'pick_id': picking_to_out.id
-            })
-            confirmation.process()
+    def picking_transfer_out_auto(self, picking_to_out):
+        if picking_to_out.state != 'assigned':
+                picking_to_out.force_assign()
+        if len(picking_to_out) == 1:
+            op_to_do = self.env["stock.pack.operation"]
+            for op in picking_to_out.pack_operation_product_ids:
+                if op.product_id.id == self.feedback_id.product_id.id:  # 找到对应的产品
+                    op_to_do = op
+                    break
+            if op_to_do:  # 若找到了
+                op_to_do.qty_done = self.feedback_id.qty_produced
+                logging.warning(u"op_to_do.qty_done ===%s" % str(op_to_do.qty_done))
+            else:
+                raise UserError(u'找不到对应的出货条目')
+        else:
+            raise UserError(u'找不到对应的出货单或者出货单数量状态异常')
+        confirmation = self.env["stock.backorder.confirmation"].create({
+            'pick_id': picking_to_out.id
+        })
+        picking_to_out.check_backorder()
+        confirmation.process()
+        picking_to_out.to_stock()
 
     def action_transfer_in_automatic(self):
         origin_sale_id = self.feedback_id.production_id.origin_sale_id
@@ -122,7 +134,13 @@ class MrpQcFeedbackExtend(models.Model):
     def action_post_inventory(self):
         res = super(MrpQcFeedbackExtend, self).action_post_inventory()
         if self._context.get("from_sub"):
-            if self.production_id.origin_sale_id and self.production_id.origin_sale_id.partner_id.sub_company == 'main':
+            if not self.production_id.origin_sale_id:
+                origin = self.production_id.origin
+                sale_id = self.env["sale.order"].search([("name", "=", origin)], limit=1)
+            else:
+                sale_id = self.production_id.origin_sale_id
+
+            if sale_id and sale_id.partner_id.sub_company == 'main':
                 trans = self.env['sub.company.transfer'].create({
                     'feedback_id': self.id,
                     'product_qty': self.qty_produced,

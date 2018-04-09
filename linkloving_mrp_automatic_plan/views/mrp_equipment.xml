@@ -331,7 +331,7 @@
                                        context="{'default_product_tmpl_id': product_tmpl_id}"
                                        required="1"
                                        attrs="{'readonly': [('has_moves', '=', True)]}"/>
-
+                                <field name="sale_order_handle_date"/>
                                 <field name="origin"/>
                                 <field name="production_order_type"/>
                                 <field name="mo_type" widget="radio" string="类型" invisible="1"/>
@@ -429,6 +429,9 @@
                 <xpath expr="//field[@name='process_id']" position="after">
                     <field name="production_line_id"
                            attrs="{'readonly': [('state', 'not in', ['confirmed', 'draft', 'waiting_material', 'prepare_material_ing'])]}"/>
+                </xpath>
+                <xpath expr="//field[@name='bom_id']" position="after">
+                    <field name="sale_order_handle_date"/>
                 </xpath>
                 <xpath expr="//button[@name='button_waiting_material']" position="replace">
                     <field name="planned_start_backup" invisible="1"/>

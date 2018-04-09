@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class HrExpenseSheetWizard(models.TransientModel):
@@ -12,6 +15,47 @@ class HrExpenseSheetWizard(models.TransientModel):
                              default=(datetime.date.today().replace(day=1) - datetime.timedelta(1)).replace(day=1))
     end_date = fields.Date(u'结束时间', default=datetime.datetime.now())
     employee_ids = fields.Many2many('hr.employee')
+
+    def _get_payment_by_hr_expense_sheet(self, date1, date2):
+
+        returnDict = {}
+        account_payment = self.env['account.payment']
+
+        payment_ids = account_payment.search([
+            ('res_model', '=', 'hr.expense.sheet'),
+            ('payment_date', '>=', date1), ('payment_date', '<=', date2)],
+            order='create_date desc')
+
+        sheet_sequence = 1
+        for payment_id in payment_ids:
+            res_id = payment_id.res_id
+
+            try:
+                hr_expense_sheet = self.env['hr.expense.sheet'].browse(res_id)
+            except:
+                _logger.warning("no sheet_id, %d" % (res_id))
+                continue
+
+            returnDict[payment_id.id] = {'data': {}, 'line': {}}
+            returnDict[payment_id.id]['data'] = {
+                'sequence': sheet_sequence,
+                'accounting_date': payment_id.payment_date,
+                'employee_id': payment_id.partner_id.name,
+                'amount': payment_id.amount,
+                'department_id': hr_expense_sheet.department_id.name,
+                'expense_no': hr_expense_sheet.expense_no,
+                'name': payment_id.name,
+                'expense_sheet_amount': hr_expense_sheet.total_amount,
+                # 'create_uid': payment.create_uid.name,
+            }
+            # for line in payment.payment_line_ids:
+            #     returnDict[payment.id]['line'].update({line.id: {
+            #         'expense_no': line.expense_no,
+            #         'name': line.name,
+            #         'amount_total': line.sheet_id.total_amount,
+            #         'amount': line.amount,
+            #     }})
+        return returnDict
 
     def _get_data_by_turn_payment(self, date1, date2):
         returnDict = {}
@@ -46,7 +90,8 @@ class HrExpenseSheetWizard(models.TransientModel):
         employee_payment = self.env['account.payment']
 
         payment_ids = employee_payment.search([
-            ('partner_type', '=', 'customer'),
+            ('payment_type', '=', 'inbound'),
+            ('state', '!=', 'draft'),
             ('payment_date', '>=', date1), ('payment_date', '<=', date2)], order='name desc')
 
         sheet_sequence = 1
@@ -56,10 +101,12 @@ class HrExpenseSheetWizard(models.TransientModel):
                 'sequence': sheet_sequence,
                 'name': payment.name,
                 'payment_date': payment.payment_date,
+                'journal_id': payment.journal_id.name,
                 'partner_id': payment.partner_id.name,
                 'team_id': payment.partner_id.team_id.name if payment.partner_id.team_id.name else u'未设置团队',
                 'sale_man': payment.partner_id.user_id.name if payment.partner_id.user_id else u'为设置业务员',
                 'amount': payment.amount,
+                'remark': payment.remark
                 # 'create_uid': payment.create_uid.name,
             }
             # for line in payment.payment_line_ids:
@@ -251,6 +298,9 @@ class HrExpenseSheetWizard(models.TransientModel):
             elif self._context.get('return'):
                 datas = self._get_data_by_turn_payment(report.start_date, report.end_date)
                 report_name = 'linkloving_report.return_account_payment_report'
+            elif self._context.get('payment_sheet'):
+                datas = self._get_payment_by_hr_expense_sheet(report.start_date, report.end_date)
+                report_name = 'linkloving_report.linkloving_account_payment_hr_expense_sheet'
 
             if not datas:
                 raise UserError(u'没找到相关数据')

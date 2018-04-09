@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_linkloving_visit_visit_partner,linkloving_visit_visit_partner,model_visit_partner,,1,1,1,1
+access_linkloving_visit_visit_partner_image,linkloving_visit_visit_partner_image,model_visit_partner_image,,1,1,1,1

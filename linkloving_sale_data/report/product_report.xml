@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record id='action_product_report' model='ir.actions.report.xml'>
+            <field name="name">销售单</field>
+            <field name='report_type'>controller</field>
+            <field name='model'>product.product</field>
+            <field name='report_rml'>/report/linkloving_sale_data.product_report</field>
+            <field name="report_name">linkloving_sale_data.product_report</field>
+        </record>
+
+
+    </data>
+</openerp>

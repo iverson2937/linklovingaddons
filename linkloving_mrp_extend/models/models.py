@@ -300,6 +300,12 @@ class MrpProductionExtend(models.Model):
 
         return super(MrpProductionExtend, self).create(vals)
 
+    @api.multi
+    def write(self, vals):
+        if 'state' in vals and vals['state'] == 'waiting_material' and self.bom_id.state not in ('draft', 'release'):
+            raise UserError('BOM还没通过审核,请联系相关负责人')
+        return super(MrpProductionExtend, self).write(vals)
+
     def action_view_secondary_mos(self):
         mos = self.env["mrp.production"].search([("origin", "ilike", self.name),
                                                  ("state", "=", "done")])
@@ -357,6 +363,17 @@ class MrpProductionExtend(models.Model):
     qc_feedback_ids = fields.One2many('mrp.qc.feedback', 'production_id', track_visibility='onchange')
     qty_unpost = fields.Float(string=u"已生产的数量", compute="_compute_qty_unpost")
     feedback_on_rework = fields.Many2one("mrp.qc.feedback", u"返工单", track_visibility='onchange')
+    has_produced_product = fields.Boolean(compute='_compute_has_produced_product', store=True)
+
+    @api.multi
+    @api.depends('qc_feedback_ids')
+    def _compute_has_produced_product(self):
+        for mo in self:
+            print ("3123131312131231")
+            if mo.qc_feedback_ids:
+                mo.has_produced_product = True
+            else:
+                mo.has_produced_product = False
 
     @api.multi
     def _compute_qty_unpost(self):
@@ -405,6 +422,12 @@ class MrpProductionExtend(models.Model):
         self._compute_sim_stock_move_lines(res)
         res._compute_location_ids()
         return res
+
+    def add_one_sim_stock_move(self, move):
+        if move and not self.env["sim.stock.move"].search(
+                [('production_id', '=', self.id), ('product_id', '=', move.product_id.id)]):
+            res = self.env['sim.stock.move'].create(self._prepare_sim_stock_move_values(move.product_id.id))
+            return res
 
     @api.multi
     def _compute_sim_stock_move_lines(self, new_pr):
@@ -787,6 +810,7 @@ class MrpProductionExtend(models.Model):
                                  'production_id': move.production_id.id,
                                  'raw_material_production_id': move.raw_material_production_id.id,
                                  'procurement_id': move.procurement_id.id or False,
+                                 'product_uom': move.product_id.uom_id.id,
                                  'is_over_picking': True})
                     move.production_id.move_raw_ids = move.production_id.move_raw_ids + new_move
                     move.over_picking_qty = 0
@@ -1124,6 +1148,7 @@ class ChangeProductionQty(models.TransientModel):
             moves.action_assign()
             for wo in production.workorder_ids:
                 operation = wo.operation_id
+
                 if operation_bom_qty.get(operation.id):
                     cycle_number = math.ceil(
                         operation_bom_qty[operation.id] / operation.workcenter_id.capacity)  # TODO: float_round UP
@@ -1608,6 +1633,14 @@ class SimStockMove(models.Model):
 
     remaining_qty = fields.Float(string=u"待领数量", compute='_compute_remaining_qty')
 
+    @api.multi
+    @api.depends('product_id')
+    def name_get(self):
+        result = []
+        for sim in self:
+            name = sim.product_id.display_name
+            result.append((sim.id, name))
+        return result
 
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
@@ -1739,7 +1772,7 @@ class LLWorkerLine(models.Model):
             if not line.worker_time_line_ids:
                 continue
             else:
-                new_time_line = line.get_newest_time_line()
+                new_time_line = line.get_newest_time_line().sudo()
                 if new_time_line.state != state:  # 若状态改变
                     if state == 'outline':
                         new_time_line.worker_id.now_mo_id = None
@@ -1871,12 +1904,13 @@ class MrpQcFeedBack(models.Model):
     def action_post_inventory(self):
         if self.state == 'alredy_post_inventory':
             raise UserError(u"该单据已入库,无需再重复入库")
-        if self.production_id.outside_type in ['outsourcing',
-                                               'all_outside'] and not self.production_id.mo_invoice_count:
-            if self.production_id.outside_type == 'outsourcing':
-                self.production_id._prepare_invoice(self.production_id.outsourcing_supplier_id, self.qty_produced)
-            else:
-                self.production_id._prepare_invoice(self.production_id.supplier_id, self.qty_produced)
+        if hasattr(self.production_id, "outside_type"):
+            if self.production_id.outside_type in ['outsourcing',
+                                                   'all_outside'] and not self.production_id.mo_invoice_count:
+                if self.production_id.outside_type == 'outsourcing':
+                    self.production_id._prepare_invoice(self.production_id.outsourcing_supplier_id, self.qty_produced)
+                else:
+                    self.production_id._prepare_invoice(self.production_id.supplier_id, self.qty_produced)
         mrp_product_produce = self.env['mrp.product.produce'].with_context({'active_id': self.production_id.id})
         produce = mrp_product_produce.create({
             'product_qty': self.qty_produced,
@@ -2038,11 +2072,21 @@ class StcokPickingExtend(models.Model):
                     'res_id': wiz.id,
                     'context': self.env.context,
                 }
+            for operation in pick.pack_operation_ids:
+                if operation.qty_done < 0:
+                    raise UserError(_('No negative quantities allowed'))
+                if operation.qty_done > 0:
+                    operation.write({'product_qty': operation.qty_done})
+                else:
+                    pack_operations_delete |= operation
+            if pack_operations_delete:
+                pack_operations_delete.unlink()
+
             if pick.picking_type_code == 'incoming':
                 pick.is_cancel_backorder = True
                 pick.state = 'waiting_in'
-            elif pick.picking_type_code == 'outgoing':
-                self.do_transfer()
+            else:
+                pick.do_transfer()
         return
 
     @api.multi
@@ -2059,7 +2103,7 @@ class StcokPickingExtend(models.Model):
                             move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
             if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
-                raise UserError(u"出货数量不能全部为0")
+                raise UserError(u"出货数量不能全部为0 %s" % pick.id)
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成
@@ -2342,8 +2386,9 @@ class purchase_order_extend(models.Model):
     @api.multi
     def unlink(self):
         for order in self:
-            if not order.state in ["cancel", "make_by_mrp"]:
-                raise UserError(_('In order to delete a purchase order, you must cancel it first.'))
+            if order.state not in ["cancel", "make_by_mrp"]:
+                raise UserError(
+                    _('In order to delete a purchase order, you must cancel it first.') + ('%s' % self.name))
         super(models.Model, self).unlink()  ###注意 fixme
 
 

@@ -136,7 +136,10 @@ class AutoSmtpMailMail(models.Model):
 
         filter_list = self.char_filter.split(',') if self.char_filter else False
 
-        email_to_one = str(email_to)[str(email_to).find('<') + 1:str(email_to).find('>')].split(';')
+        email_to_one = email_to
+
+        if str(email_to).find('<') >= 0 and str(email_to).find('>') >= 0:
+            email_to_one = str(email_to)[str(email_to).find('<') + 1:str(email_to).find('>')].split(';')
 
         for email_one in email_to_one:
             run_email = True

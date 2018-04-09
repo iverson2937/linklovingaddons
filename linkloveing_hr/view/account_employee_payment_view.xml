@@ -16,7 +16,7 @@
                                 attrs="{'invisible': [('can_return', '=', False)]}"/>
                         <button name="submit" class="oe_highlight" states="draft" string="Post" type="object"/>
 
-
+                        <button name="submit" class="oe_highlight" states="cancel" string="重新提交" type="object"/>
                         <button name="manager1_approve" class="oe_highlight" string="Approve"
                                 attrs="{'invisible':['|',('is_show','=',False),('state','!=','confirm')]}"
                                 type="object"
@@ -73,8 +73,10 @@
                                 <field name="department_id" string="Department" invisible="1"/>
                                 <field name="to_approve_id" string="Waiting Approve By" readonly="1"
                                        attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
-                                <field name="amount" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                <field name="remark" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="amount" required="1"
+                                       attrs="{'readonly': [('state', 'not in', ['draft','cancel'])]}"/>
+                                <field name="remark" required="1"
+                                       attrs="{'readonly': [('state', 'not in', ['draft','cancel'])]}"/>
                             </group>
                             <group>
                                 <field name="apply_date" attrs="{'readonly': [('state', '!=', 'draft')]}"
@@ -101,8 +103,9 @@
                             <page string='Return records' attrs="{'invisible':[('return_count','=',0)]}">
                                 <field name="return_ids">
                                     <tree create="0">
-                                        <field name="create_uid" string="Created By"/>
-                                        <field name="create_date" string="Return Date"/>
+                                        <field name="display_name"/>
+                                        <field name="payment_date"/>
+                                        <field name="journal_id"/>
                                         <field name="amount" sum="总计"/>
                                     </tree>
                                 </field>
@@ -171,6 +174,7 @@
                 <search string="Employee">
                     <field name="employee_id" string="Employee"/>
                     <field name="name" string="单号"/>
+                    <filter name="can_return" string="可用暂支" domain="[('can_return', '=', True)]"/>
                     <field name="amount" filter_domain="[('amount','ilike',self)]" string="Amount"/>
                 </search>
             </field>

@@ -309,12 +309,12 @@ class LinklovingEmployeeControllers(http.Controller):
             "emergency_contact_way": employeebean.emergency_contact_way or '',
 
             "work_experience_ids": [{
-                                        "name": experience_one.name or '',
-                                        "department": experience_one.department or '',
-                                        "position": experience_one.position or '',
-                                        "entry_time": experience_one.entry_time or '',
-                                        "Leaving_time": experience_one.Leaving_time or '',
-                                    } for experience_one in employeebean.work_experience_ids],
+                "name": experience_one.name or '',
+                "department": experience_one.department or '',
+                "position": experience_one.position or '',
+                "entry_time": experience_one.entry_time or '',
+                "Leaving_time": experience_one.Leaving_time or '',
+            } for experience_one in employeebean.work_experience_ids],
 
             "education_experience_ids": education_data,
 

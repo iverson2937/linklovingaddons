@@ -1,0 +1,45 @@
+.treegrid-indent {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    position: relative;
+}
+
+.treegrid-expander {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+/*.treegrid-expander-expanded{background-image: url(../img/collapse.png); }*/
+/*.treegrid-expander-collapsed{background-image: url(../img/expand.png);}*/
+
+.unlock_condition {
+    display: none;
+}
+
+.sel_pro, .adjusttime {
+    cursor: pointer;
+}
+
+.create_wrap {
+    position: fixed;
+    top: 5%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 569px;
+    z-index: 1040;
+    background-color: white;
+    padding: 30px;
+}
+
+.unlock_condition .foot {
+    margin-top: 20px;
+}
+
+.change_time {
+    margin-top: 10px;
+}

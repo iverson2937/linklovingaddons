@@ -6,3 +6,4 @@ access_linkloving_pdm_final_review_partner,linkloving_pdm.final_review_partner,m
 access_linkloving_pdm_tag_info,linkloving_pdm.tag_info,model_tag_info,,1,1,1,1
 access_linkloving_pdm_tag_info_line,linkloving_pdm.tag_info_line,model_tag_info_line,,1,1,1,1
 access_linkloving_pdm_tag_flow_info,linkloving_pdm.tag_flow_info,model_tag_flow_info,,1,1,1,1
+access_linkloving_pdm_tag_flow_update,linkloving_pdm.tag_flow_update,model_tag_flow_update,,1,1,1,1

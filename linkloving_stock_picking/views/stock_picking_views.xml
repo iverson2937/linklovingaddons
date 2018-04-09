@@ -8,10 +8,15 @@
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='do_new_transfer']" position="before">
                     <button name="action_post" string="Submit" type="object" class="oe_highlight"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['partially_available','assigned'])]}"
+                            attrs="{'invisible': ['|',('picking_type_code', '!=', 'incoming'),('state','not in',['partially_available','assigned'])]}"
                             groups="stock.group_stock_user"/>
 
                 </xpath>
+                <!--<xpath expr="//button[@name='action_cancel']" position="after">-->
+                <!--<button name="check_purchase_order_line" string="赋值源采购行" type="object" class="oe_highlight"-->
+                <!--groups="base.group_erp_manager"/>-->
+                <!--</xpath>-->
+
 
                 <xpath expr="//button[@name='action_cancel']" position="attributes">
                     <attribute name="string">取消订单</attribute>
@@ -33,7 +38,7 @@
                             attrs="{'invisible': [('state','not in',['waiting_in'])]}"
                             groups="stock.group_stock_user"/>
                     <button name="do_new_transfer" string="出库调拨"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"
+                            attrs="{'invisible': ['|',('picking_type_code', 'not in', ['outgoing', 'internal']),('state','not in',['assigned'])]}"
                             groups="stock.group_stock_user" type="object" class="oe_highlight"/>
                     <!--<button name="start_prepare_stock" string="开始备货"-->
                     <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned'])]}"-->
@@ -42,7 +47,7 @@
                     <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'incoming'),('state','not in',['prepare'])]}"-->
                     <!--groups="stock.group_stock_user" type="object" class="oe_highlight"/>-->
                     <button name="action_view_qc_result" string="查看品检结果"
-                            attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','in',['draft', 'assigned', 'qc_check'])]}"
+                            attrs="{'invisible': ['|',('picking_type_code', '!=', 'incoming'),('state','in',['draft', 'assigned', 'qc_check'])]}"
                             groups="purchase.group_purchase_user" type="object" class="oe_highlight"/>
                     <!--<button name="do_new_transfer" string="Confirm Receipts"-->
                     <!--attrs="{'invisible': ['|',('picking_type_code', '=', 'outgoing'),('state','not in',['validate'])]}"-->
@@ -401,7 +406,7 @@
                 </xpath>
                 <xpath expr="//filter[@name='picking_type']" position="after">
                     <filter name="picking_state" string="Status"
-                            domain="[('state','not in',('cancel'))]"
+                            domain="[('state','!=','cancel')]"
                             context="{'group_by':'state'}"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">

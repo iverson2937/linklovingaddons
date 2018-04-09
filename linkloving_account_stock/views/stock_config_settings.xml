@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- INHERITED FORM -->
+        <record id="stock_config_settings_inherit" model="ir.ui.view">
+            <field name="name">stock.config.settings.form</field>
+            <field name="model">stock.config.settings</field>
+            <field name="inherit_id" ref="stock_account.view_stock_config_settings_inherit"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='group_stock_inventory_valuation']" position="after">
+                    <group>
+                        <field name="adjust_stock_account_id" options="{'no_create':True}"/>
+                    </group>
+
+
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+    </data>
+</openerp>
+
+
+
+
+
+
+
+
+
+

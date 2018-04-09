@@ -27,6 +27,9 @@ class StockMove(models.Model):
             acc_src = self.location_id.valuation_out_account_id.id
         else:
             acc_src = accounts_data['stock_input'].id
+            # 退货，add by allen
+            if self.is_return_material:
+                acc_src = accounts_data['stock_output'].id
 
         if self.location_dest_id.valuation_in_account_id:
             acc_dest = self.location_dest_id.valuation_in_account_id.id
@@ -34,11 +37,27 @@ class StockMove(models.Model):
         else:
             acc_dest = accounts_data['stock_output'].id
 
+        # 盘盈
+        if self.location_id.usage == "inventory" and self.location_dest_id.usage == 'internal':
+            adjust_stock_account_id = self.env['ir.values'].sudo().get_default(
+                'stock.config.settings', 'adjust_stock_account_id')
+            if not adjust_stock_account_id:
+                raise UserError('请联系管理员设置库存调整会计科目')
+            acc_src = adjust_stock_account_id
+
+            acc_dest = accounts_data['stock_valuation'].id
+        # 盘亏
+        if self.location_id.usage == "internal" and self.location_dest_id.usage == 'inventory':
+
+            adjust_stock_account_id = self.env['ir.values'].sudo().get_default(
+                'stock.config.settings', 'adjust_stock_account_id')
+            if not adjust_stock_account_id:
+                raise UserError('请联系管理员设置库存调整会计科目')
+            acc_src = accounts_data['stock_valuation'].id
+            acc_dest = adjust_stock_account_id
         acc_valuation = accounts_data.get('stock_valuation', False)
         if acc_valuation:
             acc_valuation = acc_valuation.id
-        if self.picking_type_id == self.env.ref('stock.picking_type_in'):
-            acc_valuation = accounts_data['stock_material_in'].id
         if not accounts_data.get('stock_journal', False):
             raise UserError(_(
                 'You don\'t have any stock journal defined on your product category, check if you have installed a chart of accounts'))

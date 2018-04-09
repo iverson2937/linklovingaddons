@@ -4,7 +4,10 @@ import os
 import base64
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
+import re
+import logging
 
+_logger = logging.getLogger(__name__)
 # class linkloving_pdm(models.Model):
 #     _name = 'linkloving_pdm.linkloving_pdm'
 
@@ -82,6 +85,46 @@ class ReviewProcess(models.Model):
         line.review_id = review_id.id
         return review_id.id
 
+    # 获得审核全流程 new 当没有审核过的时候 也可以获取审核流程
+    def get_review_line_list_new(self, info_id):
+        sorted_line = sorted(self.review_line_ids, key=lambda x: x.review_order_seq)
+        line_list = []
+        is_released = False
+        if self.product_line_ids.state == 'released':
+            is_released = True
+        for line in sorted_line:
+            view_text_style = 'view_text_style_now' if line.review_order_seq == len(
+                sorted_line) else 'view_text_style_down'
+
+            if is_released and line.review_order_seq == len(sorted_line):
+                view_text_style = 'view_text_style_down'
+            line_list.append({
+                'id': line.id,
+                'name': line.sudo().partner_id.name,
+                'remark': line.remark or '',
+                'state': [line.state, REVIEW_LINE_STATE[line.state]],
+                'create_date': line.create_date if line.create_date else ' ',
+                'remark_content': line.remark_content or '',
+                'view_text_style': view_text_style,
+            })
+        flow_user_list = self.env['product.attachment.info'].browse(info_id).tag_type_flow_id
+        flow_list_id = [par_one.tag_approval_process_partner for par_one in flow_user_list.tag_approval_process_ids]
+        if sorted_line and flow_list_id:
+            if sorted_line[-1:][0].sudo().partner_id.id in [one.id for one in flow_list_id]:
+                sorted_last = [one.id for one in flow_list_id].index(sorted_line[-1:][0].sudo().partner_id.id)
+                flow_list_id = flow_list_id[sorted_last + 1:]
+        for line in flow_list_id:
+            line_list.append({
+                'id': ' ',
+                'name': line.sudo().name,
+                'remark': ' ',
+                'state': ' ',
+                'create_date': False,
+                'view_text_style': 'view_text_style_no',
+            })
+        line_list.reverse()
+        return line_list
+
     # 获得审核全流程
     def get_review_line_list(self):
         sorted_line = sorted(self.review_line_ids, key=lambda x: x.review_order_seq)
@@ -116,6 +159,8 @@ class ReviewProcessLine(models.Model):
     review_order_seq = fields.Integer(string=u'审核顺序', help=u"从1开始")  # 从1开始
     remark = fields.Text(u"备注")
 
+    remark_content = fields.Html(u'备注', strip_style=True)
+
     def _compute_process_line_state_copy(self):
         selection = self.fields_get(["state"]).get("state").get("selection")
         for line_one in self:
@@ -148,7 +193,7 @@ class ReviewProcessLine(models.Model):
         self.write({
             'review_time': fields.datetime.now(),
             'state': 'review_success',
-            'remark': remark
+            'remark': remark,
         })
 
         # 新建一个 审核条目 指向下一个审核人员
@@ -183,8 +228,18 @@ class ReviewProcessLine(models.Model):
         self.write({
             'review_time': fields.datetime.now(),
             'state': 'review_success',
-            'remark': remark
+            # 'remark': remark
+            # 'remark_content': remark,
         })
+        if remark:
+            if '<p' in remark:
+                self.write({
+                    'remark_content': remark,
+                })
+            else:
+                self.write({
+                    'remark': remark
+                })
 
         # 新建一个 审核条目 指向下一个审核人员
         self.env["review.process.line"].create({
@@ -397,19 +452,30 @@ class ReviewProcessLine(models.Model):
             self.write({
                 'review_time': fields.datetime.now(),
                 'state': 'review_success',
-                'remark': remark
             })
+            if remark:
+                if '<p' in remark:
+                    self.write({
+                        'remark_content': remark,
+                    })
+                else:
+                    self.write({
+                        'remark': remark
+                    })
 
             if review_type == 'file_review':
                 # if self.review_id.product_line_ids.type == 'design':
-                if self.review_id:
-                    if self.review_id.product_line_ids.type == 'design':
-                        self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
-                    else:
-                        self.send_chat_msg(self.review_id.product_line_ids.create_uid.partner_id, remark, 'pass',
-                                           material_requests_id, bom_id)
-                else:
-                    self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
+
+                self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
+
+                # if self.review_id:
+                #     if self.review_id.product_line_ids.type == 'design':
+                #         self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
+                #     else:
+                #         self.send_chat_msg(self.review_id.product_line_ids.create_uid.partner_id, remark, 'pass',
+                #                            material_requests_id, bom_id)
+                # else:
+                #     self.send_all_msg(remark, 'pass', material_requests_id, bom_id)
             elif review_type == 'bom_review':
                 self.send_chat_msg(bom_id.create_uid.partner_id, remark, 'pass',
                                    material_requests_id, bom_id)
@@ -427,8 +493,18 @@ class ReviewProcessLine(models.Model):
             self.write({
                 'review_time': fields.datetime.now(),
                 'state': 'review_success',
-                'remark': remark
+                # 'remark': remark
             })
+
+            if remark:
+                if '<p' in remark:
+                    self.write({
+                        'remark_content': remark,
+                    })
+                else:
+                    self.write({
+                        'remark': remark
+                    })
 
         else:
             raise UserError(u"您不是审核人")
@@ -438,8 +514,18 @@ class ReviewProcessLine(models.Model):
         self.write({
             'review_time': fields.datetime.now(),
             'state': 'review_fail',
-            'remark': remark
         })
+
+        if remark:
+            if '<p' in remark:
+                self.write({
+                    'remark_content': remark,
+                })
+            else:
+                self.write({
+                    'remark': remark
+                })
+
         # 新建一个 审核条目 指向最初的人
         print self.review_id.id, 'print llsssssssssss'
         self.env["review.process.line"].create({
@@ -455,8 +541,20 @@ class ReviewProcessLine(models.Model):
         self.write({
             'review_time': fields.datetime.now(),
             'state': 'review_canceled',
-            'remark': remark
+            # 'remark': remark,
+            'partner_id': self.env.user.partner_id.id,
         })
+
+        if remark:
+            if '<p' in remark:
+                self.write({
+                    'remark_content': remark,
+                })
+            else:
+                self.write({
+                    'remark': remark
+                })
+
         # 新建一个 审核条目 指向最初的人
 
         print self.review_id.id, 'self.review_id.id'
@@ -509,10 +607,18 @@ class ProductAttachmentInfo(models.Model):
         review_id = info_dic.get("review_id")
         if not review_id:
             review_id = False
+            info_dic['view_text_style'] = 'view_text_style_now'
         else:
             review_id = review_id[0]
+            info_dic['view_text_style'] = 'view_text_style_down'
+        # 注释的是获取已存在的审核流程 新的是获取全部审核流程包含 未审核的
         review = self.env["review.process"].search([("id", "=", review_id)])
-        info_dic['review_line'] = review.get_review_line_list()
+        info_dic['review_line'] = review.get_review_line_list_new(info_dic['id'])
+        # if not review:
+        #     print info_dic['id']
+        #     info_dic['review_line'] = review.get_review_line_list_new(info_dic['id'])
+        # else:
+        #     info_dic['review_line'] = review.get_review_line_list()
         info_dic['review_id'] = review.who_review_now.name or ''
 
         type1 = info_dic.get("type")
@@ -578,7 +684,16 @@ class ProductAttachmentInfo(models.Model):
         return self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
 
     def default_version(self):
-        return self._default_version()
+        res_id = self._context.get("product_id")
+        is_update = self._context.get("is_update")
+        p = self.env["product.template"].browse(res_id)
+        version_num = self._default_version()
+
+        if is_update == 'false' and self.version > 0:
+            version_num = self.version
+
+        return {'version': version_num,
+                'default_code': p.default_code}
 
     def _default_version(self):
         model = self._context.get("model")
@@ -666,7 +781,8 @@ class ProductAttachmentInfo(models.Model):
     # type = fields.Selection(string=u"类型", selection=FILE_TYPE, required=True, )
     type = fields.Char(string=u"类型")
 
-    tag_type_flow_id = fields.Many2one('tag.flow.info', string=u"审核流", required=True)
+    tag_type_flow_id = fields.Many2one('tag.flow.info', string=u"审核流", required=True,
+                                       domain=[('is_copy', '=', False)])
 
     file_review_process_line_ids = fields.One2many("review.process.line", string=u'审核流程纪录',
                                                    related='review_id.review_line_ids'
@@ -684,7 +800,11 @@ class ProductAttachmentInfo(models.Model):
 
     is_show_outage = fields.Boolean(string=u'文件是否可用', default=True)
 
+    file_is_update = fields.Boolean(string=u'文件是否修改', default=False)
+
     remark = fields.Text(string=u'备注', default='')
+
+    flow_version = fields.Integer(string=u"流程版本号", default=1)
 
     @api.onchange('tag_type_id')
     def onchange_tag_type_id(self):
@@ -694,12 +814,29 @@ class ProductAttachmentInfo(models.Model):
             self.tag_upload_file = True
         else:
             self.tag_upload_file = False
+        self.file_name = ''
 
     @api.multi
     def get_attachment_info_form_view(self):
         view_id = self.env.ref('linkloving_pdm.product_attachment_info_new_file').id
         print self
         return view_id
+
+    @api.multi
+    def get_attachment_update_info_form_view(self, **kwargs):
+        product_info_id = kwargs.get("info_id")
+        product_flow_id = kwargs.get("flow_id")
+
+        new_product_flow_id = self.env['tag.flow.info'].browse(int(product_flow_id))
+        new_product_info_id = self.env['product.attachment.info'].browse(int(product_info_id))
+        # tag.flow.update
+        add_parnter = [par_one.tag_approval_process_partner.id for par_one in
+                       new_product_flow_id.tag_approval_process_ids]
+
+        index_now = new_product_info_id.now_flow_partner_id if new_product_info_id.now_flow_partner_id == 0 else new_product_info_id.now_flow_partner_id - 1
+
+        now_parnter = add_parnter[index_now:]
+        return {'add_parnter': add_parnter, 'now_parnter': now_parnter}
 
     def chenge_outage_state(self, **kwargs):
         outage_state = kwargs.get('state_type')
@@ -730,7 +867,7 @@ class ProductAttachmentInfo(models.Model):
         if self.tag_type_id.file_size == 'gt_ten':
             if not (self.file_name and self.remote_path):
                 raise ValidationError(u"信息不完整，请完善")
-        else:
+        elif self.tag_type_id.file_size == 'lt_ten':
             # if not (self.file_name and self.file_binary):
             if not (self.file_name and self.file_binary):
                 raise ValidationError(u"信息不完整，请完善")
@@ -740,53 +877,76 @@ class ProductAttachmentInfo(models.Model):
     def action_create_many_info(self):
         print self.temp_product_tmpl_ids
 
-        for tmpl_id in self.temp_product_tmpl_ids:
-            print tmpl_id
-            # raise UserError("meishi")
+        try:
+            if not self.product_tmpl_id:
+                for tmpl_id in self.temp_product_tmpl_ids:
+                    print tmpl_id
+                    # raise UserError("meishi")
 
-            Model = self.env['product.attachment.info']
+                    Model = self.env['product.attachment.info']
 
-            # product_one = self.copy()
-            # product_one['product_tmpl_id'] = tmpl_id.id
+                    # product_one = self.copy()
+                    # product_one['product_tmpl_id'] = tmpl_id.id
 
-            val = {'file_name': self.file_name,
-                   'file_binary': self.file_binary,
-                   'remote_path': self.remote_path,
+                    val = {'file_name': self.file_name,
+                           'file_binary': self.file_binary,
+                           'remote_path': self.remote_path,
 
-                   'remark': self.remark,
-                   'tag_type_id': self.tag_type_id.id,
-                   'tag_type_flow_id': self.tag_type_flow_id.id,
+                           'remark': self.remark,
+                           'tag_type_id': self.tag_type_id.id,
+                           'tag_type_flow_id': self.tag_type_flow_id.id,
 
-                   'state': 'waiting_release',
-                   'product_tmpl_id': tmpl_id.id,
-                   'type': self.type,
-                   'version': Model.with_context(
-                       {"product_id": int(tmpl_id.id), "type": self.type})._default_version(),
-                   }
+                           'state': 'waiting_release',
+                           'product_tmpl_id': tmpl_id.id,
+                           'type': self.type,
+                           'version': Model.with_context(
+                               {"product_id": int(tmpl_id.id), "type": self.type})._default_version(),
+                           }
 
-            attach = Model.create(val)
-            filename = attach.get_download_filename()
-            attach.file_name = filename
-        # self.unlink()
-        self.search([('product_tmpl_id', '=', None)]).unlink()
+                    attach = Model.create(val)
+                    filename = attach.get_download_filename()
+                    attach.write({'file_name': filename, 'state': attach.state})
+                    # attach.file_name = filename
+            else:
+                self.temp_product_tmpl_ids = False
+        except:
+            _logger.info("创建文件审核有误")
+        finally:
+            self.search([('product_tmpl_id', '=', None)]).unlink()
         return True
 
     @api.model
     def create(self, vals):
+
         if (vals.get("file_binary") or vals.get("remote_path")):
             vals['state'] = 'waiting_release'
 
-        now_exist = self.search(
-            [('product_tmpl_id', '=', int(vals.get('product_tmpl_id')) if vals.get('product_tmpl_id') else None),
-             ('state', 'not in', ('cancel', 'released')), ('type', '=', vals.get('type'))])
-        if len(now_exist) > 3:
-            raise UserError(u"同时存在审核中 超过规定")
+        if vals.get('product_tmpl_id'):
+            now_exist = self.search(
+                [('product_tmpl_id', '=', int(vals.get('product_tmpl_id'))),
+                 ('state', 'not in', ('cancel', 'released')), ('type', '=', vals.get('type'))])
+            if len(now_exist) > 3:
+                raise UserError(u"同时存在审核中 超过规定")
+
+        if vals.get('tag_type_id'):
+            if vals.get('temp_product_tmpl_ids'):
+                if self.env['tag.info'].browse(int(vals.get('tag_type_id'))).file_size == 'gt_ten' and len(
+                        vals.get('temp_product_tmpl_ids')[0][2]) > 1:
+                    raise UserError(u"此文件不支持批量上传")
+        else:
+            raise UserError(u"请选择文件类型")
 
         res = super(ProductAttachmentInfo, self).create(vals)
         return res
 
     @api.multi
     def write(self, vals):
+
+        if vals.get('file_name'):
+
+            if self.state in ('cancel', 'deny', 'draft', 'waiting_release') and not vals.get('state'):
+                vals['file_is_update'] = True
+
         if (vals.get("file_binary") or vals.get("remote_path")):
             if self.state in ["cancel", "draft", "deny"]:
                 vals['state'] = 'waiting_release'
@@ -800,7 +960,39 @@ class ProductAttachmentInfo(models.Model):
             for info_one in (type_info_list - self):
                 info_one.write({'is_show_outage': False})
 
-        return super(ProductAttachmentInfo, self).write(vals)
+        if vals.get('file_name'):
+
+            dc = self.product_tmpl_id.default_code  # .replace(".", "_")
+            if vals.get('file_name').find(".") == -1:
+                raise UserError(u"输入文件名有误，请核对")
+            file_ext = vals.get('file_name').split('.')[-1:][0]
+            if file_ext:
+                file_ext = '.' + file_ext
+            else:
+                file_ext = ''
+            if self.state != 'released':
+                vals['file_name'] = 'Unrelease_' + (
+                    vals.get('type').upper() if vals.get('type') else self.type.upper()) + '_' + dc + '_v' + str(
+                    self.version) + file_ext
+            else:
+                vals['file_name'] = self.type.upper() + '_' + dc + '_v' + str(self.version) + file_ext
+        if vals.get('type'):
+            if self.env['tag.info'].search([('name', '=', vals.get('type').upper())]).file_size == 'lt_ten':
+                vals['remote_path'] = ''
+
+        super_res = super(ProductAttachmentInfo, self).write(vals)
+
+        if self.tag_type_id.file_size == 'gt_ten':
+            if not (self.file_name and self.remote_path):
+                raise ValidationError(u"信息不完整，请完善")
+        elif self.tag_type_id.file_size == 'lt_ten':
+            # if not (self.file_name and self.file_binary):
+            if not (self.file_name and self.file_binary):
+                raise ValidationError(u"信息不完整，请完善")
+            elif self.file_name.find(".") == -1:
+                raise ValidationError(u"输入文件名有误，请核对")
+
+        return super_res
 
     def unlink_attachment_list(self, **kwargs):
         attachment_list = kwargs.get('attachment_list')
@@ -913,25 +1105,65 @@ class TagProductFlowInfo(models.Model):
 
     remark = fields.Text(string=u'备注')
 
+    @api.multi
+    def save_tag_info(self):
+        return True
+
 
 class TagProductAttachmentInfo(models.Model):
     _name = "tag.flow.info"
 
-    name = fields.Char(string=u'流程名称')
+    name = fields.Char(string=u'流程名称', required=True)
 
     tag_approval_process = fields.Many2many('res.partner', string=u'审批流程')
 
-    tag_approval_process_one = fields.One2many('tag.info.line', 'tag_id', string=u'审批流程 one')
+    tag_approval_process_ids = fields.One2many('tag.info.line', 'tag_id', string=u'审批流程 one')
+
+    now_process_ids = fields.Many2many('res.partner', string=u'审核人集合', copy=True)
+
+    is_copy = fields.Boolean(u'是否副本', default=False)
+
+    # _sql_constraints = [('name_uniq', 'unique (name)', "流程名称必须唯一 !")]
+
+    @api.onchange('tag_approval_process_ids')
+    def onchange_tag_approval_process_ids(self):
+        self.now_process_ids = self.env['res.partner']
+        for par_one in self.tag_approval_process_ids:
+            self.now_process_ids += par_one.tag_approval_process_partner
+
+        now_list = [par_one1.tag_approval_process_partner for par_one1 in self.tag_approval_process_ids[-1:]]
 
     @api.multi
     def name_get(self):
         res = []
         for self_one in self:
-            name_conent = self_one.name + '     ('
-            for tag_line_one in self_one.tag_approval_process_one:
-                name_conent += tag_line_one.tag_approval_process_partner.name + '->'
+            name_conent = self_one.name if self_one.name else ' ' + '     ('
+            for tag_line_one in self_one.tag_approval_process_ids:
+                name_conent += str(tag_line_one.tag_approval_process_partner.name) + '->'
             res.append((self_one.id, name_conent + ')'))
         return res
+
+    @api.model
+    def create(self, vals):
+
+        if self.name != vals.get('name'):
+            if not vals.get('name').strip():
+                raise UserError('审核流名称不能为空!')
+
+            flow_data = self.env['tag.flow.info'].search([('name', '=', vals.get('name'))])
+            if len(flow_data) > 0:
+                raise UserError('审核流名称 ' + vals.get('name') + ' 已存在')
+
+        if not vals.get('tag_approval_process_ids') and not self:
+            raise UserError('审核流不能为空，请添加审核人')
+
+        res = super(TagProductAttachmentInfo, self).create(vals)
+        return res
+
+    @api.multi
+    def action_create_new_cancel_info(self):
+        self.unlink()
+        return {'type': 'ir.actions.act_window_close'}
 
 
 class TagProductAttachmentInfoLine(models.Model):
@@ -940,6 +1172,45 @@ class TagProductAttachmentInfoLine(models.Model):
     tag_approval_process_partner = fields.Many2one('res.partner', string=u'审批流程')
     tag_id = fields.Many2one('tag.flow.info')
     name = fields.Char('')
+    sequence = fields.Integer('Sequence', default=1, help='Gives the sequence order when displaying a product list')
+
+    review_type = fields.Selection([('review_none', u'未审核'), ('review_ing', u'审核中'), ('review_ok', u'已审核')],
+                                   string=u'审核人状态', default="review_none")
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('tag_approval_process_partner'):
+            raise UserError('序号为 ' + str(vals.get('sequence')) + '审核人为空，请添加审核人')
+        res = super(TagProductAttachmentInfoLine, self).create(vals)
+        return res
+
+
+class TagFlowUpdate(models.TransientModel):
+    _name = "tag.flow.update"
+
+    now_parnter_id = fields.Many2one('res.partner', string=u'当前审核人')
+
+    add_parnter_id = fields.Many2one('res.partner', string=u'添加的审核人')
+
+    @api.multi
+    def action_create_new_update_info(self):
+        new_flow = self.env['tag.flow.info'].browse(int(self._context.get('flow_id'))).copy()
+        all_flow_parnter = self._context.get('add_parnter')
+        flow_index = all_flow_parnter.index(self.now_parnter_id.id)
+        all_flow_parnter.insert(flow_index + 1, self.add_parnter_id.id)
+        product_attachment = self.env['product.attachment.info'].browse(int(self._context.get('info_id')))
+
+        if product_attachment.flow_version > 1:
+            new_name = new_flow.name.split(' ')[0]
+        else:
+            new_name = new_flow.name
+
+        new_flow.write(
+            {'name': new_name + ' 副本' + str(product_attachment.flow_version), 'tag_approval_process_ids': (
+                [(0, 0, {'tag_id': new_flow.id, 'tag_approval_process_partner': p}) for p in all_flow_parnter]),
+             'is_copy': True})
+
+        product_attachment.write({'tag_type_flow_id': new_flow.id, 'flow_version': product_attachment.flow_version + 1})
 
 
 class ProductTemplateExtend(models.Model):
@@ -1088,6 +1359,7 @@ class ReviewProcessCancelWizard(models.TransientModel):
         elif self._context.get('review_type') == 'file_review':
             self.review_process_line.action_cancel(self.remark)
             self.product_attachment_info_id.action_cancel()
+            self.product_attachment_info_id.now_flow_partner_id = 0
 
 
 class ReviewProcessWizard(models.TransientModel):
@@ -1145,6 +1417,9 @@ class ReviewProcessWizard(models.TransientModel):
     #                                 related="material_request_id.review_id.process_line_review_now")
 
     remark = fields.Text(u"备注")
+
+    remark_content = fields.Html('Content', strip_style=True)
+
     is_show_action_deny = fields.Boolean(default=True)
 
     # oa送审
@@ -1210,28 +1485,30 @@ class ReviewProcessWizard(models.TransientModel):
                     if not info_one.review_id:  # 如果没审核过
                         info_one.action_send_to_review()
 
-                    if len(info_one.tag_type_flow_id.tag_approval_process_one.ids) > info_one.now_flow_partner_id:
+                    if len(info_one.tag_type_flow_id.tag_approval_process_ids.ids) > info_one.now_flow_partner_id:
                         info_one.state = 'review_ing'  # 被拒之后 修改状态 wei 审核中
                         info_one.review_id.process_line_review_now.submit_to_next_reviewer(
                             review_type=review_type,
                             to_last_review=to_last_review,
 
-                            partner_id=info_one.tag_type_flow_id.tag_approval_process_one[
+                            partner_id=info_one.tag_type_flow_id.tag_approval_process_ids[
                                 info_one.now_flow_partner_id].tag_approval_process_partner,
 
-                            remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
+                            remark=self.remark_content, material_requests_id=self.material_requests_id,
+                            bom_id=self.bom_id)
                         info_one.now_flow_partner_id += 1
                     else:
-                        print '是最后一个人 通过 后发布'
+                        print '是最后一个人 通过 后发布22'
                         # self.action_pass()
                         info_one.action_released()
                         info_one.review_id.process_line_review_now.action_pass(self.remark, self.material_requests_id,
                                                                                self.bom_id)
+                    info_one.file_is_update = False
 
                 return True
 
             if len(
-                    self.product_attachment_info_id.tag_type_flow_id.tag_approval_process_one.ids) > self.product_attachment_info_id.now_flow_partner_id:
+                    self.product_attachment_info_id.tag_type_flow_id.tag_approval_process_ids.ids) > self.product_attachment_info_id.now_flow_partner_id:
                 if not self.product_attachment_info_id.review_id:  # 如果没审核过
                     self.product_attachment_info_id.action_send_to_review()
 
@@ -1239,12 +1516,13 @@ class ReviewProcessWizard(models.TransientModel):
                 self.product_attachment_info_id.review_id.process_line_review_now.submit_to_next_reviewer(
                     review_type=review_type,
                     to_last_review=to_last_review,
-                    partner_id=self.product_attachment_info_id.tag_type_flow_id.tag_approval_process_one[
+                    partner_id=self.product_attachment_info_id.tag_type_flow_id.tag_approval_process_ids[
                         self.product_attachment_info_id.now_flow_partner_id].tag_approval_process_partner,
-                    remark=self.remark, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
+                    remark=self.remark_content, material_requests_id=self.material_requests_id, bom_id=self.bom_id)
                 self.product_attachment_info_id.now_flow_partner_id += 1
+                self.product_attachment_info_id.file_is_update = False
             else:
-                print '是最后一个人 通过 后发布'
+                print '是最后一个人 通过 后发布1111'
 
                 self.action_pass()
 
@@ -1312,14 +1590,18 @@ class ReviewProcessWizard(models.TransientModel):
                 for info_one in self.env['product.attachment.info'].browse(
                         [int(info_list_id) for info_list_id in file_data_list]):
                     info_one.action_released()
-                    info_one.review_id.process_line_review_now.action_pass(self.remark, self.material_requests_id,
+                    info_one.review_id.process_line_review_now.action_pass(self.remark_content,
+                                                                           self.material_requests_id,
                                                                            self.bom_id)
                 return True
 
             self.product_attachment_info_id.action_released()
             # 审核通过
 
-            self.review_process_line.action_pass(self.remark, self.material_requests_id, self.bom_id)
+            if self.product_attachment_info_id.tag_type_flow_id.is_copy:
+                self.product_attachment_info_id.tag_type_flow_id.unlink()
+
+            self.review_process_line.action_pass(self.remark_content, self.material_requests_id, self.bom_id)
 
         elif review_type == 'picking_review':
 
@@ -1345,18 +1627,25 @@ class ReviewProcessWizard(models.TransientModel):
             self.review_bom_line.action_deny(self.remark, self.material_requests_id, self.bom_id)
         elif review_type == 'file_review':
 
+            dr = re.compile(r'<[^>]+>', re.S)
+            remark_content_new = dr.sub('', self.remark_content)
+
+            if not remark_content_new:
+                raise UserError('备注不能 为空')
+
             if file_data_list:
                 for info_one in self.env['product.attachment.info'].browse(
                         [int(info_list_id) for info_list_id in file_data_list]):
                     info_one.action_deny()
-                    info_one.review_id.process_line_review_now.action_deny(self.remark, self.material_requests_id,
+                    info_one.review_id.process_line_review_now.action_deny(self.remark_content,
+                                                                           self.material_requests_id,
                                                                            self.bom_id)
                     info_one.now_flow_partner_id = 0
 
                 return True
 
             self.product_attachment_info_id.action_deny()
-            self.review_process_line.action_deny(self.remark, self.material_requests_id, self.bom_id)
+            self.review_process_line.action_deny(self.remark_content, self.material_requests_id, self.bom_id)
             self.product_attachment_info_id.now_flow_partner_id = 0
 
 

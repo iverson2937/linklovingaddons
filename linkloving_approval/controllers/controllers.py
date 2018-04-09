@@ -15,12 +15,12 @@ from odoo.http import request, content_disposition
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+
 class LinklovingApproval(http.Controller):
     @http.route('/selectfile/file_show', type='http', auth='public', website=True, methods=['GET'], csrf=False)
     def order_status_show(self, **kw):
         file_id = kw.get('id')
         file_type = kw.get('type')
-
         if file_type == '工程':
             file_type = 'project'
         else:
@@ -32,15 +32,22 @@ class LinklovingApproval(http.Controller):
 
         attachment_info = request.env['product.attachment.info'].browse(int(file_id))
         version_data_list = request.env['product.attachment.info'].search_read(
-                [('product_tmpl_id', '=', attachment_info.product_tmpl_id.id), ('type', '=', file_type)],
-                fields=ATTACHINFO_FIELD)
+            [('product_tmpl_id', '=', attachment_info.product_tmpl_id.id), ('type', '=', file_type)],
+            fields=ATTACHINFO_FIELD)
         attach_list = []
         for atta in version_data_list:
-            attach_list.append(request.env['product.attachment.info'].sudo().convert_attachment_info(atta))
+            list_atta = request.env['product.attachment.info'].sudo().convert_attachment_info(atta)
+            temp_review_line = list_atta['review_line']
+            temp_review_line.reverse()
+            list_atta['review_line'] = temp_review_line
+
+            attach_list.append(list_atta)
+
         for attach_one in attach_list:
             for review_line_one in attach_one.get('review_line'):
                 review_line_one['title'] = '备注:' + str(review_line_one.get('remark')) + ',审核结果：' + str(
-                    review_line_one.get('state')[1]) + '，时间：' + str(review_line_one.get('create_date'))
+                    review_line_one.get('state')[1] if review_line_one.get('state') != ' ' else ' ') + '，时间：' + str(
+                    review_line_one.get('create_date'))
         values = {
             'attach_list': attach_list,
         }

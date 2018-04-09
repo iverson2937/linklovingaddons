@@ -36,3 +36,7 @@ class linkloving_work_order_record(models.Model):
 
     reply_record_line_ids = fields.One2many('linkloving.work.order.record', 'parent_id')
 
+    attachments = fields.One2many(comodel_name="linkloving.work.order.record.image",
+                                  inverse_name="work_order_record_id",
+                                  string="工单回复图片",
+                                  required=False, )

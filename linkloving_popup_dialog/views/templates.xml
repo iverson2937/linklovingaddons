@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="popup_dialog_widget_assets" name="Popup Dialog Widget" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/linkloving_popup_dialog/static/src/js/popup_dialog_widget.js"/>
+        </xpath>
+    </template>
+</odoo>

@@ -14,8 +14,16 @@
                     <button name="confirm" string="审核通过" type="object" class="oe_highlight"
                             states="manager" groups="linkloving_purchase_authority.purchase_manager_plus"/>
                 </xpath>
-                <xpath expr='//button[@name="reject"]' position='attributes'>
-                    <attribute name="states">posted,manager,confirm</attribute>
+                <xpath expr='//button[@name="reject"]' position='replace'>
+                    <button name="reject" string="拒绝" attrs="{'invisible':[('can_reject','!=',True)]}" type="object"/>
+                </xpath>
+
+
+                <xpath expr='//field[@name="receive_date"]' position='after'>
+                    <field name="has_to_approve_ids" invisible="1"/>
+                    <field name="can_reject" invisible="1"/>
+                    <field name="to_approve_ids" string="待审核人" widget="many2many_tags"
+                           attrs="{'invisible':[('has_to_approve_ids','=',False)]}"/>
                 </xpath>
 
                 <xpath expr='//field[@name="state"]' position='attributes'>

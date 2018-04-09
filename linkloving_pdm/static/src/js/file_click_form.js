@@ -32,7 +32,7 @@ $("#file_click_me").click(function (e) {
     product_code_str = "";
     for (var index in product_code_list)
         product_code_str += product_code_list[index];
-    // product_code_str = product_code_str.replace(/\[/g, '_').replace(/]/g, '');
+    product_code_str1 = product_code_str.replace(/\[/g, ' ').replace(/]/g, '');
 
     product_code_str = product_code_str.replace(/]/g, '');
 
@@ -44,23 +44,55 @@ $("#file_click_me").click(function (e) {
             if (data.result == '1') {
                 var cur_type = $("input.this_my_type_file").val();
                 cur_type = cur_type.replace(/"/g, '');
-                var remote_file = cur_type.toUpperCase() + '/' + cur_type.toUpperCase() + '_' + product_code_str.replace(/\./g, '_') + '_v';
+
+
                 $.ajax({
-                    type: "GET",
-                    url: "http://localhost:8088/uploadfile?id=" + product_id_list + "&remotefile=" + remote_file,
-                    success: function (data) {
-                        console.log(data);
-                        if (data.result == '1') {
-                            console.log(data.path)
-                            $(".this_my_filename").val(data.choose_file_name)
-                            $(".this_my_remote_path").val(data.path)
+                    type: "POST",
+                    dataType: 'json',
+                    url: '/get_default_version',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        'jsonrpc': "2.0",
+                        'method': "call",
+                        "params": {
+                            'id': product_id_list,
+                            'type': cur_type,
                         }
+                    }),
+                    success: function (res) {
+                        console.log(res.result.data);
+
+                        var remote_file = cur_type.toUpperCase() + '/' + cur_type.toUpperCase() + '_' + product_code_str.replace(/\./g, '_') + '_v';
+
+                        var remote_file1 = cur_type.toUpperCase() + '/' + product_code_str1.trim().split('.').join('/') + '/v' + res.result.data +
+                            '/' + cur_type.toUpperCase() + '_' + product_code_str1.trim().split('.').join('_') + '_v' + res.result.data;
+
+
+                        $.ajax({
+                            type: "GET",
+                            url: "http://localhost:8088/uploadfile?id=" + product_id_list + "&remotefile=" + remote_file1,
+                            success: function (data) {
+                                console.log(data);
+                                if (data.result == '1') {
+                                    console.log(data.path)
+                                    $(".this_my_filename").val(data.choose_file_name)
+                                    $(".this_my_remote_path").val(data.path)
+                                }
+                            },
+                            error: function (error) {
+                                alert("上传失败,请打开代理软件");
+                                console.log(error);
+                            }
+                        });
+
+
                     },
-                    error: function (error) {
-                        alert("上传失败,请打开代理软件");
-                        console.log(error);
+                    error: function (data) {
+                        console.log("ERROR ", data);
                     }
                 });
+
+
             }
             else {
                 alert("请打开代理软件!");
@@ -70,6 +102,5 @@ $("#file_click_me").click(function (e) {
             alert("上传失败,请打开代理软件");
         }
     });
-
 
 });

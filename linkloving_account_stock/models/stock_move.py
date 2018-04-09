@@ -11,7 +11,6 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-_logger = logging.getLogger(__name__)
 
 
 class StockMove(models.Model):
@@ -21,8 +20,6 @@ class StockMove(models.Model):
         """
        制造入库重写会计分录
         """
-        print credit_account_id.name
-        print debit_account_id.name
         self.ensure_one()
 
         if self._context.get('force_valuation_amount'):
@@ -45,9 +42,7 @@ class StockMove(models.Model):
                                 (self.product_id.name,))
             return []
         credit_value = debit_value
-        # 退料会计凭证
-        # if self.product_id.cost_method == 'average' and self.company_id.anglo_saxon_accounting and self.is_return_material:
-        #     pass
+
 
         if self.product_id.cost_method == 'average' and self.company_id.anglo_saxon_accounting and not self.is_return_material:
             # in case of a supplier return in anglo saxon mode, for products in average costing method, the stock_input
@@ -60,15 +55,10 @@ class StockMove(models.Model):
             if self.location_id.usage == 'customer' and self.origin_returned_move_id:
                 debit_value = self.origin_returned_move_id.price_unit * qty
                 credit_value = debit_value
-            # 盘盈
-            # if self.location_id.usage=="inventory" and self.location_dest_id.usage=='internal':
-            #     pass
-            # # 盘亏
-            # if self.location_id.usage=="internal" and self.location_dest_id.usage=='inventory':
-            #     pass
+
             # add by allen for 生产入库凭证修改
             if self.location_id.usage == 'production' and self.location_dest_id.usage == 'internal' and self.product_id.cost_method == 'average':
-                credit_value = self.product_id.get_material_cost()
+                credit_value = self.product_id.get_material_cost() * qty
         partner_id = (self.picking_id.partner_id and self.env['res.partner']._find_accounting_partner(
             self.picking_id.partner_id).id) or False
         debit_line_vals = {
@@ -116,4 +106,5 @@ class StockMove(models.Model):
                 'account_id': price_diff_account.id,
             }
             res.append((0, 0, price_diff_line))
+
         return res

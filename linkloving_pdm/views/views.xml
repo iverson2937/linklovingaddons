@@ -86,6 +86,110 @@
         </record>
 
 
+        <!--<record id="product_attachment_info_update_file_ss" model="ir.ui.view">-->
+        <!--<field name="name">修改审核流程</field>-->
+        <!--<field name="model">tag.flow.info</field>-->
+        <!--<field name="arch" type="xml">-->
+        <!--<form string="">-->
+        <!--<sheet>-->
+        <!--<group>-->
+
+        <!--<field name="name" string="流程名称"/>-->
+        <!--<field name="tag_approval_process" invisible="1"/>-->
+        <!--<field name="now_process_ids" invisible="1"/>-->
+
+        <!--</group>-->
+
+        <!--<notebook>-->
+        <!--<page string="审核流程记录">-->
+        <!--<field name="tag_approval_process_ids">-->
+        <!--<tree editable="bottom">-->
+        <!--<field name="tag_approval_process_partner"-->
+        <!--domain="[('employee', '=', True),('tag_approval_process_partner','not in',now_process_ids)]"-->
+        <!--string="审核人"-->
+        <!--/>-->
+
+        <!--</tree>-->
+        <!--</field>-->
+        <!--</page>-->
+        <!--</notebook>-->
+
+        <!--</sheet>-->
+        <!--<footer>-->
+        <!--<button string="保存" type="object" name="action_create_new_update_info"-->
+        <!--class="btn-primary"/>-->
+        <!--&lt;!&ndash;<button name='action_create_many_info' type='object' string='' class='oe_highlight review_reload'/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<button string='取消' type="object" name="action_create_new_cancel_info" class='oe_link review_reload' special='cancel'/>&ndash;&gt;-->
+        <!--<button string="取消" class="btn-default" name="action_create_new_cancel_info" type="object"/>-->
+        <!--</footer>-->
+        <!--</form>-->
+        <!--</field>-->
+        <!--</record>-->
+
+
+        <record id="tag_flow_update_form" model="ir.ui.view">
+            <field name="name">tag.flow.update form</field>
+            <field name="model">tag.flow.update</field>
+            <field name="arch" type="xml">
+                <form string="">
+
+                    <sheet>
+
+                        <div class="o_row">
+                            <span>在</span>
+                            <field name="now_parnter_id" required="1" options="{'no_create': True}"
+                                   domain="[('id','in',context.get('now_parnter'))]"/>
+                            <span>审核之后, 添加审核人</span>
+                            <field name="add_parnter_id" required="1" options="{'no_create': True}"
+                                   domain="[('id','not in',context.get('add_parnter')),('employee', '=', True)]"/>
+                            <span></span>
+                        </div>
+
+                        <!--<field name="now_parnter_ids"/>-->
+                        <!--<field name="add_parnter_id"/>-->
+
+                    </sheet>
+
+                    <footer>
+                        <button string="保存" type="object" name="action_create_new_update_info" class="btn-primary"/>
+                        <button string='取消' type="object" class='oe_link review_reload' special='cancel'/>
+                    </footer>
+
+                </form>
+            </field>
+        </record>
+
+
+        <record id="tag_info_form" model="ir.ui.view">
+            <field name="name">tag.info form</field>
+            <field name="model">tag.info</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="file_size"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="remark"/>
+                        </group>
+
+                    </sheet>
+
+                    <footer>
+                        <button name="save_tag_info" string="保存" type="object" class="btn-primary"/>
+                        <button string="取消" class="btn-default" special="cancel"/>
+                    </footer>
+
+                </form>
+            </field>
+        </record>
+
+
         <record id="product_attachment_info_new_file" model="ir.ui.view">
             <field name="name">文件详细</field>
             <field name="model">product.attachment.info</field>
@@ -94,27 +198,30 @@
                     <sheet>
                         <group>
 
-                            <field name="file_product_tmpl_id" string="产品名称"/>
+                            <field name="file_product_tmpl_id" readonly="1" string="产品名称"/>
+                            <!--<field name="file_product_tmpl_id" />-->
 
                             <field name="type" class="this_my_type" invisible="1"/>
                             <field name="tag_upload_file" invisible="1"/>
-                            <field name="tag_type_id"/>
+                            <field name="tag_type_id" options="{'no_create': True}"/>
                             <field name="tag_type_flow_id"/>
                         </group>
                         <group>
+                            <field name="file_binary" widget="pdm_proxy_widget"
+                                   attrs="{'invisible': [('tag_upload_file', '!=', True)]}"/>
                             <field name="file_binary" class="this_my_file_binary"
                                    attrs="{'invisible': [('tag_upload_file', '=', True)]}"/>
                         </group>
-                        <group style="margin-left: 18%;">
+                        <!--<group style="margin-left: 18%;">-->
 
-                            <group attrs="{'invisible': [('tag_upload_file', '!=', True)]}">
-                                <!--<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值-->
-                                <!--</a>-->
-                                <a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件
-                                </a>
-                            </group>
+                        <!--<group attrs="{'invisible': [('tag_upload_file', '!=', True)]}">-->
+                        <!--&lt;!&ndash;<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值&ndash;&gt;-->
+                        <!--&lt;!&ndash;</a>&ndash;&gt;-->
+                        <!--<a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件-->
+                        <!--</a>-->
+                        <!--</group>-->
 
-                        </group>
+                        <!--</group>-->
                         <group>
                             <!--<field name="file_name" attrs="{'invisible': [('type', 'not in', ('design','other'))]}"/>-->
                             <field name="file_name" class="this_my_filename" placeholder="输入格式（*.*）"/>
@@ -126,12 +233,12 @@
                             <field name="review_id" invisible="1"/>
                             <field name="remark"/>
                         </group>
-                        <script type="text/javascript" src="/linkloving_pdm/static/src/js/file_click_form.js"/>
+                        <!--<script type="text/javascript" src="/linkloving_pdm/static/src/js/file_click_form.js"/>-->
 
                         <notebook>
                             <page string="审核流程记录">
                                 <field name="file_review_process_line_ids">
-                                    <tree editable="bottom" create="0">
+                                    <tree editable="bottom" create="0" delete="0">
                                         <field name="review_order_seq" string="顺序" invisible="1"/>
                                         <field name="last_review_line_id" string="上一级审核" invisible="1"/>
 
@@ -167,26 +274,26 @@
                             <field name="temp_product_tmpl_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="type" class="this_my_type_file" invisible="1"/>
                             <field name="tag_upload_file" invisible="1"/>
-                            <field name="tag_type_id"/>
+                            <field name="tag_type_id" options="{'no_create': True}"/>
                             <field name="tag_type_flow_id"/>
+                            <field name="flow_version" invisible="1"/>
                         </group>
                         <group>
+                            <field name="file_binary" widget="pdm_proxy_widget"
+                                   attrs="{'invisible': [('tag_upload_file', '!=', True)]}"/>
                             <field name="file_binary" class="this_my_file_binary"
                                    attrs="{'invisible': [('tag_upload_file', '=', True)]}"/>
                         </group>
-                        <group style="margin-left: 18%;">
-                            <!--<group attrs="{'invisible': [('type', 'in', ('design','other'))]}">-->
-                            <!--<a href="javascript:;" id="my_load_file_a">-->
-                            <!--<input type="file" class="o_form_input my_load_file_view" name="file_binary"/>-->
-                            <!--</a>-->
-                            <!--</group>-->
-                            <group attrs="{'invisible': [('tag_upload_file', '!=', True)]}">
-                                <!--<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值-->
-                                <!--</a>-->
-                                <a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件
-                                </a>
-                            </group>
-                        </group>
+                        <!--<group style="margin-left: 18%;">-->
+
+                        <!--<group attrs="{'invisible': [('tag_upload_file', '!=', True)]}">-->
+                        <!--&lt;!&ndash;<a id="file_click_me_my" class="o_form_input" href="javascript:void(-1);">测试赋值&ndash;&gt;-->
+                        <!--&lt;!&ndash;</a>&ndash;&gt;-->
+                        <!--<a id="file_click_me" class="o_form_input" href="javascript:void(-1);">选择文件-->
+                        <!--</a>-->
+                        <!--</group>-->
+
+                        <!--</group>-->
                         <group>
                             <!--<field name="file_name" attrs="{'invisible': [('type', 'not in', ('design','other'))]}"/>-->
                             <field name="file_name" class="this_my_filename" placeholder="输入格式（*.*）"/>
@@ -198,7 +305,7 @@
                             <field name="review_id" invisible="1"/>
                             <field name="remark"/>
                         </group>
-                        <script type="text/javascript" src="/linkloving_pdm/static/src/js/file_click_form.js"/>
+                        <!--<script type="text/javascript" src="/linkloving_pdm/static/src/js/file_click_form.js"/>-->
                     </sheet>
                     <footer>
                         <button string="保存" type="object" name="action_create_many_info"
@@ -209,6 +316,18 @@
                 </form>
             </field>
         </record>
+
+        <record id="tag_product_attachment_info_tree" model="ir.ui.view">
+            <field name="name">tag.flow.info tree</field>
+            <field name="model">tag.flow.info</field>
+            <field name="arch" type="xml">
+                <tree string="更多">
+                    <field name="display_name" string="流程名称"/>
+                    <!--<field name="review_type" string="审核类型"/>-->
+                </tree>
+            </field>
+        </record>
+
 
         <record id="tag_product_attachment_info_form" model="ir.ui.view">
             <field name="name">设置审核流程</field>
@@ -228,19 +347,21 @@
                                 <!--<page string="审批流程">-->
                                 <!--<field name="tag_approval_process" domain="[('employee', '=', True)]"/>-->
                                 <!--</page>-->
-                                <page string="审批流程002">
-                                    <field name="tag_approval_process_one" mode="tree,kanban">
+                                <page string="审批流程">
+                                    <field name="tag_approval_process_ids" mode="tree,kanban">
                                         <form string="审批流程">
                                             <group>
 
-                                                <field name="tag_approval_process_partner" string="审核人" readonly="0"/>
+                                                <field name="tag_approval_process_partner" domain="[('employee', '=', True)]" string="审核人" readonly="0"/>
 
                                             </group>
                                         </form>
                                         <tree string="Sales Order Lines" editable="bottom">
-                                            <field name="tag_approval_process_partner" string="审核人" readonly="0"/>
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="tag_approval_process_partner" options="{'no_create':True}" domain="[('employee', '=', True)]" string="审核人" readonly="0"/>
                                         </tree>
                                         <kanban class="o_kanban_mobile">
+                                            <!--<field name="sequence" widget="handle"/>-->
                                             <field name="tag_approval_process_partner"/>
                                             <templates>
                                                 <t t-name="kanban-box">
@@ -327,7 +448,14 @@
                             <field name="partner_id" require="1"
                                    options="{'no_create':True}" invisible="context.get('new_file_style')"
                                    domain="[('id','!=',cur_partner_id),('employee', '=', True)]"/>
-                            <field name="remark"/>
+
+
+                            <field name="remark" invisible="context.get('new_file_style')"/>
+
+                            <field name="remark_content" widget="html" options="{'style-inline': true}" string="备注"
+                                   invisible="not context.get('new_file_style')"/>
+
+
                             <!--<field name="need_sop" widget="radio" invisible="context.get('review_type')!='bom_review'"/>-->
                             <!--<field name="sop_name" readonly="1" invisible="context.get('review_type')!='bom_review'"/>-->
                         </group>
@@ -344,7 +472,11 @@
 
                         <div invisible="not context.get('new_file_style')">
 
-                            <button name='action_to_next' type='object' string='同意' class='oe_highlight review_reload'/>
+                            <button name='action_to_next' invisible="not context.get('is_first')" type='object'
+                                    string='提交审核' class='oe_highlight review_reload'/>
+                            <button name='action_to_next' invisible="context.get('is_first')" type='object' string='同意'
+                                    class='oe_highlight review_reload'/>
+
                             <button name='action_deny'
                                     invisible="context.get('is_show_action_deny') == 'false' or context.get('view_show')"
                                     type='object' string='审核不通过' class='oe_highlight review_reload'/>
@@ -415,7 +547,7 @@
 
                 <script type="text/javascript" src="/linkloving_pdm/static/src/js/document_load.js"/>
                 <link rel="stylesheet" href="/linkloving_pdm/static/src/css/document_load.css"/>
-                <!--<script type="text/javascript" src="/linkloving_pdm/static/src/js/file_form_js.js"/>-->
+                <script type="text/javascript" src="/linkloving_pdm/static/src/js/pdm_proxy_widget.js"/>
             </xpath>
         </template>
 

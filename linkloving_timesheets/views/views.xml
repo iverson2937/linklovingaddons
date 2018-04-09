@@ -138,10 +138,10 @@
 
                 <xpath expr="//button[@name='do_new_transfer']" position="replace">
                     <button name="do_new_transfer" string="出库调拨"
-                            attrs="{'invisible': ['|', '|',('picking_type_code', '=', 'incoming'),('state','not in',['assigned']),('secondary_operation', '=', True)]}"
+                            attrs="{'invisible': ['|', '|',('picking_type_code', 'not in', ['outgoing', 'internal']),('state','not in',['assigned']),('secondary_operation', '=', True)]}"
                             groups="stock.group_stock_user" type="object" class="oe_highlight"/>
                     <button name="do_new_transfer" string="出库调拨"
-                            attrs="{'invisible': ['|', '|',('picking_type_code', '=', 'incoming'),('state','not in',['secondary_operation_done']),('secondary_operation', '=', False)]}"
+                            attrs="{'invisible': ['|', '|',('picking_type_code', 'not in', ['outgoing', 'internal']),('state','not in',['secondary_operation_done']),('secondary_operation', '=', False)]}"
                             groups="stock.group_stock_user" type="object" class="oe_highlight"/>
 
                     <!-- Add your fields or attributes here -->

@@ -122,10 +122,10 @@
                                 </div>
 
                                 <div class="col-xs-3">
-                                    <strong>总经理:</strong>
-                                    <p t-field="o.manager_id.name"/>
-                                    <img t-if="o.manager_id.employee_ids[0].signature"
-                                         t-att-src="'data:image/png;base64,%s' % o.manager_id.employee_ids[0].signature"
+                                    <strong>审核人:</strong>
+                                    <p t-field="o.approve_id.name"/>
+                                    <img t-if="o.approve_id"
+                                         t-att-src="'data:image/png;base64,%s' % o.approve_id.employee_ids[0].signature"
                                          style="position:absolute; z-index:2;top: 0;width: 48%;"/>
                                 </div>
                                 <div class="col-xs-3">
@@ -134,8 +134,8 @@
                                 <div class="col-xs-3">
                                     <strong>主管:</strong>
 
-                                    <img t-if="o.approve_id.employee_ids[0].signature"
-                                         t-att-src="'data:image/png;base64,%s' % o.approve_id.employee_ids[0].signature"
+                                    <img t-if="o.manager_id"
+                                         t-att-src="'data:image/png;base64,%s' % o.manager_id.employee_ids[0].signature"
                                          style="position:absolute; z-index:2;top: 0;width: 48%;"/>
 
                                 </div>

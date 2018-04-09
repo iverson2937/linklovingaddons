@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, SUPERUSER_ID
 
 
 class AccountPaymentRegister(models.Model):
@@ -18,6 +18,41 @@ class AccountPaymentRegister(models.Model):
         ('done', u'Done'),
         ('cancel', u'Cancel')
     ], 'State', readonly=True, default='draft', track_visibility='onchange')
+
+    has_to_approve_ids = fields.Boolean(compute='get_to_approve_id')
+
+    can_reject = fields.Boolean(compute='check_can_reject')
+
+    @api.multi
+    def check_can_reject(self):
+        for p in self:
+            if p.state in ('posted', 'confirm', 'manager') and p.create_uid == self.env.user:
+                p.can_reject = True
+            elif p.state == 'posted' and self.env.user.has_group(
+                    'linkloving_purchase_authority.purchase_manager_1'):
+                p.can_reject = True
+            elif p.state == 'manager' and self.env.user.has_group(
+                    'linkloving_purchase_authority.purchase_manager_plus'):
+                p.can_reject = True
+            else:
+                p.can_reject = False
+
+    to_approve_ids = fields.Many2many('res.users', compute='get_to_approve_id')
+
+    @api.multi
+    def get_to_approve_id(self):
+        for payment in self:
+            if payment.state == 'posted':
+                group = self.env.ref('linkloving_purchase_authority.purchase_manager_1')
+                payment.to_approve_ids = group.users.filtered(lambda x: x.id != SUPERUSER_ID)
+                payment.has_to_approve_ids = True
+            elif payment.state == 'manager':
+                group = self.env.ref('linkloving_purchase_authority.purchase_manager_plus')
+                payment.to_approve_ids = group.users.filtered(lambda x: x.id != SUPERUSER_ID)
+                payment.has_to_approve_ids = True
+            else:
+                payment.to_approve_ids = False
+                payment.has_to_approve_ids = False
 
     @api.multi
     def to_manager_approve(self):

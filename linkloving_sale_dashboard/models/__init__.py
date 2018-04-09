@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import models, crm_lead
+from . import crm_team, crm_lead

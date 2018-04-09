@@ -19,19 +19,30 @@ class AccountInvoice(models.Model):
             data = []
             for line in invoice.invoice_line_ids:
                 if line.invoice_line_tax_ids:
+
                     tax_name = line.invoice_line_tax_ids[0].amount / 100
+                    untax_price_unit = line.price_unit / (1 + float(tax_name))
                     tax_type = line.invoice_line_tax_ids[0].type_tax_use
                 else:
                     tax_name = 0
+                    untax_price_unit = line.price_unit
                     tax_type = 'bank'
 
                 res = {
                     'product_name': line.product_id.name,
                     'product_id': line.product_id.id,
+                    'product_uom': line.uom_id.name,
                     'quantity': line.quantity,
+                    # 未税单价
+                    'untax_price_unit': untax_price_unit,
+                    # 单价
                     'price_unit': line.price_unit,
+                    # 未税金额
                     'price_subtotal': line.price_subtotal,
-                    'tax_name': tax_name,
+                    # 含稅金額
+                    'subtotal': line.quantity * line.price_unit,
+                    'tax_name': 0.17,
+
                     'tax_type': tax_type
                 }
                 data.append(res)
@@ -45,6 +56,15 @@ class AccountInvoice(models.Model):
                 invoice.po_id = po.id if po else None
 
     po_id = fields.Many2one('purchase.order', compute=_get_po_number)
+
+    @api.multi
+    def _get_so_number(self):
+        for invoice in self:
+            if invoice.origin:
+                so = invoice.env['sale.order'].sudo().search([('name', '=', invoice.origin)])
+                invoice.so_id = so.id if so else None
+
+    so_id = fields.Many2one('sale.order', compute=_get_so_number)
     order_line = fields.One2many('purchase.order.line', related='po_id.order_line')
     deduct_amount = fields.Float(string=u'扣款')
     remark = fields.Text(string=u'备注')
@@ -107,12 +127,14 @@ class AccountInvoice(models.Model):
         self.state = 'draft'
 
     def parse_invoice_data(self):
+
         return {
-            'name': self.name,
+            'name': self.number,
             'partner_name': self.partner_id.name,
             'line_ids': [
                 {
                     'product_name': line.product_id.name,
+                    'short_name': line.product_id.name.split('-')[0],
                     'qty': line.quantity,
                     'price_unit': line.price_unit,
                     'total_amount': line.quantity * line.price_unit

@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_mrp_approve_stage_admin,linkloving_product_approve.linkloving_product_approve_stage,model_mrp_approve_stage,,1,1,1,1
 access_model_mrp_approval_template_admin,linkloving_product_approve.model_mrp_approval_template,model_mrp_approval_template,,1,1,1,1
 access_model_mrp_approval_record_admin,linkloving_product_approve.model_mrp_approval_record,model_mrp_approval_record,,1,1,1,1
+access_model_mrp_approve_type_admin,linkloving_product_approve.model_mrp_approve_type,model_mrp_approve_type,,1,1,1,1
