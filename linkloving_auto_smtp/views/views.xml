@@ -47,8 +47,7 @@
             <field name="res_model">mail.mail</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <!--<field name="domain">[('author_id.user_id', '=', uid)]</field>-->
-            <field name="domain">[('state','=','outgoing'),('mail_message_id.create_uid', '=', uid)]</field>
+            <field name="domain">[('state','=','received'),('create_uid', '=', uid)]</field>
             <field name="context">
                 {
                 }
@@ -64,6 +63,7 @@
 
         <menuitem id="menu_sales_email" name="邮件销售" sequence="4"/>
 
+
         <menuitem action="menu_sales_email_inbox_action"
                   id="menu_sales_email_inbox"
                   parent="menu_sales_email"
@@ -76,6 +76,12 @@
                   parent="menu_sales_email"
                   groups=""
                   sequence="2" name="发件箱"/>
+
+
+        <!--<menuitem id="linkloving_auto_smtp_menu_mail_message"-->
+                  <!--parent="menu_sales_email"-->
+                  <!--name="Messages"-->
+                  <!--action="mail.action_view_mail_message"/>-->
 
 
         <!--<menuitem action="menu_sales_email_send_action"-->
