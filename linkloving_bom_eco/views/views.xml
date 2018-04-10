@@ -1,5 +1,15 @@
 <openerp>
     <data>
+        <record id="view_bom_eco_search" model="ir.ui.view">
+            <field name="name">mrp.bom.eco.search</field>
+            <field name="model">mrp.bom.eco</field>
+            <field name="arch" type="xml">
+                <search string="品检单" create="false">
+                    <field string="物料清单" name="bom_id"/>
+                </search>
+            </field>
+        </record>
+
         <record id="view_eco_effect_order_form" model="ir.ui.view">
             <field name="name">eco.effect.order.form</field>
             <field name="model">eco.effect.order</field>
@@ -80,6 +90,7 @@
         <record id="view_mrp_bom_eco_tree" model="ir.ui.view">
             <field name="name">mrp.bom.eco.tree</field>
             <field name="model">mrp.bom.eco</field>
+            <field name="search_view_id" ref="view_bom_eco_search"/>
             <field name="arch" type="xml">
                 <tree string="BOM ECO" create="0">
                     <field name="bom_id"/>
@@ -87,6 +98,7 @@
                     <field name="user_id"/>
                     <field name="old_version"/>
                     <field name="effectivity_date" attrs="{'invisible': [('effectivity', '!=', 'date')]}"/>
+                    <field name="create_date"/>
                 </tree>
             </field>
         </record>
@@ -119,6 +131,7 @@
                             <group>
                                 <field name="user_id"/>
                                 <field name="company_id"/>
+                                <field name="create_date"/>
                                 <field name="note"/>
                             </group>
                         </group>

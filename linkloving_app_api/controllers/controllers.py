@@ -84,7 +84,7 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/is_inner_ip', type='http', auth='none', cors='*')
     def is_inner_ip(self, **kw):
         remote_addr = request.httprequest.environ.get('HTTP_X_REAL_IP')
-        if remote_addr in ['112.80.45.130', '221.224.85.74']:
+        if remote_addr in ['112.80.45.130', '221.224.85.74', '49.75.219.17', '221.225.245.181']:
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr},
                                               jsonRequest=False)
         else:
