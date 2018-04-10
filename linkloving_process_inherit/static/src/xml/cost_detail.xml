@@ -35,6 +35,28 @@
         </div>
     </t>
 
+     <t t-name="process_action_table_new">
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                     <th style="width:85px">工序</th>
+                     <th style="width:160px">动作</th>
+                     <th style="width:56px">次数</th>
+                     <th style="width:100px">参数</th>
+                     <th style="width:100px">单价</th>
+                     <th>备注</th>
+                     <th style="width:30px"></th>
+                 </tr>
+
+                <t t-call="add_tr_templ_new">
+                    <t t-if="result">
+                    <t t-set="result" t-value="result"></t>
+                        </t>
+                </t>
+            </tbody>
+        </table>
+    </t>
+
 
     <t t-name="process_action_table">
         <table class="table table-bordered">
@@ -59,6 +81,46 @@
     </t>
 
 
+<t t-name="add_tr_templ_new">
+        <t t-if="result.result">
+        <t t-foreach="result.result" t-as="data">
+            <tr>
+                <td class="process_select">
+                    <select>
+                        <t t-set="index" t-value="0"></t>
+                       <t t-foreach="result.process_options" t-as="option">
+                          <option t-att-data-index="index" t-att-data-id="option.id" t-att-selected="id == result.process_id ? 'selected' : null">
+                              <t t-esc="option.name"/>
+                          </option>
+                           <t t-set="index" t-value="index+1"></t>
+                        </t>
+                    </select>
+                </td>
+                <td class="action_select">
+
+                    <select  t-att-data-id="data.line_id">
+                        <t t-set="index" t-value="0"></t>
+                           <t t-foreach="result.action_options" t-as="options">
+                          <option t-att-data-id="options.id" t-att-data-index="index" t-att-selected="id == data.action_id ? 'selected' : null">
+                              <p style="width:150px"><t t-esc="options.name"/></p>
+                          </option>
+                               <t t-set="index" t-value="index+1"></t>
+                        </t>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="times" name="rate_2" t-att-value="data.rate_2"/>
+                </td>
+                <td>
+                    <input type="text" name="rate" t-att-value="data.rate" />
+                </td>
+                <td class="cost"><t t-esc="data.cost"/></td>
+                <td class="remark"> <t t-esc="data.remark"/></td>
+                <td class="delete"><i class="fa fa-trash"/></td>
+            </tr>
+        </t>
+            </t>
+    </t>
     <t t-name="add_tr_templ">
         <t t-if="result">
         <t t-foreach="result" t-as="data">
@@ -197,7 +259,7 @@
                             <td>简称</td>
                             <td>配比</td>
                             <td>工序动作</td>
-                            <td>替代</td>
+                            <td style="width:150px">替代</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -250,8 +312,10 @@
                 <td><t t-esc="item.source_product_name"/></td>
                 <td><t t-esc="item.source_qty"/></td>
                 <td>
-                    <t t-foreach="item.source_action_ids" t-as="obj">
-                          <span><t t-esc="obj.action_name"/></span><span class="pull-right"><t t-esc="obj.rate_2"/>x<t t-esc="obj.rate"/></span>
+                    <t t-foreach="item.source_action_ids" t-as="source_obj">
+                        <div>
+                          <span><t t-esc="source_obj.action_name"/></span><span class="pull-right"><t t-esc="source_obj.rate_2"/>x<t t-esc="source_obj.rate"/></span>
+                        </div>
                     </t>
                 </td>
                 <t t-if="target==true">
@@ -264,8 +328,10 @@
                             编辑
                         </t>
                         <t t-else="">
-                            <t t-foreach="item.dest_action_ids" t-as="obj">
-                                <t t-esc="obj.action_name"/>
+                            <t t-foreach="item.dest_action_ids" t-as="dest_obj">
+                                <div>
+                                 <span><t t-esc="dest_obj.action_name"/></span><span class="pull-right"><t t-esc="dest_obj.rate_2"/>x<t t-esc="dest_obj.rate"/></span>
+                                </div>
                             </t>
                         </t>
                     </t>
