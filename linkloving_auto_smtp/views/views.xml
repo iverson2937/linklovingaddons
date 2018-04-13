@@ -111,6 +111,24 @@
             </field>
         </record>
 
+        <record id="menu_sales_email_unseen_action" model="ir.actions.act_window">
+            <field name="name">未读邮件</field>
+            <field name="res_model">mail.mail</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','=','unseen'),('create_uid', '=', uid)]</field>
+            <field name="context">
+                {
+                }
+            </field>
+            <field name="search_view_id" ref="mail.view_mail_search"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to add a Email.
+                </p>
+            </field>
+        </record>
+
 
         <record id="menu_sales_email_inbox_action" model="ir.actions.act_window">
             <field name="name">收件箱</field>
@@ -133,31 +151,37 @@
 
         <menuitem id="menu_sales_email" name="邮件销售" sequence="4"/>
 
+        <menuitem action="menu_sales_email_unseen_action"
+                  id="menu_sales_email_unseen"
+                  parent="menu_sales_email"
+                  groups=""
+                  sequence="2" name="未读邮件"/>
+
 
         <menuitem action="menu_sales_email_inbox_action"
                   id="menu_sales_email_inbox"
                   parent="menu_sales_email"
                   groups=""
-                  sequence="1" name="收件箱"/>
+                  sequence="5" name="收件箱"/>
 
 
         <menuitem action="menu_sales_email_send_action"
                   id="menu_sales_email_send"
                   parent="menu_sales_email"
                   groups=""
-                  sequence="2" name="发件箱"/>
+                  sequence="10" name="发件箱"/>
 
         <menuitem action="menu_sales_email_load_subscribe_action"
                   id="menu_sales_email_load_subscribe"
                   parent="menu_sales_email"
                   groups=""
-                  sequence="3" name="邮件退订与查看率"/>
+                  sequence="100" name="邮件退订与查看率"/>
 
 
         <!--<menuitem id="linkloving_auto_smtp_menu_mail_message"-->
-                  <!--parent="menu_sales_email"-->
-                  <!--name="Messages"-->
-                  <!--action="mail.action_view_mail_message"/>-->
+        <!--parent="menu_sales_email"-->
+        <!--name="Messages"-->
+        <!--action="mail.action_view_mail_message"/>-->
 
 
         <!--<menuitem action="menu_sales_email_send_action"-->
