@@ -69,7 +69,7 @@ class AccountPaymentRegister(models.Model):
     def get_amount(self):
         amount = 0
         for invoice in self.invoice_ids:
-            amount += invoice.remain_apply_balance
+            amount += invoice.residual
         self.amount = amount
 
     bank_id = fields.Many2one('res.partner.bank', string=u'Account', domain="[('partner_id', '=', partner_id)]")
