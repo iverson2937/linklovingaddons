@@ -3781,7 +3781,7 @@ class LinklovingAppApi(http.Controller):
         # request.params["db"] = db
         domain = []
         if product_name:
-            domain.append(('name', 'ilike', product_name))
+            domain.append(('name', 'ilike', product_name), ('active', '!=', None))
         products = request.env['product.product'].sudo().search(domain,
                                                                 limit=10)
         json_list = []

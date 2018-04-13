@@ -326,8 +326,8 @@ class ProductTemplate(models.Model):
         res = self._compute_quantities_dict()
         ress = {k: {'nbr_reordering_rules': 0, 'reordering_min_qty': 0, 'reordering_max_qty': 0} for k in self.ids}
         product_data = self.env['stock.warehouse.orderpoint'].read_group(
-                [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
-                ['product_id'])
+            [('product_id.product_tmpl_id', 'in', self.ids)], ['product_id', 'product_min_qty', 'product_max_qty'],
+            ['product_id'])
         for data in product_data:
             product = self.env['product.product'].browse([data['product_id'][0]])
             product_tmpl_id = product.product_tmpl_id.id
@@ -559,8 +559,10 @@ class ProductTemplate(models.Model):
             product_data = res[product.id]
             product.stock = product_data['qty_available']
             product.forecast_qty = product_data['virtual_available']
+            product.rt_incoming_qty = product_data['incoming_qty']
 
     stock = fields.Float(string=u'库存', store=True, compute=get_stock)
+    rt_incoming_qty = fields.Float(string=u'在产', store=True, compute=get_stock)
     forecast_qty = fields.Float(string=u'预测数量', store=True, compute=get_stock)
 
     _sql_constraints = [
