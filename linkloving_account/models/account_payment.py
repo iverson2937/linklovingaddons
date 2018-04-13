@@ -31,7 +31,7 @@ class AccountPaymentRegister(models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
     name = fields.Char()
     balance_ids = fields.One2many('account.payment.register.balance', 'payment_id')
-    amount = fields.Float(string=u'Amount', compute='get_amount', store=True, track_visibility='onchange')
+    amount = fields.Float(string=u'Amount', compute='get_amount', track_visibility='onchange')
     company_id = fields.Many2one('res.company', 'Company',
                                  default=lambda self: self.env['res.company']._company_default_get(
                                      'account.payment.register'))
