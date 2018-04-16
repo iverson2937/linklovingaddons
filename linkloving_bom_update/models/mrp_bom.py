@@ -140,7 +140,7 @@ class MrpBomLine(models.Model):
             if line_id.bom_id.state == 'release':
                 if not self.bom_id.review_id:
                     self.bom_id.review_id = self.env["review.process"].create_review_process('mrp.bom',
-                                                                                      self.id)
+                                                                                             self.bom_id.id)
                 else:
                     line_ids = self.bom_id.review_id.get_review_line_list()
                     self.env["review.process.line"].create({
