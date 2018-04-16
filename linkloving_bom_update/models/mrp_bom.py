@@ -137,6 +137,27 @@ class MrpBomLine(models.Model):
                     + u"<li>数量<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
                        line_id.product_id.name, line_id.product_specs, line_id.product_qty)
             line_id.bom_id.message_post(body=body)
+            if line_id.bom_id.state == 'release':
+                if not self.review_id:
+                    self.review_id = self.env["review.process"].create_review_process('mrp.bom',
+                                                                                      self.id)
+                else:
+                    line_ids = self.review_id.get_review_line_list()
+                    self.env["review.process.line"].create({
+                        'partner_id': self.env.user.partner_id.id,
+                        'review_id': self.review_id.id,
+                        'remark': '%s----->%s' % (self.state, u'更新'),
+                        'state': 'waiting_review',
+                        'last_review_line_id': line_ids[-1].get('id') if line_ids else False,
+                        'review_order_seq': max([line.review_order_seq for line in self.review_id.review_line_ids]) + 1
+                    })
+
+                vals.update({
+                    'current_review_id': self.env.user.id,
+                    'state': 'updated',
+                })
+
+
         return line_id
 
     @api.multi
