@@ -138,21 +138,21 @@ class MrpBomLine(models.Model):
                        line_id.product_id.name, line_id.product_specs, line_id.product_qty)
             line_id.bom_id.message_post(body=body)
             if line_id.bom_id.state == 'release':
-                if not self.bom_id.review_id:
-                    self.bom_id.review_id = self.env["review.process"].create_review_process('mrp.bom',
-                                                                                             self.bom_id.id)
+                if not line_id.bom_id.review_id:
+                    line_id.bom_id.review_id = self.env["review.process"].create_review_process('mrp.bom',
+                                                                                                line_id.bom_id.id)
                 else:
-                    line_ids = self.bom_id.review_id.get_review_line_list()
+                    line_ids = line_id.bom_id.review_id.get_review_line_list()
                     self.env["review.process.line"].create({
                         'partner_id': self.env.user.partner_id.id,
-                        'review_id': self.review_id.id,
-                        'remark': '%s----->%s' % (self.state, u'更新'),
+                        'review_id': line_id.bom_id.review_id.id,
+                        'remark': '%s----->%s' % (line_id.bom_id.state, u'更新'),
                         'state': 'waiting_review',
                         'last_review_line_id': line_ids[-1].get('id') if line_ids else False,
                         'review_order_seq': max(
-                            [line.review_order_seq for line in self.bom_id.review_id.review_line_ids]) + 1
+                            [line.review_order_seq for line in line_id.bom_id.review_id.review_line_ids]) + 1
                     })
-                self.bom_id.write({
+                line_id.bom_id.write({
                     'current_review_id': self.env.user.id,
                     'state': 'updated',
                 })
