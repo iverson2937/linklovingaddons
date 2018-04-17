@@ -330,6 +330,8 @@ class MrpBom(models.Model):
         if self.product_tmpl_id.product_ll_type:
             product_type_dict = self._get_product_type_dict()
         total_cost = self.product_tmpl_id.product_variant_ids[0].pre_cost_cal_new(raise_exception=False)
+        if not total_cost:
+            total_cost = 0
 
         man_cost = self.product_tmpl_id.product_variant_ids[0].get_pure_manpower_cost()
         material_cost = total_cost - man_cost
