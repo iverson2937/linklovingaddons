@@ -394,8 +394,8 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 showExport: true,
                 treeShowField: 'name',
                 treeEnable: true,
-                idField: 'id',
-                parentIdField: 'pid',
+               idField: 'uuid',
+                parentIdField: 'puuid',
                 editable: true,
                 showRefresh: true,
                 iconsPrefix: 'fa', // glyphicon of fa (font awesome)
@@ -452,8 +452,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             self.$('#table').bootstrapTable(options);
             self.$('#table').treegrid({
                 // initialState: 'collapsed',//收缩
-                idField: 'uuid',
-                parentIdField: 'puuid',
+
                 treeColumn: 0,//指明第几列数据改为树形
                 expanderExpandedClass: 'fa fa-caret-down',
                 expanderCollapsedClass: 'fa fa-caret-right',
