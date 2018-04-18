@@ -463,7 +463,7 @@ def _get_rec_default(categ_id, p_uuid, object, parnet, result, product_type_dict
 
 def _get_rec(object, p_uuid, parnet, result, product_type_dict):
     for l in object:
-        c_uuid = str(uuid.uuid1()),
+        c_uuid = str(uuid.uuid1())
         if l.child_line_ids:
             for line in l.child_line_ids:
                 _get_rec(line, c_uuid, l, result, product_type_dict)
