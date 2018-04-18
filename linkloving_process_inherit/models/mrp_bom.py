@@ -342,6 +342,8 @@ class MrpBom(models.Model):
         res = {
             'id': 1,
             'pid': 0,
+            'puuid': 0,
+            'uuid': 1,
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
