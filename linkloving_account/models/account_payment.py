@@ -207,26 +207,23 @@ class AccountPayment(models.Model):
     @api.multi
     def get_account_payment_register_id(self):
         for p in self:
-            if p.res_id:
+            if p.res_id and p.res_model == 'account.payment.register':
                 account_payment_register_id = self.env[p.res_model].browse(p.res_id)
-                if account_payment_register_id:
-                    p.account_payment_register_id = account_payment_register_id.id
+                p.account_payment_register_id = account_payment_register_id.id
 
     @api.multi
     def get_account_employee_payment_id(self):
         for p in self:
-            if p.res_id:
+            if p.res_id and p.res_model == 'account.employee.payment':
                 account_employee_payment_id = self.env[p.res_model].browse(p.res_id)
-                if account_employee_payment_id:
-                    p.account_employee_payment_id = account_employee_payment_id.id
+                p.account_employee_payment_id = account_employee_payment_id.id
 
     @api.multi
     def get_sheet_id(self):
         for p in self:
-            if p.res_id:
+            if p.res_id and p.res_model == 'hr.expense.sheet':
                 sheet_id = self.env[p.res_model].browse(p.res_id)
-                if sheet_id:
-                    p.sheet_id = sheet_id.id
+                p.sheet_id = sheet_id.id
 
     def _get_move_ids(self):
         self.move_ids = self.move_line_ids.mapped('move_id').ids
