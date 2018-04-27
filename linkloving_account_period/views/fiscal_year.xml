@@ -164,6 +164,24 @@
         </record>
         <menuitem id="menu_action_account_period" action="action_account_period" parent="menu_account_periods"/>
 
+        <record model="ir.ui.view" id="view_account_payment_search_inherit">
+            <field name="name">stock.picking.search.inherit</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="string">单号</attribute>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="after">
+
+                    <field name="period_id" string="会计区间"/>
+
+                </xpath>
+
+            </field>
+        </record>
+
+
         <record id="action_account_payment_all" model="ir.actions.act_window">
             <field name="name">付款</field>
             <field name="res_model">account.payment</field>
