@@ -11,7 +11,7 @@ class ResUserExtend(models.Model):
 
     mail_server = fields.Many2one('ir.mail_server', string=u'Send Mail Server')
 
-    fetch_mail_server = fields.Many2one('fetchmail.server', string=u'Fetch Mail Server')
+    # fetch_mail_server = fields.Many2one('fetchmail.server', string=u'Fetch Mail Server')
 
 
 class ir_mail_server(models.Model):
