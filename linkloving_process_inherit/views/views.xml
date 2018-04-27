@@ -33,9 +33,21 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+        <record id="action_product_cost_copy" model="ir.actions.client">
+            <field name="name">成本明细匹配</field>
+            <field name="tag">bom_cost_reproduce</field>
+        </record>
+
 
         <menuitem id="menu_mrp_work_type_config" name="工序动作" parent="mrp.menu_mrp_configuration" sequence="33"
                   action="action_mrp_process_action"/>
+
+        <menuitem
+                id="menu_bom_cost_update"
+                name="成本明细匹配"
+                action="action_product_cost_copy"
+                parent="mrp.menu_mrp_bom"
+                sequence="5"/>
 
 
     </data>

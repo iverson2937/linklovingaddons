@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
+import uuid
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class MrpBom(models.Model):
@@ -10,12 +12,228 @@ class MrpBom(models.Model):
     manpower_cost = fields.Float(string='工序动作成本', compute='_get_bom_cost')
 
     @api.model
-    def get_diff_bom_date(self, source_id, dest_id):
+    def get_diff_bom_data(self, **kwargs):
         bom_obj = self.env['mrp.bom']
+        source_id = kwargs.get("origin_bom_id")
+        dest_id = kwargs.get("target_bom_id")
         source_bom = bom_obj.browse(source_id)
         dest_bom = bom_obj.browse(dest_id)
         source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
-        dest_bom_produt_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
+        datas = []
+        dest_process_id = dest_bom.process_id.id
+        dest_action_options = []
+        process_options = []
+        actions = self.env['mrp.process.action'].search(
+            ['|', ('process_id', '=', dest_process_id), ('process_id', '=', False)])
+        for action in actions:
+            dest_action_options.append({
+                'id': action.id,
+                'name': action.name,
+                'cost': action.cost,
+                'remark': action.remark
+            })
+        ps = self.env['mrp.process'].search([])
+        for p in ps:
+            process_options.append({
+                'id': p.id,
+                'name': p.name
+            })
+        for product in common_products:
+            source_line = source_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
+            dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == product)
+            datas.append({
+                'source_default_code': source_line.product_id.default_code,
+                'source_product_name': source_line.product_id.name,
+                'source_qty': source_line.product_qty,
+                'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
+                'dest_default_code': dest_line.product_id.default_code,
+                'dest_product_name': dest_line.product_id.name,
+                'dest_qty': dest_line.product_qty,
+                'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
+                'dest_bom_line': dest_line.id,
+                'no_edit': True
+            })
+
+        for s_product in source_bom_product_ids:
+            source_line = source_bom.bom_line_ids.filtered(lambda x: x.product_id.id == s_product)
+            if s_product not in common_products:
+                datas.append({
+                    'source_default_code': source_line.product_id.default_code,
+                    'source_product_name': source_line.product_id.name,
+                    'source_qty': source_line.product_qty,
+                    'source_action_ids': source_line.parse_action_line_data(no_option=True, no_data=True),
+                    'dest_default_code': '',
+                    'dest_product_name': '',
+                    'dest_qty': '',
+                    'dest_action_ids': '',
+                    'dest_bom_line': '',
+                    'no_edit': True
+                })
+        for d_product in dest_bom_product_ids:
+            dest_line = dest_bom.bom_line_ids.filtered(lambda x: x.product_id.id == d_product)
+            if d_product not in common_products:
+                datas.append({
+                    'source_default_code': '',
+                    'source_product_name': '',
+                    'source_qty': '',
+                    'source_action_ids': '',
+                    'dest_default_code': dest_line.product_id.default_code,
+                    'dest_product_name': dest_line.product_id.name,
+                    'dest_qty': dest_line.product_qty,
+                    'dest_action_ids': dest_line.parse_action_line_data(no_option=True, no_data=True),
+                    'dest_bom_line': dest_line.id,
+                    'no_edit': False
+                })
+        return {'datas': datas, 'process_options': process_options, 'process_id': dest_process_id,
+                'action_options': dest_action_options}
+
+    @api.model
+    def get_product_options(self, **kwargs):
+        datas = []
+        bom_obj = self.env['mrp.bom']
+        source_id = kwargs.get('origin_bom_id')
+        dest_bom_id = kwargs.get('target_bom_id')
+        source_bom = bom_obj.browse(source_id)
+        dest_bom = bom_obj.browse(dest_bom_id)
+        source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
+        for product in source_bom_product_ids:
+            ation_data = source_bom.mapped('bom_line_ids').filtered(
+                lambda x: x.product_id.id == product)
+            if product not in common_products:
+                datas.append({
+                    'id': product,
+                    'action_ids': ation_data.parse_action_line_data(no_option=True, no_data=True),
+                    'name': self.env['product.product'].browse(product).display_name
+                })
+        return datas
+
+    @api.model
+    def save_changes(self, **kwargs):
+        print kwargs
+        source_bom_id = kwargs.get('source_bom_id')
+        dest_bom_id = kwargs.get('dest_bom_id')
+        bom_obj = self.env['mrp.bom']
+        source_bom = bom_obj.browse(int(source_bom_id))
+        dest_bom = bom_obj.browse(int(dest_bom_id))
+        source_bom_product_ids = source_bom.mapped('bom_line_ids.product_id').ids
+        dest_bom_product_ids = dest_bom.mapped('bom_line_ids.product_id').ids
+        common_products = set(source_bom_product_ids) & set(dest_bom_product_ids)
+        # 共同的line copy前提是一致
+        for p in common_products:
+            source_line = source_bom.mapped('bom_line_ids').filtered(lambda x: x.product_id.id == p)
+            dest_line = dest_bom.mapped('bom_line_ids').filtered(lambda x: x.product_id.id == p)
+            if not dest_line.action_line_ids and source_line.action_line_ids:
+                for ac in source_line.action_line_ids:
+                    self.env['process.action.line'].create({
+                        'action_id': ac.action_id.id,
+                        'rate': ac.rate,
+                        'rate_2': ac.rate_2,
+                        'bom_line_id': dest_line.id
+                    })
+
+        copy_actions = kwargs.get('copy_actions')
+        update_actions = kwargs.get('update_actions')
+        action_line_obj = self.env['process.action.line']
+        source_action_line_ids = []
+        for action in copy_actions:
+            product_id = action.get('replace_id')
+            if product_id:
+                source_bom_line = self.env['mrp.bom'].browse(int(source_bom_id)).mapped('bom_line_ids').filtered(
+                    lambda x: x.product_id.id == product_id)
+                if source_bom_line:
+                    source_action_line_ids = source_bom_line[0].action_line_ids
+
+                dest_bom_line = action.get('dest_bom_line')
+                if self.env['mrp.bom.line'].browse(dest_bom_line).action_line_ids:
+                    for l in self.env['mrp.bom.line'].browse(dest_bom_line).action_line_ids:
+                        l.unlink()
+                for action_line in source_action_line_ids:
+                    self.env['process.action.line'].create({
+                        'action_id': action_line.action_id.id,
+                        'rate': action_line.rate,
+                        'rate_2': action_line.rate_2,
+                        'bom_line_id': int(dest_bom_line)
+                    })
+        if update_actions:
+            print update_actions
+            for bom_line_id, actions in update_actions.iteritems():
+                print bom_line_id,
+                print actions
+
+                if actions:
+                    bom_line = self.env['mrp.bom.line'].browse(int(bom_line_id))
+                    for action in actions:
+                        if type(action) == dict and action.get('line_id'):
+                            process_action_line = action_line_obj.browse(action.get('line_id'))
+                            action_id_new = int(action.get('action_id'))
+                            if action_id_new in self.env['mrp.process.action'].search([]).ids:
+                                process_action_line.write({
+                                    'rate': action.get('rate'),
+                                    'rate_2': action.get('rate_2'),
+                                    'action_id': action_id_new
+                                })
+                        elif action.get('delete_line_id'):
+                            action_line_obj.browse(int(action.get('delete_line_id'))).unlink()
+                        else:
+                            action_line_obj.create({
+                                'rate': action.get('rate'),
+                                'rate_2': action.get('rate_2'),
+                                'action_id': int(action.get('action_id')),
+                                'bom_line_id': int(bom_line_id)
+                            })
+                    # else:
+                    #     self.env['process.action.line'].browse()
+
+                    action_data = bom_line.parse_action_line_data(no_option=True, no_data=True)
+                    category_id = bom_line.bom_id.product_tmpl_id.categ_id.id
+                    tmp_obj = self.env['bom.cost.category.temp']
+                    product_id = bom_line.product_id.id
+                    temp_id = tmp_obj.search(
+                        [('category_id', '=', category_id), ('product_id', '=', product_id)], limit=1)
+                    if temp_id:
+
+                        temp_id.action_data = json.dumps(action_data)
+                    else:
+                        tmp_obj.create({'category_id': bom_line.bom_id.product_tmpl_id.categ_id.id,
+                                        'product_id': product_id,
+                                        'action_data': json.dumps(action_data)
+                                        })
+
+        return 'ok'
+
+    # 搜索bom
+    @api.model
+    def get_bom_list(self, arg):
+        product_name = arg.get('name')
+        product_tmpl_ids = self.env['product.template'].search(
+            [('bom_ids', '!=', False), '|', ('name', 'ilike', product_name), ('default_code', 'ilike', product_name)],
+            limit=10)
+        bom_list = []
+        for product_tmpl_id in product_tmpl_ids:
+            if product_tmpl_id.bom_count > 1:
+                raise UserError('%s有超过一个Bom,请核对') % product_tmpl_id.name
+            else:
+                bom_list.append({
+                    'id': product_tmpl_id.bom_ids[0].id,
+                    'name': product_tmpl_id.display_name
+                })
+        return bom_list
+
+    def get_bom_line_list(self):
+        line_list = []
+        for line in self.bom_line_ids:
+            line_list.append({
+                'source_default_code': line.product_id.default_code,
+                'source_product_name': line.product_id.name,
+                'source_qty': line.product_qty,
+                'no_edit': True,
+                'source_action_ids': line.parse_action_line_data(no_option=True, no_data=True)
+            })
+        return line_list
 
     def _get_product_type_dict(self):
         return dict(
@@ -33,6 +251,8 @@ class MrpBom(models.Model):
         res = {
             'id': 1,
             'pid': 0,
+            'uuid':1,
+            'puuid':0,
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
@@ -61,10 +281,11 @@ class MrpBom(models.Model):
         :param product_type_dict:
         :return:
         '''
+        c_uuid = str(uuid.uuid1())
         if line.child_line_ids:
 
             for l in line.child_line_ids:
-                _get_rec_default(categ_id, l, line, result, product_type_dict)
+                _get_rec_default(categ_id, c_uuid, l, line, result, product_type_dict)
 
         bom_id = line.product_id.product_tmpl_id.bom_ids
 
@@ -81,11 +302,8 @@ class MrpBom(models.Model):
         if not line.parse_action_line_data(no_option=True, no_data=True) and line.get_product_action_default():
             is_default = True
             action_process = line.get_product_action_default()
-            print action_process
-            print action_process, 'default'
         else:
             action_process = line.parse_action_line_data(no_option=True)
-            print action_process, 'line'
 
             is_default = False
 
@@ -97,6 +315,8 @@ class MrpBom(models.Model):
             'id': line.id,
             'has_lines': 0 if line.child_line_ids else 1,
             'pid': 1,
+            'uuid': c_uuid,
+            'p_uuid': 1,
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'qty': line.product_qty,
@@ -116,12 +336,16 @@ class MrpBom(models.Model):
         if self.product_tmpl_id.product_ll_type:
             product_type_dict = self._get_product_type_dict()
         total_cost = self.product_tmpl_id.product_variant_ids[0].pre_cost_cal_new(raise_exception=False)
+        if not total_cost:
+            total_cost = 0
 
         man_cost = self.product_tmpl_id.product_variant_ids[0].get_pure_manpower_cost()
         material_cost = total_cost - man_cost
         res = {
             'id': 1,
             'pid': 0,
+            'puuid': 0,
+            'uuid': 1,
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
@@ -143,10 +367,11 @@ class MrpBom(models.Model):
         return result + sorted(line_ids, key=lambda product: product['code'], reverse=True)
 
     def get_bom_line_new(self, line, result, product_type_dict):
+        c_uuid = str(uuid.uuid1())
         if line.child_line_ids:
 
             for l in line.child_line_ids:
-                _get_rec(l, line, result, product_type_dict)
+                _get_rec(l, c_uuid, line, result, product_type_dict)
 
         bom_id = line.product_id.product_tmpl_id.bom_ids
 
@@ -165,6 +390,8 @@ class MrpBom(models.Model):
             'product_id': line.product_id.id,
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
             'id': line.id,
+            'uuid': c_uuid,
+            'puuid': 1,
             'has_lines': 0 if line.child_line_ids else 1,
             'pid': 1,
             'product_specs': line.product_id.product_specs,
@@ -186,11 +413,12 @@ class MrpBom(models.Model):
             bom.manpower_cost = sum(bom_line.bom_line_man_cost for bom_line in bom.bom_line_ids)
 
 
-def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
+def _get_rec_default(categ_id, p_uuid, object, parnet, result, product_type_dict):
     for l in object:
+        c_uuid = str(uuid.uuid1()),
         if l.child_line_ids:
             for line in l.child_line_ids:
-                _get_rec_default(categ_id, line, l, result, product_type_dict)
+                _get_rec_default(categ_id, c_uuid, line, l, result, product_type_dict)
 
         bom_id = l.product_id.product_tmpl_id.bom_ids
         process_id = []
@@ -220,6 +448,8 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
             # 'is_highlight': l.is_highlight,
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
+            'uuid': c_uuid,
+            'p_uuid': p_uuid,
             'pid': parnet.id,
             'process_action': action_process,
             'is_default': is_default,
@@ -235,11 +465,12 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
     return res
 
 
-def _get_rec(object, parnet, result, product_type_dict):
+def _get_rec(object, p_uuid, parnet, result, product_type_dict):
     for l in object:
+        c_uuid = str(uuid.uuid1())
         if l.child_line_ids:
             for line in l.child_line_ids:
-                _get_rec(line, l, result, product_type_dict)
+                _get_rec(line, c_uuid, l, result, product_type_dict)
 
         bom_id = l.product_id.product_tmpl_id.bom_ids
         process_id = []
@@ -262,6 +493,8 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'is_highlight': l.is_highlight,
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
+            'puuid': p_uuid,
+            'uuid': c_uuid,
             'pid': parnet.id,
             'material_cost': round(material_cost, 5),
             'process_action': l.parse_action_line_data(),
@@ -300,10 +533,8 @@ class MrpBomLine(models.Model):
                   ('product_id', '=', self.product_id.id)]
         temp_id = self.env['bom.cost.category.temp'].search(domain)
         res = []
-        print temp_id, 'temp_id'
         if temp_id:
             res = json.loads(temp_id.action_data)
-            print res, 'res'
         return res
 
     @api.model
@@ -429,6 +660,8 @@ class MrpBomLine(models.Model):
             'rate': 1,
             'rate_2': 0,
             'options': options,
+            'remark': options[0].get('remark'),
+            'cost': options[0].get('remark'),
             'process_id': self.bom_id.process_id.id,
             'process_options': process_options,
 

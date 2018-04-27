@@ -286,19 +286,15 @@ class MrpConfigSettingsI(models.TransientModel):
                 self.env['ir.config_parameter'].set_param("mrp.config.settings.%s" % fi, getattr(record, fi, ''))
 
 
-
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
     is_secondary_produce = fields.Boolean(default=False)
     secondary_produce_time_ids = fields.One2many("production.time.record", 'production_id', )
 
-    @api.model
-    def create(self, vals):
-        print vals,
-        print '***************************************'
-
-        return super(MrpProductionExtend, self).create(vals)
+    # @api.model
+    # def create(self, vals):
+    #     return super(MrpProductionExtend, self).create(vals)
 
     @api.multi
     def write(self, vals):
@@ -1318,9 +1314,10 @@ class ReturnOfMaterial(models.Model):
         product_ids = []
         if self._context.get('active_id') and self._context.get('active_model') == "mrp.production":
             mrp_production_order = self.env['mrp.production'].browse(self._context['active_id'])
-            if mrp_production_order.product_id.bom_ids:
-                product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(
-                    'product_id').ids
+            product_ids = mrp_production_order.sim_stock_move_lines.mapped("product_id").ids
+            # if mrp_production_order.product_id.bom_ids:
+            #     product_ids = mrp_production_order.product_id.bom_ids[0].bom_line_ids.mapped(
+            #         'product_id').ids
             if mrp_production_order.process_id.is_rework:
                 product_ids = mrp_production_order.rework_material_line_ids.mapped(
                     'product_id').ids

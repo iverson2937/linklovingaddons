@@ -16,8 +16,8 @@ class MrpBom(models.Model):
 
     @api.multi
     def action_released(self):
-        for l in self.bom_line_ids:
-            set_bom_line_product_bom_released(l)
+        for line in self.bom_line_ids:
+            line.set_bom_line_product_bom_released()
 
     @api.multi
     def bom_detail(self):
@@ -41,7 +41,7 @@ class MrpBom(models.Model):
             'name': self.product_tmpl_id.name,
             'code': self.product_tmpl_id.default_code,
             'process_id': self.process_id.name,
-            'bom_ids': sorted(res, key=lambda product : product['code']),
+            'bom_ids': sorted(res, key=lambda product: product['code']),
             'state': self.state,
             'review_line': self.review_id.get_review_line_list(),
         }
@@ -116,6 +116,14 @@ class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
     is_highlight = fields.Boolean()
 
+    def set_bom_line_product_bom_released(self):
+        self.bom_id.state = 'release'
+        # line.bom_id.product_tmpl_id.apply_bom_update()
+
+        if self.child_line_ids:
+            for line in self.child_line_ids:
+                line.set_bom_line_product_bom_released()
+
     @api.model
     def create(self, vals):
         line_id = super(MrpBomLine, self).create(vals)
@@ -129,13 +137,34 @@ class MrpBomLine(models.Model):
                     + u"<li>数量<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
                        line_id.product_id.name, line_id.product_specs, line_id.product_qty)
             line_id.bom_id.message_post(body=body)
+            if line_id.bom_id.state == 'release':
+                if not line_id.bom_id.review_id:
+                    line_id.bom_id.review_id = self.env["review.process"].create_review_process('mrp.bom',
+                                                                                                line_id.bom_id.id)
+                else:
+                    line_ids = line_id.bom_id.review_id.get_review_line_list()
+                    self.env["review.process.line"].create({
+                        'partner_id': self.env.user.partner_id.id,
+                        'review_id': line_id.bom_id.review_id.id,
+                        'remark': '%s----->%s' % (line_id.bom_id.state, u'更新'),
+                        'state': 'waiting_review',
+                        'last_review_line_id': line_ids[-1].get('id') if line_ids else False,
+                        'review_order_seq': max(
+                            [line.review_order_seq for line in line_id.bom_id.review_id.review_line_ids]) + 1
+                    })
+                line_id.bom_id.write({
+                    'current_review_id': self.env.user.id,
+                    'state': 'updated',
+                })
+
+
         return line_id
 
     @api.multi
     def write(self, vals):
 
         if (
-                        'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
+                'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
                 and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'你没有权限修改请联系管理员')
 
@@ -170,7 +199,7 @@ class MrpBomLine(models.Model):
     @api.multi
     def unlink(self):
         if (
-                        'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
+                'RT-ENG' in self.bom_id.product_tmpl_id.name or self.bom_id.product_tmpl_id.product_ll_type == 'semi-finished') \
                 and not self.env.user.has_group('mrp.group_mrp_manager'):
             raise UserError(u'你没有权限修改请联系管理员')
         if self.bom_id and self.bom_id.state != 'new':
@@ -206,15 +235,6 @@ def get_next_default_code(default_code):
     version = default_code.split('.')[-1]
 
     return int(version) + 1
-
-
-def set_bom_line_product_bom_released(line):
-    line.bom_id.state = 'release'
-    # line.bom_id.product_tmpl_id.apply_bom_update()
-
-    if line.child_line_ids:
-        for l in line.child_line_ids:
-            set_bom_line_product_bom_released(l)
 
 
 def reject_bom_line_product_bom(line):
