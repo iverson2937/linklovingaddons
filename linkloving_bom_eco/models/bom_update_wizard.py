@@ -7,6 +7,18 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
+class MrpBomLine(models.Model):
+    _inherit = 'mrp.bom.line'
+
+    def set_bom_line_product_bom_released(self):
+        eco_ids = self.bom_id.eco_ids.filtered(lambda x: x.state != 'done')
+        if eco_ids:
+            for eco in eco_ids:
+                eco.bom_apply()
+
+        return super(MrpBomLine, self).set_bom_line_product_bom_released()
+
+
 class BomUpdateWizard(models.TransientModel):
     _inherit = "bom.update.wizard"
 
@@ -123,25 +135,26 @@ class BomUpdateWizard(models.TransientModel):
 
             # 直接删除line无需添加
             elif modify_type == 'delete':
-                del_bom_line_id = val.get('id')
-                old_product_id = line_obj.browse(del_bom_line_id).product_id
-                update_bom_line_delete(bom_id, old_product_id)
-
+                del_bom_line_id = line_obj.browse(val.get('id'))
+                old_product_id = del_bom_line_id.product_id
                 delete_vals = {
                     'bom_id': bom_id.id,
-                    'product_id': currnet_bom_line_id.product_id.id,
+                    'product_id': del_bom_line_id.product_id.id,
                     'operate_type': 'remove'
 
                 }
+                update_bom_line_delete(bom_id, old_product_id)
+
                 eco_lines.append(delete_vals)
             for line in eco_lines:
                 bom_id = line.get('bom_id')
+                bom_obj_id = bom_obj.browse(bom_id)
                 product_id = line.get('product_id')
                 operate_type = line.get('operate_type')
                 new_product_qty = line.get('new_product_qty')
-                bom_eco_id = bom_eco_obj.search([('state', '!=', 'draft'), ('bom_id', '=', bom_id)])
+                bom_eco_id = bom_eco_obj.search([('state', '=', 'draft'), ('bom_id', '=', bom_id)])
                 if bom_eco_id:
-                    line_id = bom_eco_id.filtered(
+                    line_id = bom_eco_id.bom_change_ids.filtered(
                         lambda x: x.product_id.id == product_id and x.operate_type == operate_type)
                     if not line_id:
                         eco_line_obj.create({
@@ -159,12 +172,14 @@ class BomUpdateWizard(models.TransientModel):
                 else:
                     bom_eco_obj.create({
                         'bom_id': bom_id,
-                        'bom_change_ids': (0, 0, {
+                        'old_version': bom_obj_id.version,
+                        'new_version': bom_obj_id.version + 1,
+                        'bom_change_ids': [(0, 0, {
                             'bom_id': bom_id,
                             'product_id': product_id,
                             'operate_type': operate_type,
                             'new_product_qty': new_product_qty,
-                        })
+                        })]
                     })
 
             # eco_order_obj.create({

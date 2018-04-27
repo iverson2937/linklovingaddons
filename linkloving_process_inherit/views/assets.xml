@@ -5,6 +5,7 @@
         <template id="assets_backend" name="statistic" inherit_id="linkloving_core.core_static">
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/linkloving_process_inherit/static/src/js/cost_detail.js"/>
+                <script type="text/javascript" src="/linkloving_process_inherit/static/src/js/bom_cost_reproduce.js"/>
 
                 <link rel="stylesheet" href="/linkloving_process_inherit/static/src/css/budget.css"/>
             </xpath>

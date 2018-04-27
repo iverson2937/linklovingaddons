@@ -171,6 +171,7 @@ class StockPicking(models.Model):
         ('qc_check', u'品检'),
         ('validate', u'采购确认'),
         ('waiting_in', u'入库'),
+        ('waiting_out', u'等待出库'),
         ('done', 'Done'),
     ], string='Status', compute='_compute_state',
         copy=False, index=True, readonly=True, store=True, track_visibility='onchange',
@@ -368,7 +369,11 @@ class StockPicking(models.Model):
 
         return action
 
-
+    @api.multi
+    def stock_ready(self):
+        for stock in self:
+            if stock.state not in ['done', 'cancel', 'confirmed', 'draft', 'waiting_in', 'validate']:
+                stock.state = 'waiting_out'
 class SaleOrderExtend(models.Model):
     _inherit = "sale.order"
 

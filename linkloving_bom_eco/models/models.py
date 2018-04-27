@@ -48,6 +48,7 @@ class ProcurementOrderExtend1(models.Model):
         if self._context.get("eco_vals"):
             eco_vals = self._context.get("eco_vals")
             eco_vals["line_type"] = "purchase_order"
+            eco_vals["from_qty"] = 0
             self.create_effect_line(eco_vals)
         return res
 
@@ -57,6 +58,7 @@ class ProcurementOrderExtend1(models.Model):
         if self._context.get("eco_vals"):
             eco_vals = self._context.get("eco_vals")
             eco_vals["line_type"] = "mrp_production"
+            eco_vals["from_qty"] = 0
             self.create_effect_line(eco_vals)
         return res
 
@@ -65,7 +67,7 @@ class ProcurementOrderExtend1(models.Model):
             eco_vals["purchase_id"] = procurement.purchase_id.id or None,
             eco_vals["purchase_line_id"] = procurement.purchase_line_id.id or None,
             eco_vals["production_id"] = procurement.production_id.id or None,
-            # eco_vals["to_qty"] = procurement.product_qty
+            eco_vals["to_qty"] = procurement.production_id.product_qty or procurement.purchase_line_id.product_qty
             self.env["eco.effect.line"].create(eco_vals)
 
     @api.multi
@@ -117,11 +119,11 @@ class ProcurementOrderExtend1(models.Model):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         if not float_is_zero(product_qty, precision_digits=precision):
             seller = self.product_id._select_seller(
-                    partner_id=self.purchase_line_id.partner_id,
-                    quantity=product_qty,
-                    date=self.purchase_line_id.order_id.date_order and self.purchase_line_id.order_id.date_order[
-                                                                       :10],
-                    uom_id=self.purchase_line_id.product_uom)
+                partner_id=self.purchase_line_id.partner_id,
+                quantity=product_qty,
+                date=self.purchase_line_id.order_id.date_order and self.purchase_line_id.order_id.date_order[
+                                                                   :10],
+                uom_id=self.purchase_line_id.product_uom)
             price_unit = self.env['account.tax']._fix_tax_included_price(seller.price,
                                                                          self.purchase_line_id.product_id.supplier_taxes_id,
                                                                          self.purchase_line_id.taxes_id) if seller else 0.0
@@ -157,8 +159,8 @@ class StockMoveExtend(models.Model):
             routes = product.route_ids + product.route_from_categ_ids
             # TODO: optimize with read_group?
             pull = self.env['procurement.rule'].search(
-                    [('route_id', 'in', [x.id for x in routes]), ('location_src_id', '=', move.location_id.id),
-                     ('location_id', '=', move.location_dest_id.id)], limit=1)
+                [('route_id', 'in', [x.id for x in routes]), ('location_src_id', '=', move.location_id.id),
+                 ('location_id', '=', move.location_dest_id.id)], limit=1)
             if pull and (pull.procure_method == 'make_to_order'):
                 move.procure_method = pull.procure_method
             elif not pull:  # If there is no make_to_stock rule either
@@ -194,10 +196,12 @@ class MrpProductionExtend(models.Model):
             if procurements:
                 procurements.require_reduced()
 
+
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
     version = fields.Integer(u'版本号', default=1)
+    eco_ids = fields.One2many('mrp.bom.eco', 'bom_id')
 
 
 class ProductProductExtend(models.Model):
@@ -242,7 +246,7 @@ class MrpEcoOrder(models.Model):
     effectivity = fields.Selection([
         ('asap', u'立即'),
         ('date', u'根据时间')], string=u'何时生效?',  # Is this English ?
-            default='asap', required=True)  # TDE: usefull ?
+        default='asap', required=True)  # TDE: usefull ?
 
     effectivity_date = fields.Datetime(u'生效时间', track_visibility="onchange")
     eco_line_ids = fields.One2many(comodel_name="mrp.eco.line",
@@ -254,7 +258,7 @@ class MrpEcoOrder(models.Model):
         ('draft', u'草稿'),
         ('progress', u'等待至选定日生效'),
         ('done', u'完成')], string=u'状态',
-            copy=False, default='draft', required=True, track_visibility="onchange")
+        copy=False, default='draft', required=True, track_visibility="onchange")
     note = fields.Text(u'备注')
 
     bom_eco_ids = fields.One2many(comodel_name="mrp.bom.eco",
@@ -332,6 +336,7 @@ class MrpEcoOrder(models.Model):
             'target': 'current',
             'domain': [('id', 'in', self.eco_effect_line_ids.ids)]
         }
+
     @api.multi
     def make_mrp_bom_ecos(self):
         mrp_bom_eco = self.env["mrp.bom.eco"]
@@ -379,7 +384,7 @@ class MrpEcoLine(models.Model):
 
     # product_tmpl_id = fields.Many2one('product.template', "Product")
     bom_id = fields.Many2one(
-            'mrp.bom', u"物料清单", ondelete="restrict", required=True)
+        'mrp.bom', u"物料清单", ondelete="restrict", required=True)
 
     bom_line_id = fields.Many2one('mrp.bom.line',
                                   string=u'BOM明细行',
@@ -391,11 +396,11 @@ class MrpEcoLine(models.Model):
                                     string=u'操作')
     product_id = fields.Many2one('product.product', string=u'产品', domain="[('bom_line_ids.bom_id', '=', bom_id)]")
     new_product_qty = fields.Float(
-            u'更新后的配比',
-            digits=dp.get_precision('Product Unit of Measure'),
-            default=1.0)
+        u'更新后的配比',
+        digits=dp.get_precision('Product Unit of Measure'),
+        default=1.0)
     new_product_id = fields.Many2one(
-            'product.product', u'更新后的产品', domain="[('bom_line_ids.bom_id', '!=', bom_id), ('type', '=', 'product')]")
+        'product.product', u'更新后的产品', domain="[('bom_line_ids.bom_id', '!=', bom_id), ('type', '=', 'product')]")
 
     bom_eco_id = fields.Many2one(comodel_name="mrp.bom.eco", ondelete="restrict")
 
@@ -431,10 +436,10 @@ class MrpBomEco(models.Model):
     effectivity = fields.Selection([
         ('asap', u'立即'),
         ('date', u'根据时间')], string=u'何时生效?',  # Is this English ?
-            default='asap', required=True, track_visibility="onchange")  # TDE: usefull ?
+        default='asap', required=True, track_visibility="onchange")  # TDE: usefull ?
     effectivity_date = fields.Datetime(u'生效时间')
     bom_id = fields.Many2one(
-            'mrp.bom', u"物料清单", ondelete="restrict", required=True)
+        'mrp.bom', u"物料清单", ondelete="restrict", required=True)
 
     bom_change_ids = fields.One2many(comodel_name='mrp.eco.line', inverse_name='bom_eco_id', string=u'BOM变更明细')
     note = fields.Text(u'备注')
@@ -514,13 +519,13 @@ class MrpBomEco(models.Model):
                 for change1 in bom_eco.bom_change_ids:
                     if change != change1:
                         if (change.product_id.id and change1.product_id.id) and \
-                                        change.product_id == change1.product_id:  # 适用于 update和 remove
+                                change.product_id == change1.product_id:  # 适用于 update和 remove
                             return False
                         if (change.product_id.id and change1.new_product_id.id) and \
-                                        change.product_id == change1.new_product_id:  # 适用于 add
+                                change.product_id == change1.new_product_id:  # 适用于 add
                             return False
                         if (change.new_product_id.id and change1.product_id.id) and \
-                                        change.new_product_id == change1.new_product_id:
+                                change.new_product_id == change1.new_product_id:
                             return False
 
                             # product_ids = bom_eco.bom_change_ids.mapped('product_id')
@@ -540,6 +545,11 @@ class MrpBomEco(models.Model):
                 raise UserError(u'BOM版本不匹配,请检查')
             else:
                 bom_eco.bom_id.version = bom_eco.new_version
+
+    @api.multi
+    def bom_apply(self):
+        self.apply_to_bom()
+        self.apply_bom_update()  # 应用 更新至MO
 
     @api.multi
     def apply_to_bom(self):
@@ -588,11 +598,11 @@ class MrpBomEco(models.Model):
         EffectOrder = self.env["eco.effect.order"]
         for bom_eco in self:
             mos = self.env["mrp.production"].search(
-                    [
-                        ('bom_id', '=', bom_eco.bom_id.id),
-                        ('state', 'not in', ['cancel', 'done']),
-                        # ('bom_version', '=', bom_eco.old_version)
-                    ]
+                [
+                    ('bom_id', '=', bom_eco.bom_id.id),
+                    ('state', 'not in', ['cancel', 'done']),
+                    # ('bom_version', '=', bom_eco.old_version)
+                ]
             )
             new_effect_order = EffectOrder.create({
                 'bom_eco_id': bom_eco.id,
@@ -601,7 +611,7 @@ class MrpBomEco(models.Model):
             for mo in mos:
                 # 算出的所需物料的数量, 要减去已完成的数量
                 done_moves = mo.move_finished_ids.filtered(
-                        lambda x: x.state == 'done' and x.product_id == mo.product_id)
+                    lambda x: x.state == 'done' and x.product_id == mo.product_id)
                 qty_produced = mo.product_id.uom_id._compute_quantity(sum(done_moves.mapped('product_qty')),
                                                                       mo.product_uom_id)
                 factor = mo.product_uom_id._compute_quantity(mo.product_qty - qty_produced,
@@ -630,7 +640,7 @@ class MrpBomEco(models.Model):
                         bom_line_id, line_data = self.find_line_data_with_bom_line(lines,
                                                                                    product_id=change.product_id)
                         move = mo.move_raw_ids.filtered(
-                                lambda x: x.bom_line_id.id == bom_line_id.id and x.state != 'cancel')
+                            lambda x: x.bom_line_id.id == bom_line_id.id and x.state != 'cancel')
                         if not move:
                             continue
                         else:
@@ -659,7 +669,7 @@ class MrpBomEco(models.Model):
                             bom_line_id, line_data = self.find_line_data_with_bom_line(lines,
                                                                                        product_id=change.product_id)
                             sim_move_id = mo.sim_stock_move_lines.filtered(
-                                    lambda x: x.product_id == bom_line_id.product_id)
+                                lambda x: x.product_id == bom_line_id.product_id)
                             mo._update_raw_move(bom_line_id, line_data)  # 在获取完应该补充的qty之后,再更新mo的rawmove 重要!
                             to_qty = line_data["qty"]
                             self.create_effect_mo_type(new_effect_order, move, sim_move_id, bom_eco, change, from_qty,
@@ -672,11 +682,12 @@ class MrpBomEco(models.Model):
 
                     elif change.operate_type == 'remove':  # 移除时,筛选出相同产品的,并且可用的move单 取消他们.
                         moves_to_cancel = mo.move_raw_ids.filtered(
-                                lambda x: x.product_id == change.product_id and x.state not in ["done", "cancel"])
+                            lambda x: x.product_id == change.product_id and x.state not in ["done", "cancel"])
                         if moves_to_cancel:
                             moves_to_cancel.action_cancel()  # 取消的对应的move 并且取消 对应的补货单
                             sim_move_id = \
-                            mo.sim_stock_move_lines.filtered(lambda x: x.product_id == moves_to_cancel[0].product_id)[0]
+                                mo.sim_stock_move_lines.filtered(
+                                    lambda x: x.product_id == moves_to_cancel[0].product_id)[0]
                             self.create_effect_mo_type(new_effect_order, moves_to_cancel, sim_move_id, bom_eco, change,
                                                        moves_to_cancel.product_uom_qty, 0)
                             procurements = ProcurementOrder.search([('move_dest_id', 'in', moves_to_cancel.ids)])
@@ -720,7 +731,7 @@ class MrpBomEco(models.Model):
 
         return self.env["eco.effect.line"].create({
             'line_type': 'mrp_production',
-            'production_id': sim_move_id.production_id.id,
+            'production_id': sim_move_id and sim_move_id.production_id.id,
             'bom_eco_id': bom_eco_id.id,
             'eco_order_id': bom_change_line_id.eco_order_id.id,
             'bom_change_line_id': bom_change_line_id.id,
