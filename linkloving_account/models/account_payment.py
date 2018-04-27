@@ -210,7 +210,7 @@ class AccountPayment(models.Model):
             if p.res_id:
                 account_payment_register_id = self.env[p.res_model].browse(p.res_id)
                 if account_payment_register_id:
-                    p.account_employee_payment_id = account_payment_register_id.id
+                    p.account_payment_register_id = account_payment_register_id.id
 
     @api.multi
     def get_account_employee_payment_id(self):
