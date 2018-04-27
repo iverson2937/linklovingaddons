@@ -205,7 +205,7 @@ class AccountPayment(models.Model):
                                                   string='付款申请')
 
     @api.multi
-    def get_account_employee_payment_id(self):
+    def get_account_payment_register_id(self):
         for p in self:
             if p.res_id:
                 account_payment_register_id = self.env[p.res_model].browse(p.res_id)
