@@ -208,7 +208,7 @@ class AccountPayment(models.Model):
     def get_account_payment_register_id(self):
         for p in self:
             if p.res_id and p.res_model == 'account.payment.register':
-                print p.res_id, p.id
+                print p.res_id, p.id, 'fsfsfa'
                 account_payment_register_id = self.env[p.res_model].browse(p.res_id)
                 p.account_payment_register_id = account_payment_register_id.id
 
@@ -216,7 +216,7 @@ class AccountPayment(models.Model):
     def get_account_employee_payment_id(self):
         for p in self:
             if p.res_id and p.res_model == 'account.employee.payment':
-                print p.res_id, p.id
+                print p.res_id, p.id, 'dddddd'
                 account_employee_payment_id = self.env[p.res_model].browse(p.res_id)
                 p.account_employee_payment_id = account_employee_payment_id.id
 
@@ -224,7 +224,7 @@ class AccountPayment(models.Model):
     def get_sheet_id(self):
         for p in self:
             if p.res_id and p.res_model == 'hr.expense.sheet':
-                print p.res_id, p.id
+                print p.res_id, p.id, 'fff'
                 sheet_id = self.env[p.res_model].browse(p.res_id)
                 p.sheet_id = sheet_id.id
 
