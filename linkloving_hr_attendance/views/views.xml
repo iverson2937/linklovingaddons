@@ -15,7 +15,11 @@
                     </group>
 
                     <footer>
-                        <button name='print_report' type='object' string='导出' class='oe_highlight'/>
+                        <button name='print_report' type='object' string='导出全部' class='oe_highlight'/>
+                        or
+                        <button name='print_report_late' type='object' string='导出迟到' class='oe_highlight'/>
+                        or
+                        <button name='print_report_overtime' type='object' string='导出加班' class='oe_highlight'/>
                         or
                         <button string='取消' class='oe_link' special='cancel'/>
                     </footer>
@@ -34,6 +38,13 @@
     <record model="ir.actions.act_window" id="hr_attendance_devices">
             <field name="name">考勤机</field>
             <field name="res_model">linkloving.ble.device</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    <record model="ir.actions.act_window" id="hr_attendance_regular">
+            <field name="name">考勤规则</field>
+            <field name="res_model">rt.attendance.regular</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
@@ -78,9 +89,70 @@
         </field>
     </record>
 
+     <record id="linkloving_hr_attendance_regular_tree" model="ir.ui.view">
+            <field name="name">rt.attendance.regular</field>
+            <field name="model">rt.attendance.regular</field>
+            <field name="arch" type="xml">
+               <tree>
+                    <field name="rt_name" string="标题"/>
+                    <field name="create_uid" string="创建人" />
+                   <field name="create_date" string="创建时间" />
+                </tree>
+            </field>
+        </record>
+
+    <record id="linkloving_hr_attendance_regular_form" model="ir.ui.view">
+            <field name="name">rt.attendance.regular</field>
+            <field name="model">rt.attendance.regular</field>
+            <field name="arch" type="xml">
+                <form>
+                    <!--<header>-->
+                        <!--<field name="issue_state" widget="statusbar"-->
+                               <!--statusbar_visible="draft,unaccept,process,check,done"/>-->
+                    <!--</header>-->
+                    <sheet>
+                    <div class="oe_title">
+                            <h1>
+                                <field name="rt_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                        <group>
+                        <field name="rt_name"/>
+                        <field name="rt_attendance_holiday_id" string="休假日历"/>
+                        </group>
+                        <group>
+                             <field name="create_uid" string="创建人" />
+                             <field name="create_date" string="创建时间" />
+                        </group>
+                        <field name="rt_week_regular_lines"  string="考勤规则">
+                            <tree>
+                                <field name="rt_week_type"/>
+                                <field name="rt_check_in_1" />
+                                <field name="rt_check_out_1"/>
+                                <field name="rt_check_in_2"/>
+                                <field name="rt_check_out_2"/>
+                            </tree>
+                        </field>
+                        <field name="rt_flex" string="弹性时间"/>
+                        <field name="rt_time_setting_id" string="加班设置">
+                            <form>
+                                <field name="rt_is_salary"/>
+                                <field name="rt_start_over_time" />
+                                <field name="rt_min_over_time"/>
+                                <field name="rt_min_unit"/>
+                                <field name="rt_overtime_type"/>
+                            </form>
+                        </field>
+                    </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
 
       <menuitem id="menu_hr_attendance_devices" name="考勤机" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="25" action="hr_attendance_devices"/>
       <menuitem id="menu_hr_attendance_report" name="导出考勤" parent="hr_attendance.menu_hr_attendance_manage_attendances"
                   sequence="30" action="export_hr_attendance"/>
+    <menuitem id="menu_hr_attendance_regulars" name="考勤规则" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="35" action="hr_attendance_regular"/>
 </odoo>
