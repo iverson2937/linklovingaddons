@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import uuid
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -250,6 +251,8 @@ class MrpBom(models.Model):
         res = {
             'id': 1,
             'pid': 0,
+            'uuid':1,
+            'puuid':0,
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
@@ -278,10 +281,11 @@ class MrpBom(models.Model):
         :param product_type_dict:
         :return:
         '''
+        c_uuid = str(uuid.uuid1())
         if line.child_line_ids:
 
             for l in line.child_line_ids:
-                _get_rec_default(categ_id, l, line, result, product_type_dict)
+                _get_rec_default(categ_id, c_uuid, l, line, result, product_type_dict)
 
         bom_id = line.product_id.product_tmpl_id.bom_ids
 
@@ -311,6 +315,8 @@ class MrpBom(models.Model):
             'id': line.id,
             'has_lines': 0 if line.child_line_ids else 1,
             'pid': 1,
+            'uuid': c_uuid,
+            'p_uuid': 1,
             'product_specs': line.product_id.product_specs,
             'code': line.product_id.default_code,
             'qty': line.product_qty,
@@ -330,12 +336,16 @@ class MrpBom(models.Model):
         if self.product_tmpl_id.product_ll_type:
             product_type_dict = self._get_product_type_dict()
         total_cost = self.product_tmpl_id.product_variant_ids[0].pre_cost_cal_new(raise_exception=False)
+        if not total_cost:
+            total_cost = 0
 
         man_cost = self.product_tmpl_id.product_variant_ids[0].get_pure_manpower_cost()
         material_cost = total_cost - man_cost
         res = {
             'id': 1,
             'pid': 0,
+            'puuid': 0,
+            'uuid': 1,
             'bom_id': self.id,
             'product_id': self.product_tmpl_id.id,
             'product_tmpl_id': self.product_tmpl_id.id,
@@ -357,10 +367,11 @@ class MrpBom(models.Model):
         return result + sorted(line_ids, key=lambda product: product['code'], reverse=True)
 
     def get_bom_line_new(self, line, result, product_type_dict):
+        c_uuid = str(uuid.uuid1())
         if line.child_line_ids:
 
             for l in line.child_line_ids:
-                _get_rec(l, line, result, product_type_dict)
+                _get_rec(l, c_uuid, line, result, product_type_dict)
 
         bom_id = line.product_id.product_tmpl_id.bom_ids
 
@@ -379,6 +390,8 @@ class MrpBom(models.Model):
             'product_id': line.product_id.id,
             'product_tmpl_id': line.product_id.product_tmpl_id.id,
             'id': line.id,
+            'uuid': c_uuid,
+            'puuid': 1,
             'has_lines': 0 if line.child_line_ids else 1,
             'pid': 1,
             'product_specs': line.product_id.product_specs,
@@ -400,11 +413,12 @@ class MrpBom(models.Model):
             bom.manpower_cost = sum(bom_line.bom_line_man_cost for bom_line in bom.bom_line_ids)
 
 
-def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
+def _get_rec_default(categ_id, p_uuid, object, parnet, result, product_type_dict):
     for l in object:
+        c_uuid = str(uuid.uuid1()),
         if l.child_line_ids:
             for line in l.child_line_ids:
-                _get_rec_default(categ_id, line, l, result, product_type_dict)
+                _get_rec_default(categ_id, c_uuid, line, l, result, product_type_dict)
 
         bom_id = l.product_id.product_tmpl_id.bom_ids
         process_id = []
@@ -434,6 +448,8 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
             # 'is_highlight': l.is_highlight,
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
+            'uuid': c_uuid,
+            'p_uuid': p_uuid,
             'pid': parnet.id,
             'process_action': action_process,
             'is_default': is_default,
@@ -449,11 +465,12 @@ def _get_rec_default(categ_id, object, parnet, result, product_type_dict):
     return res
 
 
-def _get_rec(object, parnet, result, product_type_dict):
+def _get_rec(object, p_uuid, parnet, result, product_type_dict):
     for l in object:
+        c_uuid = str(uuid.uuid1())
         if l.child_line_ids:
             for line in l.child_line_ids:
-                _get_rec(line, l, result, product_type_dict)
+                _get_rec(line, c_uuid, l, result, product_type_dict)
 
         bom_id = l.product_id.product_tmpl_id.bom_ids
         process_id = []
@@ -476,6 +493,8 @@ def _get_rec(object, parnet, result, product_type_dict):
             # 'is_highlight': l.is_highlight,
             # 'product_type': l.product_id.product_ll_type,
             'id': l.id,
+            'puuid': p_uuid,
+            'uuid': c_uuid,
             'pid': parnet.id,
             'material_cost': round(material_cost, 5),
             'process_action': l.parse_action_line_data(),

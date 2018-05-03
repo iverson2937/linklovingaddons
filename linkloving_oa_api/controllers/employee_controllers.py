@@ -94,9 +94,7 @@ class LinklovingEmployeeControllers(http.Controller):
 
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data_list)
 
-
-        # 更新nfc 号码的接口
-
+    # 更新nfc 号码的接口
     @http.route('/linkloving_oa_api/update_nfc_number', type='json', auth='none', csrf=False, cors='*')
     def update_nfc_number(self, **kw):
 
@@ -107,7 +105,6 @@ class LinklovingEmployeeControllers(http.Controller):
             "card_num": card_num
         })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=self.employee_to_json(employee))
-
 
     # 修改用户
     @http.route('/linkloving_oa_api/update_employee', type='json', auth='none', csrf=False, cors='*')
