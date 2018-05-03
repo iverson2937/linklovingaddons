@@ -279,7 +279,7 @@ class MrpProductionLine(models.Model):
     last_mo_time = fields.Datetime(compute="_compute_last_mo_time")
     total_time = fields.Float(compute='_compute_total_time')
     total_ava_time = fields.Float(compute='_compute_total_ava_time')
-
+    active = fields.Boolean(default=True)
     # 根据process_id 获取产线
     def get_production_line_list(self, **kwargs):
         process_id = kwargs.get("process_id")
