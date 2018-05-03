@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_mrp_eco_order,linkloving_bom_eco.mrp_eco_order,model_mrp_eco_order,,1,1,1,1
 access_mrp_eco_line,linkloving_bom_eco.mrp_eco_line,model_mrp_eco_line,,1,1,1,1
+access_mrp_bom_eco,linkloving_bom_eco.mrp_bom_eco,model_mrp_bom_eco,,1,1,1,1

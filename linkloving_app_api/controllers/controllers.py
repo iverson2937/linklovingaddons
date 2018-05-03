@@ -84,7 +84,7 @@ class LinklovingAppApi(http.Controller):
     @http.route('/linkloving_app_api/is_inner_ip', type='http', auth='none', cors='*')
     def is_inner_ip(self, **kw):
         remote_addr = request.httprequest.environ.get('HTTP_X_REAL_IP')
-        if remote_addr in ['112.80.45.130', '221.224.85.74']:
+        if remote_addr in ['112.80.45.130', '221.224.85.74', '49.75.219.17', '221.225.245.181']:
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={'origin_ip': remote_addr},
                                               jsonRequest=False)
         else:
@@ -2515,21 +2515,37 @@ class LinklovingAppApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=order.bom_id.get_bom())
 
+    @http.route('/linkloving_app_api/reassign_pack_done_qty', type='json', auth='none', csrf=False)
+    def reassign_pack_done_qty(self, **kw):
+        pack_id = request.jsonrequest.get('pack_id')  # 订单id
+        new_qty_done = request.jsonrequest.get('new_qty_done')
+        pack_op = request.env["stock.pack.operation"].sudo(LinklovingAppApi.CURRENT_USER()).browse(int(pack_id))
+        if pack_op.picking_id.state not in ["done", "cancel"]:
+            pack_op.qty_done = new_qty_done
+
+            # if pack_op.picking_id.pack_operation_product_ids and \
+            #     sum(pack_op.picking_id.pack_operation_product_ids.mapped("qty_done")) == 0:
+            #     # 如果所有的pack都为空了,就把这个出货单,置回可用
+            #     pack_op.picking_id.state = 'assigned'
+        else:
+            raise UserError(u"该条目已经出货,不能做此操作")
+        return JsonResponse.send_response(STATUS_CODE_OK)
+
     @http.route('/linkloving_app_api/change_stock_picking_state', type='json', auth='none', csrf=False, cors='*')
     def change_stock_picking_state(self, **kw):
         state = request.jsonrequest.get('state')  # 状态
         picking_id = request.jsonrequest.get('picking_id')  # 订单id
         print LinklovingAppApi.CURRENT_USER()
 
-        pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids')  # 修改
+        pack_operation_product_ids = request.jsonrequest.get('pack_operation_product_ids', [])  # 修改
         i = 0
         for pacl in pack_operation_product_ids:
             if pacl['pack_id'] == -1:
                 pack_operation_product_ids.pop(i)
             i = i + 1
-        if not pack_operation_product_ids:
-            return JsonResponse.send_response(STATUS_CODE_ERROR,
-                                              res_data={'error': _("Pack Order not found")})
+        # if not pack_operation_product_ids:
+        #     return JsonResponse.send_response(STATUS_CODE_ERROR,
+        #                                       res_data={'error': _("Pack Order not found")})
 
         pack_list = request.env['stock.pack.operation'].sudo(LinklovingAppApi.CURRENT_USER()).search(
             [('id', 'in', map(lambda a: a['pack_id'], pack_operation_product_ids))])
@@ -2600,7 +2616,8 @@ class LinklovingAppApi(http.Controller):
                         return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                           res_data={"error": u"该销售单需要一次性发完货,请等待货齐后再发"})
                     elif picking_obj.sale_id.delivery_rule == "delivery_once" and picking_obj.state not in ["assigned",
-                                                                                                            "secondary_operation_done"]:
+                                                                                                            "secondary_operation_done",
+                                                                                                            "waiting_out"]:
                         return JsonResponse.send_response(STATUS_CODE_ERROR,
                                                           res_data={"error": u"该单据为部分可用,请等待货齐后再发"})
                     elif picking_obj.sale_id.delivery_rule == "cancel_backorder":  # 取消欠单
@@ -2611,7 +2628,7 @@ class LinklovingAppApi(http.Controller):
                         wiz.process()
                         picking_obj.to_stock()
                     elif picking_obj.sale_id.delivery_rule == "delivery_once" and is_yes == "yes" and picking_obj.state in [
-                        "assigned", "secondary_operation_done"]:  # 一次性出货并备货完成
+                        "assigned", "secondary_operation_done", "waiting_out"]:  # 一次性出货并备货完成
                         wiz.process()
                         picking_obj.to_stock()
                 else:
@@ -2641,10 +2658,10 @@ class LinklovingAppApi(http.Controller):
             # way.with_context({'is_all_transfer_in': is_all_in}).choose_transfer_way()
         elif state == 'transfer':  # 入库
             picking_obj.to_stock()
-        elif state == 'start_prepare_stock':  # 开始备货
-            picking_obj.start_prepare_stock()
-        # elif state == 'stock_ready':#备货完成
-        #     picking_obj.stock_ready()
+        elif state == 'cancel_stock':  # 开始备货
+            picking_obj.state = 'assigned'
+        elif state == 'stock_ready':  # 备货完成
+            picking_obj.stock_ready()
         elif state == 'upload_img':
             express_img = request.jsonrequest.get('qc_img')
             DEFAULT_SERVER_DATE_FORMAT = "%Y%m%d%H%M%S"
@@ -2688,9 +2705,9 @@ class LinklovingAppApi(http.Controller):
     def stock_picking_to_json(cls, stock_picking_obj):
         pack_list = []
         move_lines = stock_picking_obj.move_lines
-        quants = request.env["stock.quant"]
-        if stock_picking_obj.picking_type_code == 'outgoing':
-            quants = stock_picking_obj.reserveration_qty()
+        # quants = request.env["stock.quant"]
+        # if stock_picking_obj.picking_type_code == 'outgoing':
+        #     quants = stock_picking_obj.reserveration_qty()
         for pack in stock_picking_obj.pack_operation_product_ids:
             dic = {
                 'pack_id': pack.id,
@@ -2714,12 +2731,33 @@ class LinklovingAppApi(http.Controller):
                 'to_location': pack.to_loc,
                 'rejects_qty': pack.rejects_qty,
             }
+            dic.update(cls.get_reserved_pack(pack.product_id, pack.picking_id.id))
+
             move_ids = pack.linked_move_operation_ids.mapped("move_id")
-            if move_ids and quants:
-                if quants.get(move_ids[0].id):
-                    quant = quants.get(move_ids[0].id).filtered(lambda x: x.reservation_id.id not in move_lines.ids)
-                    reserved_qty = sum(quant.mapped("qty") if quant else [])
-                    dic["reserved_qty"] = reserved_qty
+            # if move_ids and quants:
+            #     if quants.get(move_ids[0].id):
+            #         quant = quants.get(move_ids[0].id).filtered(lambda x: x.reservation_id.id not in move_lines.ids)
+            #         if quant:
+            #             pack_products = quant.mapped("reservation_id") and\
+            #             quant.mapped("reservation_id").mapped("picking_id") and \
+            #             quant.mapped("reservation_id").mapped("picking_id").mapped("pack_operation_product_ids")
+            #             packs = []
+            #             for pack1 in pack_products:
+            #                 if pack1.product_id == pack.product_id:
+            #                     packs.append({
+            #                         'id': pack1.id,
+            #                         'origin': pack1.picking_id.origin or '',
+            #                         'pick_name': pack1.picking_id.name,
+            #                         'qty_done': pack1.qty_done,
+            #                         'partner_name': pack1.picking_id.partner_id.name,
+            #                         'product_name': pack1.product_id.display_name,
+            #                         'product_qty': pack1.product_qty,
+            #                     })
+            #             dic["reserved_picking_ids"] = packs
+            #         else:
+            #             dic["reserved_picking_ids"] = []
+            #         reserved_qty = sum(quant.mapped("qty") if quant else [])
+            #         dic["reserved_qty"] = reserved_qty
             origin_qty = 0
             for move in move_ids:
                 # if len(move_ids) == 1:
@@ -2741,19 +2779,39 @@ class LinklovingAppApi(http.Controller):
                         'area_id': move.product_id.area_id.id or None,
                         'area_name': move.product_id.area_id.name or None,
                     },
-                    'image_ids': [
-                        {'image_url': LinklovingAppApi.get_product_image_url_new(urlBean.id, 'ir.attachment')}
-                        for urlBean in pack.product_id.product_img_ids]
+                    'image_ids':
+                        [
+                        ]
                 },
                 'product_qty': 0,
                 'qty_done': 0,
                 'origin_qty': move.product_uom_qty,
             }
-            if move and quants:
-                if quants.get(move.id):
-                    quant = quants.get(move.id).filtered(lambda x: x.reservation_id.id not in move_lines.ids)
-                    reserved_qty = sum(quant.mapped("qty") if quant else [])
-                    dic["reserved_qty"] = reserved_qty
+            dic.update(cls.get_reserved_pack(move.product_id, -1))
+            # if move and quants:
+            #     if quants.get(move.id):
+            #         quant = quants.get(move.id).filtered(lambda x: x.reservation_id.id not in move_lines.ids)
+            #         reserved_qty = sum(quant.mapped("qty") if quant else [])
+            #         dic["reserved_qty"] = reserved_qty  #
+            #         if quant:
+            #             pack_products = quant.mapped("reservation_id") and\
+            #             quant.mapped("reservation_id").mapped("picking_id") and \
+            #             quant.mapped("reservation_id").mapped("picking_id").mapped("pack_operation_product_ids")
+            #             packs = []
+            #             for pack in pack_products:
+            #                 if pack.product_id == move.product_id:
+            #                     packs.append({
+            #                         'id': pack.id,
+            #                         'origin': pack.picking_id.origin or '',
+            #                         'pick_name': pack.picking_id.name,
+            #                         'qty_done': pack.qty_done,
+            #                         'partner_name': pack.picking_id.partner_id.name,
+            #                         'product_name': pack.product_id.display_name,
+            #                         'product_qty': pack.product_qty,
+            #                     })
+            #             dic["reserved_picking_ids"] = packs
+            #         else:
+            #             dic["reserved_picking_ids"] = []
             pack_list.append(dic)
         data = {
             'secondary_operation': stock_picking_obj.secondary_operation,  # zou增，下，
@@ -2804,6 +2862,34 @@ class LinklovingAppApi(http.Controller):
                 }
         }
         return data
+
+    @classmethod
+    def get_reserved_pack(cls, product_id, picking_id):
+        res_dic = {}
+        pickings = request.env["stock.picking"].sudo().search([('state', 'not in', ['done', 'cancel', 'confirmed']),
+                                                               ('picking_type_code', '=', 'outgoing'),
+                                                               ('product_id', '=', product_id.id),
+                                                               ('id', '!=', picking_id)])
+        reserved_qty = 0
+        if pickings:
+            packs = []
+            for pack_op in pickings.mapped("pack_operation_product_ids").filtered(
+                    lambda x: x.product_id == product_id and x.qty_done > 0):
+                packs.append({
+                    'id': pack_op.id,
+                    'origin': pack_op.picking_id.origin or '',
+                    'pick_name': pack_op.picking_id.name,
+                    'qty_done': pack_op.qty_done,
+                    'partner_name': pack_op.picking_id.partner_id.name,
+                    'product_name': pack_op.product_id.display_name,
+                    'product_qty': pack_op.product_qty,
+                })
+                reserved_qty += pack_op.qty_done
+            res_dic["reserved_picking_ids"] = packs
+        else:
+            res_dic["reserved_picking_ids"] = []
+        res_dic["reserved_qty"] = reserved_qty
+        return res_dic
 
     @classmethod
     def get_stock_picking_img_url(cls, picking_id, field):
@@ -3696,6 +3782,7 @@ class LinklovingAppApi(http.Controller):
         domain = []
         if product_name:
             domain.append(('name', 'ilike', product_name))
+            domain.append(('active', '!=', None))
         products = request.env['product.product'].sudo().search(domain,
                                                                 limit=10)
         json_list = []

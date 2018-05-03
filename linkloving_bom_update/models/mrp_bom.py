@@ -19,14 +19,6 @@ class MrpBom(models.Model):
         for line in self.bom_line_ids:
             line.set_bom_line_product_bom_released()
 
-    def set_bom_line_product_bom_released(self):
-        self.bom_id.state = 'release'
-        # line.bom_id.product_tmpl_id.apply_bom_update()
-
-        if self.child_line_ids:
-            for line in self.child_line_ids:
-                line.set_bom_line_product_bom_released()
-
     @api.multi
     def bom_detail(self):
 
@@ -124,6 +116,14 @@ class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
     is_highlight = fields.Boolean()
 
+    def set_bom_line_product_bom_released(self):
+        self.bom_id.state = 'release'
+        # line.bom_id.product_tmpl_id.apply_bom_update()
+
+        if self.child_line_ids:
+            for line in self.child_line_ids:
+                line.set_bom_line_product_bom_released()
+
     @api.model
     def create(self, vals):
         line_id = super(MrpBomLine, self).create(vals)
@@ -137,6 +137,27 @@ class MrpBomLine(models.Model):
                     + u"<li>数量<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
                        line_id.product_id.name, line_id.product_specs, line_id.product_qty)
             line_id.bom_id.message_post(body=body)
+            if line_id.bom_id.state == 'release':
+                if not line_id.bom_id.review_id:
+                    line_id.bom_id.review_id = self.env["review.process"].create_review_process('mrp.bom',
+                                                                                                line_id.bom_id.id)
+                else:
+                    line_ids = line_id.bom_id.review_id.get_review_line_list()
+                    self.env["review.process.line"].create({
+                        'partner_id': self.env.user.partner_id.id,
+                        'review_id': line_id.bom_id.review_id.id,
+                        'remark': '%s----->%s' % (line_id.bom_id.state, u'更新'),
+                        'state': 'waiting_review',
+                        'last_review_line_id': line_ids[-1].get('id') if line_ids else False,
+                        'review_order_seq': max(
+                            [line.review_order_seq for line in line_id.bom_id.review_id.review_line_ids]) + 1
+                    })
+                line_id.bom_id.write({
+                    'current_review_id': self.env.user.id,
+                    'state': 'updated',
+                })
+
+
         return line_id
 
     @api.multi

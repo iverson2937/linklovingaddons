@@ -87,7 +87,7 @@ class LinklovingTimesheets(http.Controller):
                 'id': bean['id'],
                 'name': bean['display_name']
             })
-        return JsonResponse.send_response(LinklovingTimesheets, res_data=data_list)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data_list)
 
         # zou增加解析json二次加工信息
 

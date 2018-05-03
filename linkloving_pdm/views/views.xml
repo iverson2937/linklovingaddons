@@ -352,7 +352,7 @@
                                         <form string="审批流程">
                                             <group>
 
-                                                <field name="tag_approval_process_partner" domain="[('employee', '=', True)]" string="审核人" readonly="0"/>
+                                                <field name="tag_approval_process_partner" options="{'no_create':True}" domain="[('employee', '=', True)]" string="审核人" readonly="0"/>
 
                                             </group>
                                         </form>
