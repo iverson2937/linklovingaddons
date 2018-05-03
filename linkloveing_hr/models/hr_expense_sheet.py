@@ -228,7 +228,7 @@ class HrExpenseSheet(models.Model):
             if not exp.expense_line_ids:
                 raise UserError(u'请填写报销明细')
             state = 'submit'
-            department = exp.department_id
+            department = exp.sudo().department_id
             if exp.employee_id == department.manager_id:
                 # 报销金额小于部门允许金额直接通过
                 if not department.parent_id or (
