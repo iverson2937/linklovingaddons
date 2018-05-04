@@ -19,7 +19,7 @@ class HrAttendanceWizard(models.TransientModel):
         domain = [
             ('write_date', '>=', start_date), ('write_date', '<=', end_date)]
         # domain = []
-        return_ids = return_hr_attendance.sudo().read_group(fields=['employee_id', 'new_check_in', 'check_out'],
+        return_ids = return_hr_attendance.sudo().read_group(domain,fields=['employee_id', 'new_check_in', 'check_out'],
                                                      groupby='employee_id')
         index = 0
         for return_id in return_ids:
