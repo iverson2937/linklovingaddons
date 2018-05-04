@@ -36,10 +36,10 @@ class HrAttendanceWizard(models.TransientModel):
                         time_arr.append(attendance_detail.new_check_in)
                     if attendance_detail.check_out:
                         time_arr.append(attendance_detail.check_out)
-            returnDict[index]['data'] = {
-                'time_arr': time_arr,
-                'employee_id': attendance[0].employee_id.name,
-            }
+                returnDict[index]['data'] = {
+                    'time_arr': time_arr,
+                    'employee_id': attendance[0].employee_id.name,
+                }
             index = index + 1
         return returnDict
 
