@@ -27,6 +27,7 @@ class HrAttendanceWizard(models.TransientModel):
         # return_ids = return_hr_attendance.sudo().read_group(domain,fields=['employee_id', 'new_check_in', 'check_out'],
                                                     # groupby='employee_id')
         return_ids = self.env['hr.employee'].sudo().search([])
+        print len(return_ids), '------------------------------------------------------------------------'
         index = 0
         for return_id in return_ids:
             attendance = return_hr_attendance.sudo().search(
