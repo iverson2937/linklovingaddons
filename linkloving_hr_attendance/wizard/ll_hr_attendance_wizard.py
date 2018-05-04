@@ -18,27 +18,34 @@ class HrAttendanceWizard(models.TransientModel):
 
         domain = [
             ('write_date', '>=', start_date), ('write_date', '<=', end_date)]
+
+        domain_start = (datetime.datetime.strptime((start_date + " 00:00:00"),"%Y-%m-%d %H:%M:%S") + timedelta(hours=-8)).strftime("%Y-%m-%d %H:%M:%S")
+
+        domain_end = (datetime.datetime.strptime((end_date + " 23:59:59"),"%Y-%m-%d %H:%M:%S") + timedelta(hours=-8)).strftime("%Y-%m-%d %H:%M:%S")
+
         # domain = []
-        return_ids = return_hr_attendance.sudo().read_group(domain,fields=['employee_id', 'new_check_in', 'check_out'],
-                                                     groupby='employee_id')
+        # return_ids = return_hr_attendance.sudo().read_group(domain,fields=['employee_id', 'new_check_in', 'check_out'],
+                                                    # groupby='employee_id')
+        return_ids = self.env['hr.employee'].sudo().search([])
         index = 0
         for return_id in return_ids:
-            returnDict[index] = {'data': {}, 'start_date': start_date, 'end_date': end_date}
             attendance = return_hr_attendance.sudo().search(
-                [("employee_id", "=", return_id['employee_id'][0]), ('write_date', '>=', start_date),
-                 ('write_date', '<=', end_date)])
+                [("employee_id", "=", return_id.id)])
             time_arr = []
             if (len(attendance)):
+                returnDict[index] = {'data': {}, 'start_date': start_date, 'end_date': end_date}
                 for attendance_detail in attendance:
                     if attendance_detail.new_check_in:
-                        time_arr.append(attendance_detail.new_check_in)
+                        if attendance_detail.new_check_in >= domain_start and attendance_detail.new_check_in <= domain_end:
+                            time_arr.append(attendance_detail.new_check_in)
                     if attendance_detail.check_out:
-                        time_arr.append(attendance_detail.check_out)
-            returnDict[index]['data'] = {
-                'time_arr': time_arr,
-                'employee_id': attendance[0].employee_id.name,
-            }
-            index = index + 1
+                        if attendance_detail.check_out >= domain_start and attendance_detail.check_out <= domain_end:
+                            time_arr.append(attendance_detail.check_out)
+                returnDict[index]['data'] = {
+                    'time_arr': time_arr,
+                    'employee_id': attendance[0].employee_id.name,
+                }
+                index = index + 1
         return returnDict
 
     @api.multi
