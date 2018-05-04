@@ -54,10 +54,9 @@ class ReportHrAttendanceSheet(http.Controller):
             for record in data.itervalues():
                 for index_now in range(0, ((date2 - date1).days + 2)):
                     rows_arr.append(" ")
-                if record == 'late' or record == 'normal' or record == 'overtime':
-                    break
                 vals = record.get('data')
                 # print vals.get('time_arr')
+                type = vals.get('type')
                 for time in vals.get('time_arr'):
                     time_date = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
                     inside = 0
@@ -76,10 +75,10 @@ class ReportHrAttendanceSheet(http.Controller):
                                  style)
                 for time_index in range(1,len(rows_arr)):
                     if len(rows_arr[time_index].split()) > 0:
-                        if data['type'] == 'late':
+                        if type == 'late':
                             if rows_arr[time_index].split()[len(rows_arr[time_index].split()) - 1] > '08:30':
                                 data_sheet.write(current_row, time_index, rows_arr[time_index], style)
-                        elif data['type'] == 'overtime':
+                        elif type == 'overtime':
                             if rows_arr[time_index].split()[0] > '19:50':
                                 data_sheet.write(current_row, time_index, rows_arr[time_index], style)
                         else:
