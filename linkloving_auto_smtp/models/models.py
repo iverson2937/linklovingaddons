@@ -9,7 +9,9 @@ import re
 class ResUserExtend(models.Model):
     _inherit = 'res.users'
 
-    mail_server = fields.Many2one('ir.mail_server', string=u'Mail Server')
+    mail_server = fields.Many2one('ir.mail_server', string=u'Send Mail Server')
+
+    # fetch_mail_server = fields.Many2one('fetchmail.server', string=u'Fetch Mail Server')
 
 
 class ir_mail_server(models.Model):
@@ -58,6 +60,48 @@ class AutoSmtpMailMail(models.Model):
     _inherit = 'mail.mail'
 
     char_filter = fields.Char(string=u'需要过滤的邮件地址')
+
+    @api.model
+    def message_new(self, message_dict, custom_values):
+        # received 收到
+
+        print message_dict
+
+        partner_ids = set()
+        kwargs_partner_ids = message_dict.pop('partner_ids', [])
+        for partner_id in kwargs_partner_ids:
+            if isinstance(partner_id, (list, tuple)) and partner_id[0] == 4 and len(partner_id) == 2:
+                partner_ids.add(partner_id[1])
+            if isinstance(partner_id, (list, tuple)) and partner_id[0] == 6 and len(partner_id) == 3:
+                partner_ids |= set(partner_id[2])
+            elif isinstance(partner_id, (int, long)):
+                partner_ids.add(partner_id)
+            else:
+                pass  # we do not manage anything else
+
+        # 根据 用户绑定的收件服务器 来获取Email
+
+        self.env['res.users'].search([('login', 'ilike', message_dict.get('to').split("<")[-1].split(">")[0])])
+
+        partner_ids.add(3624)
+
+        val = {
+            'subject': message_dict.get('subject'),
+            'body_html': message_dict.get('body'),
+            'body': message_dict.get('body'),
+            'email_from': message_dict.get('email_from').split("<")[-1].split(">")[0],
+            'email_to': message_dict.get('to').split("<")[-1].split(">")[0],
+            'email_cc': message_dict.get('cc'),
+            'author_id': message_dict.get('author_id'),
+            'date': message_dict.get('date'),
+            # 'message_type': 'email',
+            # 'attachment_ids': message_dict.get('attachments'),
+            'message_id': message_dict.get('message_id'),
+            'partner_ids': [(4, pid) for pid in partner_ids],
+            'state': 'received',
+        }
+        new_msg = self.sudo(self.env.user.id).create(val)
+        return new_msg
 
     @api.multi
     def send(self, auto_commit=False, raise_exception=False):
@@ -125,3 +169,10 @@ class EmailSendStatistics(models.Model):
     request_type = fields.Selection([('subscribe', u'订阅'), ('read', u'读取')], string=u'请求类型')
     is_subscribe = fields.Boolean(u'是否退订', default=True)
     email = fields.Char(u'Email')
+
+
+class EmailAddressee(models.Model):
+    _name = 'll.email.addressee'
+
+    name = fields.Char(u'邮件标题')
+    body = fields.Html(u'Email')

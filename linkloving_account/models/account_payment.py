@@ -198,6 +198,35 @@ class AccountPayment(models.Model):
 
     res_model = fields.Char()
     res_id = fields.Integer()
+    sheet_id = fields.Many2one('hr.expense.sheet', compute='get_sheet_id', string='报销单')
+    account_employee_payment_id = fields.Many2one('account.employee.payment', compute='get_account_employee_payment_id',
+                                                  string='暂支单')
+    account_payment_register_id = fields.Many2one('account.payment.register', compute='get_account_payment_register_id',
+                                                  string='付款申请')
+
+    @api.multi
+    def get_account_payment_register_id(self):
+        for p in self:
+            if p.res_id and p.res_model == 'account.payment.register':
+                print p.res_id, p.id, 'fsfsfa'
+                account_payment_register_id = self.env[p.res_model].browse(p.res_id)
+                p.account_payment_register_id = account_payment_register_id.id
+
+    @api.multi
+    def get_account_employee_payment_id(self):
+        for p in self:
+            if p.res_id and p.res_model == 'account.employee.payment':
+                print p.res_id, p.id, 'dddddd'
+                account_employee_payment_id = self.env[p.res_model].browse(p.res_id)
+                p.account_employee_payment_id = account_employee_payment_id.id
+
+    @api.multi
+    def get_sheet_id(self):
+        for p in self:
+            if p.res_id and p.res_model == 'hr.expense.sheet':
+                print p.res_id, p.id, 'fff'
+                sheet_id = self.env[p.res_model].browse(p.res_id)
+                p.sheet_id = sheet_id.id
 
     def _get_move_ids(self):
         self.move_ids = self.move_line_ids.mapped('move_id').ids
@@ -314,7 +343,6 @@ class AccountPayment(models.Model):
             'currency_id': self.currency_id != self.company_id.currency_id and self.currency_id.id or False,
             'payment_id': self.id,
         }
-
 
     @api.multi
     def post(self):

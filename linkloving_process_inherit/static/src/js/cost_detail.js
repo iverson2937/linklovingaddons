@@ -83,7 +83,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
 
             var e = e || window.event;
             var target = e.target || e.srcElement;
-            var bom_line_id = $('.unlock_condition').attr('data-id');
+            var bom_line_id = $('.unlock_condition').attr('data-bom-line-id');
 
 
             new Model('mrp.bom.line').call('add_action_line_data', [parseInt(bom_line_id)]).then(function (results) {
@@ -120,7 +120,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
             var self = this;
             var tr = $(target).parents('tr');
             var action_line_id = tr.find('.action_select select').attr('data-id');
-            var bom_line_id = $('.unlock_condition').attr('data-id');
+            var bom_line_id = $('.unlock_condition').attr('data-bom-line-id');
             if (action_line_id) {
                 var delete_data = [];
                 if (self.delete_action_ids[bom_line_id]) {
@@ -201,7 +201,9 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
         },
         confirm_sel_func: function () {
             var self = this;
-            var bom_line_id = $('.unlock_condition').attr('data-id');
+            var bom_line_id = $('.unlock_condition').attr('data-bom-line-id');
+
+            var line_id = $('.unlock_condition').attr('data-id');
             var trs = $('.unlock_condition').find('tr');
             var actions = [];
 
@@ -245,9 +247,11 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 }
 
             }
-
+            console.log(line_id);
+            console.log(bom_line_id);
             var new_div = QWeb.render('action_process', {'result': actions});
-            $('.treegrid-' + bom_line_id).find('.sel_action').html(new_div);
+            console.log(new_div);
+            $('.treegrid-' + line_id).find('.sel_action').html(new_div);
             // self.table_data[self.index]['process_action_1'] = $('.unlock_condition select option:selected').val();
             // if ($('.unlock_condition .change_time input').val() != '') {
             //     $('.fixed-table-body tr[data-index=' + self.index + ']').find('.adjusttime').html($('.unlock_condition .change_time input').val());
@@ -284,7 +288,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 new Model('mrp.bom.line').call('parse_action_line_data', [self.table_data[index].id]).then(function (results) {
                     var datas = [];
 
-                    $('.unlock_condition').attr('data-id', self.table_data[index].id).show();
+                    $('.unlock_condition').attr('data-id', self.table_data[index].uuid).attr('data-bom-line-id', self.table_data[index].id).show();
                     $('#action_table').html('');
                     self.tr_datas.results = results;
 
@@ -394,7 +398,7 @@ odoo.define('linkloving_process_inherit.cost_detail_new', function (require) {
                 showExport: true,
                 treeShowField: 'name',
                 treeEnable: true,
-               idField: 'uuid',
+                idField: 'uuid',
                 parentIdField: 'puuid',
                 editable: true,
                 showRefresh: true,

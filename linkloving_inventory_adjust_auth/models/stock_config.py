@@ -21,7 +21,8 @@ class StockSettings(models.TransientModel):
     @api.multi
     def set_wood_material_approve_id_defaults(self):
         group = self.env.ref('linkloving_inventory_adjust_auth.group_inventory_user')
-        self.wood_material_approve_id.groups_id = [(4, group.id)]
+        if self.wood_material_approve_id:
+            self.wood_material_approve_id.groups_id = [(4, group.id)]
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'wood_material_approve_id', self.wood_material_approve_id.id)
 
