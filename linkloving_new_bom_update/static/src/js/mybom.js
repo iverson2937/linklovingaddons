@@ -521,7 +521,7 @@ odoo.define('linkloving_new_bom_update.new_bom_update', function (require) {
                             $("#treeMenu").attr("data-bom-id", result.bom_id);
                             $.TreeTable("treeMenu", heads, tNodes);
                             $("#treeMenu").treetable("node", result.bom_id).toggle();
-                            if (result.state == 'new' || result.state == 'draft' || result.state == 'updated') {
+                            if (result.state == 'new' || result.state == 'draft' || result.state == 'updated'||result.state=='deny') {
                                 if (!this.is_show) {
                                     $(".new_bom_btns_wrap").append('<button class="btn btn-primary btn-sm submit_to_approval">提交审核</button>')
                                 }
