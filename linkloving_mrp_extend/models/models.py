@@ -635,6 +635,9 @@ class MrpProductionExtend(models.Model):
 
     # 确认生产 等待备料
     def button_waiting_material(self):
+        if self.product_id.status == 'eol' or not self.product_id.active:
+            raise UserError('%s已停产或者归档,不能生产' % self.product_id.name)
+
         if self.bom_id.state not in ('draft', 'release'):
             raise UserError('BOM还没通过审核,请联系相关负责人')
         # if self.location_ids.filtered(lambda x: x.is_circulate_location == False) or not self.location_ids:
