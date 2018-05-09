@@ -13,6 +13,9 @@ class MrpProduction(models.Model):
     @api.multi
     def set_to_confirm(self):
         for m in self:
+            if m.product_id.status == 'eol' or not m.product_id.active:
+                raise UserError('%s已停产或者归档,不能生产' % m.product_id.name)
+
             m.state = 'confirmed'
 
     @api.multi
