@@ -417,9 +417,10 @@ class ProductTemplate(models.Model):
             r.status = 'eol'
             orderPoints = OrderPoint.search([('product_id.product_tmpl_id', 'in', r.ids)])
             if orderPoints:
-                orderPoints.write({
-                    'active': False
-                })
+                for p in orderPoints:
+                    p.write({
+                        'active': False
+                    })
 
     @api.multi
     def cancel_eol(self):
