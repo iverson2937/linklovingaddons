@@ -612,7 +612,7 @@ class ProductAttachmentInfo(models.Model):
             review_id = review_id[0]
             info_dic['view_text_style'] = 'view_text_style_down'
         # 注释的是获取已存在的审核流程 新的是获取全部审核流程包含 未审核的
-        review = self.env["review.process"].search([("id", "=", review_id)])
+        review = self.env["review.process"].sudo().search([("id", "=", review_id)])
         info_dic['review_line'] = review.get_review_line_list_new(info_dic['id'])
         # if not review:
         #     print info_dic['id']
