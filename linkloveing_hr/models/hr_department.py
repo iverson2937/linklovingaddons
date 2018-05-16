@@ -24,5 +24,5 @@ class HrExpense(models.Model):
         else:
             if not self.manager_id:
                 raise UserError(u'请设置部门审核人')
-            to_approve_id = self.manager_id.user_id.id
+            to_approve_id = self.sudo().manager_id.user_id.id
         return state, to_approve_id

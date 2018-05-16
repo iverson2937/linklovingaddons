@@ -27,6 +27,18 @@ class PurchaseOrder(models.Model):
     pre_payment_amount = fields.Float(compute='_compute_invoice_amount')
 
     @api.multi
+    def button_confirm(self):
+        for order in self:
+            for line in order.order_line:
+                print line.product_id.status, 'dd'
+                if line.product_id.status == 'eol' or not line.product_id.active:
+                    raise UserError('%s已停产或者归档,不能下单购买' % line.product_id.name)
+
+        res = super(PurchaseOrder, self).button_confirm()
+
+        return res
+
+    @api.multi
     def button_cancel(self):
         for order in self:
             for pick in order.picking_ids:
