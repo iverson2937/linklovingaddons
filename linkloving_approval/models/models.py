@@ -283,7 +283,7 @@ class ApprovalCenter(models.TransientModel):
 
         attach_list = []
         for atta in attatchments:
-            res = self.env['product.attachment.info'].convert_attachment_info(atta)
+            res = self.env['product.attachment.info'].sudo().convert_attachment_info(atta)
             res.update({
                 'checkbox_type': self.type
             })
