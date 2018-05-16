@@ -67,7 +67,9 @@
             <xpath expr="//field[@name='check_in']" position="replace">
                 <field name="new_check_in" string="签到"/>
             </xpath>
-
+            <xpath expr="//field[@name='check_in']" position="after">
+                <field name="device_version" string="设备uuid"/>
+            </xpath>
         </field>
     </record>
 
