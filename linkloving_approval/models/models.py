@@ -99,43 +99,43 @@ class ApprovalCenter(models.TransientModel):
 
         if product_view_new:
             domain = [("product_tmpl_id", '=', product_view_new)]
-            attatchments = self.env[self.res_model].search_read(domain + domain_my,
-                                                                limit=limit,
-                                                                offset=offset,
-                                                                order='create_date desc',
-                                                                fields=ATTACHINFO_FIELD)
+            attatchments = self.env[self.res_model].sudo().search_read(domain + domain_my,
+                                                                       limit=limit,
+                                                                       offset=offset,
+                                                                       order='create_date desc',
+                                                                       fields=ATTACHINFO_FIELD)
         else:
 
             if self.type == 'waiting_submit':
                 domain = [('create_uid', '=', self.env.user.id),
                           ('state', 'in', ['waiting_release', 'cancel', 'deny'])]
-                attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
-                                                                    limit=limit,
-                                                                    offset=offset,
-                                                                    order='create_date desc',
-                                                                    fields=ATTACHINFO_FIELD)
+                attatchments = self.env[self.res_model].sudo().search_read(expression.AND([domain, domain_my]),
+                                                                           limit=limit,
+                                                                           offset=offset,
+                                                                           order='create_date desc',
+                                                                           fields=ATTACHINFO_FIELD)
             elif self.type == 'submitted':
                 domain = [('create_uid', '=', self.env.user.id),
                           (
                               'state', 'not in',
                               ['waiting_release', 'draft', 'cancel', 'deny'])]
-                attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
-                                                                    limit=limit,
-                                                                    offset=offset,
-                                                                    order='create_date desc',
-                                                                    fields=ATTACHINFO_FIELD)
+                attatchments = self.env[self.res_model].sudo().search_read(expression.AND([domain, domain_my]),
+                                                                           limit=limit,
+                                                                           offset=offset,
+                                                                           order='create_date desc',
+                                                                           fields=ATTACHINFO_FIELD)
             elif self.type == 'waiting_approval':
 
-                lines = self.env["review.process.line"].search([("state", '=', 'waiting_review'),
-                                                                ('partner_id', '=', self.env.user.partner_id.id)],
-                                                               order='create_date desc')
+                lines = self.env["review.process.line"].sudo().search([("state", '=', 'waiting_review'),
+                                                                       ('partner_id', '=', self.env.user.partner_id.id)],
+                                                                      order='create_date desc')
                 review_ids = lines.mapped("review_id")
                 domain = [("review_id", "in", review_ids.ids),
                           ('state', 'in', ['review_ing'])]
-                attatchments = self.env[self.res_model].search_read(expression.AND([domain, domain_my]),
-                                                                    limit=limit,
-                                                                    offset=offset,
-                                                                    fields=ATTACHINFO_FIELD)
+                attatchments = self.env[self.res_model].sudo().search_read(expression.AND([domain, domain_my]),
+                                                                           limit=limit,
+                                                                           offset=offset,
+                                                                           fields=ATTACHINFO_FIELD)
             elif self.type == 'approval':
 
                 lines = self.env["review.process.line"].search(
