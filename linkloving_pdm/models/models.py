@@ -612,7 +612,7 @@ class ProductAttachmentInfo(models.Model):
             review_id = review_id[0]
             info_dic['view_text_style'] = 'view_text_style_down'
         # 注释的是获取已存在的审核流程 新的是获取全部审核流程包含 未审核的
-        review = self.env["review.process"].sudo().search([("id", "=", review_id)])
+        review = self.env["review.process"].browse(review_id)
         info_dic['review_line'] = review.get_review_line_list_new(info_dic['id'])
         # if not review:
         #     print info_dic['id']
@@ -626,37 +626,13 @@ class ProductAttachmentInfo(models.Model):
         info_dic["type"] = type1.upper() if type1 else ''
 
         c_uid = info_dic.get("create_uid")[0]
-        create_uid = self.env["res.users"].sudo().browse(c_uid)
+        create_uid = self.env["res.users"].browse(c_uid)
         info_dic["create_uid_name"] = create_uid.name
 
         info_dic['is_delect_view'] = 'yes' if create_uid.id == self.env.uid else 'no',
         info_dic["is_checkbox_show"] = 'yes'
         info_dic["remark"] = info_dic.get('remark') if info_dic.get('remark') else ''
         return info_dic
-        return {
-            'product_id': {
-                'id': self.product_tmpl_id.id,
-                'name': self.product_tmpl_id.display_name,
-                'default_code': self.product_tmpl_id.default_code,
-            },
-            'id': self.id,
-            'file_name': self.file_name or '',
-            'review_id': self.review_id.who_review_now.name or '',
-            'remote_path': self.remote_path or '',
-            'version': self.version or '',
-            'state': [self.state, ATTACHMENT_STATE[self.state]],
-            'has_right_to_review': self.has_right_to_review,
-            'review_line': self.review_id.get_review_line_list(),
-            'is_able_to_use': self.is_able_to_use,
-            'is_show_cancel': self.is_show_cancel,
-            'is_first_review': self.is_first_review,
-            'is_show_action_deny': self.is_show_action_deny,
-            'create_uid_name': self.sudo().create_uid.name,
-            'type': FILE_TYPE_DIC.get(self.type or '') or '',
-            'is_delect_view': 'yes' if self.create_uid.id == self.env.uid else 'no',
-            'is_checkbox_show': 'yes',
-            'is_show_outage': self.is_show_outage,
-        }
 
     def get_file_download_url(self, type, host, product_tmpl_id):
         files = self.search([('product_tmpl_id', '=', product_tmpl_id), ('type', '=', type)])
@@ -666,7 +642,7 @@ class ProductAttachmentInfo(models.Model):
         elif len(file) == 0:
             return ''
         else:
-            raise u"数据异常,有两个可用的文件"
+            raise UserError(u"数据异常,有两个可用的文件")
 
     def get_download_filename(self):
         dc = self.product_tmpl_id.default_code  # .replace(".", "_")
