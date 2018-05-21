@@ -8,9 +8,9 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form</field>
             <field name="domain">
-                [('customer','=','1'),('is_company','=',True),('is_order','=',True),('crm_is_partner','=',False),('public_partners','!=','public')]
+                [('customer','=','1'),('is_company','=',True),('is_order','=',True),('public_partners','!=','public')]
             </field>
-            <field name="context">{'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
+            <field name="context">{'default_customer':True,'default_is_company':True}
             </field>
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="base.view_res_partner_filter"/>
