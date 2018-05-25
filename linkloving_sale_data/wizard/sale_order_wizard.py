@@ -21,8 +21,8 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
         domain = []
         if team_ids:
             domain.append(('team_id', 'in', team_ids.ids))
-        domain.append(('state', '=', 'sale'),
-                      ('date_order', '>=', date1), ('date_order', '<=', date2))
+        domain + [('state', '=', 'sale'),
+                  ('date_order', '>=', date1), ('date_order', '<=', date2)]
         sale_orders = sale_obj.search(domain, order='date_order')
 
         sale_sequence = 1
