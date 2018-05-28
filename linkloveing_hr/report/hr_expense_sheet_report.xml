@@ -129,8 +129,8 @@
                             <div class="row">
                                 <div class="col-xs-3">
                                     <strong>总经理:</strong>
-                                    <img t-if="o.remark_comments_ids[-1]"
-                                         t-att-src="'data:image/png;base64,%s' % o.remark_comments_ids[-1].create_uid.employee_ids[0].signature"
+                                    <img t-if="o.sudo().remark_comments_ids[-1]"
+                                         t-att-src="'data:image/png;base64,%s' % o.sudo().remark_comments_ids[-1].create_uid.employee_ids[0].signature"
                                          style="position:absolute; z-index:2;top: 0;width: 48%;"/>
                                 </div>
                                 <div class="col-xs-3">
@@ -164,7 +164,7 @@
                             <table class="table table-condensed">
                                 <div class="row">
                                     <t t-set="i" t-value="1"/>
-                                    <tr t-foreach="o.remark_comments_ids" t-as="lines">
+                                    <tr t-foreach="o.sudo().remark_comments_ids" t-as="lines">
                                         <td>
                                             <span t-esc="i"/>
                                         </td>
