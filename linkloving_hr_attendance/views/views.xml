@@ -22,6 +22,8 @@
                         <button name='print_report_overtime' type='object' string='导出加班' class='oe_highlight'/>
                         or
                         <button string='取消' class='oe_link' special='cancel'/>
+                        or
+                        <button name='update_attendance' type='object' string='更新' class='oe_highlight'/>
                     </footer>
                 </form>
             </field>
@@ -49,7 +51,7 @@
         <field name="arch" type="xml">
 
             <!--<tree string="Employee attendances">-->
-            <xpath expr="//field[@name='check_in']" position="replace">
+            <xpath expr="//field[@name='check_out']" position="before">
                 <field name="new_check_in" string="签到"/>
             </xpath>
             <xpath expr="//field[@name='check_out']" position="after">
@@ -64,10 +66,10 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='check_in']" position="replace">
+            <xpath expr="//field[@name='check_out']" position="before">
                 <field name="new_check_in" string="签到"/>
             </xpath>
-            <xpath expr="//field[@name='check_in']" position="after">
+            <xpath expr="//field[@name='check_out']" position="after">
                 <field name="device_version" string="设备uuid"/>
             </xpath>
         </field>
