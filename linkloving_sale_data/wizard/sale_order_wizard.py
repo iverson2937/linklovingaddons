@@ -15,13 +15,15 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
                              default=(datetime.date.today().replace(day=1) - datetime.timedelta(1)).replace(day=1))
     end_date = fields.Date(u'订单截至日期', default=datetime.datetime.now())
 
-    def _get_data_by_sale(self, date1, date2):
+    def _get_data_by_sale(self, date1, date2, team_ids):
         returnDict = {}
         sale_obj = self.env['sale.order']
-
-        sale_orders = sale_obj.search([
-            ('state', '=', 'sale'),
-            ('date_order', '>=', date1), ('date_order', '<=', date2)], order='date_order')
+        domain = []
+        if team_ids:
+            domain.append(('team_id', 'in', team_ids.ids))
+        d1 = domain + [('state', '=', 'sale'),
+                       ('date_order', '>=', date1), ('date_order', '<=', date2)]
+        sale_orders = sale_obj.search(d1, order='date_order')
 
         sale_sequence = 1
         for sale_order in sale_orders:
@@ -55,7 +57,7 @@ class PurchaseOrderListPrintWizard(models.TransientModel):
     @api.multi
     def print_report(self):
         for report in self:
-            datas = self._get_data_by_sale(report.start_date, report.end_date)
+            datas = self._get_data_by_sale(report.start_date, report.end_date, report.team_ids)
             report_name = 'linkloving_sale_data.sale_order_report'
 
             if not datas:

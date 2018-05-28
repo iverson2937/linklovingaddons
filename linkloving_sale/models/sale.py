@@ -166,7 +166,7 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         self.ensure_one()
         for line in self.order_line:
-            if line.product_id.status == 'eol' and (line.product_id.qty_available < line.product_qty):
+            if line.product_id.status == 'eol' and (line.product_id.virtual_available < line.product_qty):
                 raise UserError('%s 已停产且订购数量大于库存,不允许下单' % line.product_id.name)
 
         return super(SaleOrder, self).action_confirm()
