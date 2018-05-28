@@ -2779,7 +2779,7 @@ class LinklovingOAApi(http.Controller):
                     "open_id": open_id,
                 })
 
-            domain = [("write_date", ">", day_start), ("write_date", "<", day_end), ("employee_id", "=", employee.id)]
+            domain = [("check_in", ">", day_start), ("check_in", "<", day_end), ("employee_id", "=", employee.id)]
 
             attendance_list = request.env['hr.attendance'].sudo().search(domain)
             data = []
