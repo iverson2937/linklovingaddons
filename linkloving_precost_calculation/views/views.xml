@@ -62,7 +62,7 @@
                 <header position="inside">
                     <button string="计算当前成本"
                             type="object"
-                            name="btn_pre_cost_cal"/>
+                            name="btn_pre_cost_cal_new"/>
                 </header>
 
 

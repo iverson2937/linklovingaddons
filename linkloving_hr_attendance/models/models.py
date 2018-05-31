@@ -25,6 +25,27 @@ class Linkloving_hr_attendance(models.Model):
      is_location_on = fields.Boolean(string='上班是否是定位打卡', default=False)
      is_location_off = fields.Boolean(string='下班是否是定位打卡', default=False)
 
+     rt_is_on = fields.Selection([
+         ('0', u'上班'),
+         ('1', u'下班'),
+     ], string=u"上下班类型")
+
+     rt_type = fields.Selection([
+         ('0', u'初始数据'),
+         ('1', u'补卡'),
+         ('2', u'销卡'),
+         ('3', u'审核补卡'),
+         ('4', u'审核销卡')
+     ], default='0', string=u"打卡类型")
+
+     @api.depends('check_out','new_check_in')
+     def _get_is_on(self):
+         for attendance in self:
+             if attendance.check_out:
+                 attendance.rt_is_on = "1"
+             else:
+                 attendance.rt_is_on = "0"
+
      @api.constrains('check_in', 'check_out', 'employee_id')
      def _check_validity(self):
           """ Verifies the validity of the attendance record compared to the others from the same employee.

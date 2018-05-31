@@ -275,8 +275,8 @@ class CrmMailMessage(models.Model):
                 if mail_connect_id.id in message.messages_label_ids.ids:
                     if (not crm_partner_val.opportunity_ids) and message.messages_label_ids:
                         if (not (crm_partner_val.company_type == 'person')) and crm_partner_val.customer:
-                            if not mail_connect_id.msg_stage_ids:
-                                raise UserError(u'请检查阶段是否已绑定记录类型')
+                            # if not mail_stage_id.full_name_ids:
+                            #     raise UserError(u'请检查阶段是否已绑定记录类型')
                             lead_vals = {
                                 'name': "默认商机-" + str(crm_partner_val.name),
                                 'partner_id': crm_partner_val.id,

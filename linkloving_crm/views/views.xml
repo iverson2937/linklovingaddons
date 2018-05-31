@@ -39,7 +39,8 @@
                 <!--左-->
 
                 <xpath expr="//field[@name='team_id']" position="after">
-                    <field name="crm_source_id" options="{'no_create': True}" required="True"/>
+                    <field name="crm_source_id" options="{'no_create': True}"
+                           required="True"/>
                 </xpath>
                 <xpath expr="//field[@name='crm_source_id']" position="after">
                     <field name="express_sample_record"/>
@@ -52,12 +53,15 @@
 
                 <xpath expr="//page[@name='extra']" position="after">
                     <page string="产品" attrs="{'invisible': True}">
-                        <field name="interested_in_product" domain="[('sale_ok','=',True)]" widget="list_new_view"
+                        <field name="interested_in_product"
+                               domain="[('sale_ok','=',True)]" widget="list_new_view"
                                context="{'search_default_rteng':1,'search_default_filter_categ_id':1}"/>
                     </page>
                     <page string="产品">
-                        <field name="product_series_ids" widget="crm_tree_list_js" attrs="">
-                            <tree string="产品系列" default_order="crm_product_type" create="0">
+                        <field name="product_series_ids" widget="crm_tree_list_js"
+                               attrs="">
+                            <tree string="产品系列" default_order="crm_product_type"
+                                  create="0">
                                 <field name="crm_product_type"/>
                                 <field name="name"/>
                                 <field name="detail"/>
@@ -65,7 +69,8 @@
                                 <field name="crm_Parent_ontomany_ids"/>
                             </tree>
                         </field>
-                        <button string="添加型号" name="action_tree_list_view" type="object" class="btn-primary" groups=""/>
+                        <button string="添加型号" name="action_tree_list_view" type="object"
+                                class="btn-primary" groups=""/>
                         <div class="oe_clear"/>
                     </page>
 
@@ -226,7 +231,8 @@
                                 <field name="crm_product_type"/>
                             </group>
                             <group>
-                                <field name="crm_Parent_id" domain="[('crm_product_type','in',('brand','series'))]"
+                                <field name="crm_Parent_id"
+                                       domain="[('crm_product_type','in',('brand','series'))]"
                                        attrs="{'invisible': [('crm_product_type','=','brand')]}"/>
                             </group>
                             <field name="detail"/>
@@ -335,7 +341,8 @@
             <field name="domain">
                 [('customer','=','1'),('is_company','=',True),('is_order','=',False),('crm_is_partner','=',False),('public_partners','!=','public')]
             </field>
-            <field name="context">{'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
+            <field name="context">
+                {'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
             </field>
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="base.view_res_partner_filter"/>
@@ -360,7 +367,8 @@
             <field name="domain">
                 [('customer','=','1'),('is_company','=',True),('crm_is_partner','=',True),('public_partners','!=','public')]
             </field>
-            <field name="context">{'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
+            <field name="context">
+                {'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
             </field>
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="base.view_res_partner_filter"/>
@@ -378,8 +386,11 @@
             <field name="res_model">res.partner</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,kanban,form</field>
-            <field name="domain">[('customer','=','1'),('is_company','=',True),('public_partners','=','public')]</field>
-            <field name="context">{'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
+            <field name="domain">
+                [('customer','=','1'),('is_company','=',True),('public_partners','=','public')]
+            </field>
+            <field name="context">
+                {'default_customer':True,'default_is_company':True,'default_crm_is_partner':True}
             </field>
             <field name="view_id" eval="False"/>
             <field name="search_view_id" ref="base.view_res_partner_filter"/>
@@ -442,6 +453,27 @@
                   sequence="3" name="客户状态"/>
 
 
+        <record id="crm_crm_sale_daily_day_manager_tree" model="ir.actions.act_window">
+            <field name="name">工作报告</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">crm.sale.daily</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    暂时没有工作报告
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem action="crm_crm_sale_daily_day_manager_tree"
+                  id="linkloving_crm_sale_daily_tree_manager"
+                  parent="sales_team.menu_sale_report"
+                  groups="sales_team.group_sale_manager"
+                  sequence="9" name="工作报告"/>
+
+
         <record model="ir.ui.view" id="mail.view_message_form">
             <field name="name">mail.message.form</field>
             <field name="model">mail.message</field>
@@ -458,7 +490,8 @@
                                 <field name="record_name" invisible="1"/>
                             </group>
                             <group>
-                                <field name="messages_label_ids" string="记录类型" widget="many2many_checkboxes"
+                                <field name="messages_label_ids" string="记录类型"
+                                       widget="many2many_checkboxes"
                                        options="{'no_create': True}"
                                        attrs="{'invisible': [('sale_order_type','in',('inspection','question','partner_question'))]}"/>
                                 <field name="parent_id" invisible="1"/>
@@ -476,7 +509,8 @@
                                    attrs="{'invisible': [('sale_order_type','not in',('inspection','question','partner_question'))]}"/>
                             <field name="anticipated_loss"
                                    attrs="{'invisible': [('sale_order_type','not in',('inspection','question','partner_question'))]}"/>
-                            <field name="attachment_ids" attrs="{'invisible': [('attachment_ids','=',[])]}">
+                            <field name="attachment_ids"
+                                   attrs="{'invisible': [('attachment_ids','=',[])]}">
                                 <tree create="0">
                                     <field name="name"/>
                                 </tree>
@@ -505,7 +539,8 @@
                     </sheet>
 
                     <footer>
-                        <button string="修改" name="update_message_action" type="object" class="btn-primary" groups=""/>
+                        <button string="修改" name="update_message_action" type="object"
+                                class="btn-primary" groups=""/>
                         <!--<button string="修改" type="button" class="btn btn-sm btn-primary o_composer_button_sendss"/>-->
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
@@ -521,8 +556,10 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='consumable']" position="after">
                     <separator/>
-                    <filter string="RT-ENG" name="rteng" domain="[('name','ilike', 'RT-ENG')]"/>
-                    <filter string="RT-CN" name="rtcn" domain="[('name','ilike', 'RT-CN')]"/>
+                    <filter string="RT-ENG" name="rteng"
+                            domain="[('name','ilike', 'RT-ENG')]"/>
+                    <filter string="RT-CN" name="rtcn"
+                            domain="[('name','ilike', 'RT-CN')]"/>
                     <separator/>
                     <filter string="库存不足" domain="[('product_insufficient','=',True)]"/>
                     <separator/>
@@ -565,11 +602,13 @@
                         </group>
                         <group>
                             <field name="on_change"/>
-                            <field name="probability" attrs="{'invisible': [('on_change', '=', False)]}"/>
+                            <field name="probability"
+                                   attrs="{'invisible': [('on_change', '=', False)]}"/>
                         </group>
                     </group>
                     <group>
-                        <field name="full_name_ids" widget="many2many_tags" options="{'no_create': True}"
+                        <field name="full_name_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
                                groups="sales_team.group_sale_manager"/>
                     </group>
                     <separator string="Requirements"/>
@@ -584,13 +623,18 @@
             <field name="arch" type="xml">
                 <search string="类型">
 
-                    <filter string="日报" name="day_search" domain="[('type','=','day_daily')]"/>
-                    <filter string="周报" name="week_search" domain="[('type', '=', 'week_daily')]"/>
-                    <filter string="月报" name="month_search" domain="[('type','=','mouth_daily')]"/>
+                    <filter string="日报" name="day_search"
+                            domain="[('type','=','day_daily')]"/>
+                    <filter string="周报" name="week_search"
+                            domain="[('type', '=', 'week_daily')]"/>
+                    <filter string="月报" name="month_search"
+                            domain="[('type','=','mouth_daily')]"/>
 
                     <group expand="0" string="Group By">
-                        <filter string="月份" name="group_month" domain="[]" context="{'group_by':'create_date'}"/>
-                        <filter string="类型" name="group_type" domain="[]" context="{'group_by':'type'}"/>
+                        <filter string="月份" name="group_month" domain="[]"
+                                context="{'group_by':'create_date'}"/>
+                        <filter string="类型" name="group_type" domain="[]"
+                                context="{'group_by':'type'}"/>
                     </group>
 
                 </search>
@@ -621,7 +665,8 @@
                         <field name="plan" placeholder="计划"/>
                     </group>
                     <footer>
-                        <button string="确定" name="set_daily_save" type="object" default_focus="1"
+                        <button string="确定" name="set_daily_save" type="object"
+                                default_focus="1"
                                 class="btn-primary"/>
                         <button string="取消" class="btn-default" special="cancel"/>
                     </footer>
@@ -666,7 +711,8 @@
             <field name="res_model">crm.sale.daily</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('type','=','week_daily'),('create_uid','=',uid)]</field>
+            <field name="domain">[('type','=','week_daily'),('create_uid','=',uid)]
+            </field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     暂时没有工作报告
@@ -680,7 +726,8 @@
             <field name="res_model">crm.sale.daily</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('type','=','mouth_daily'),('create_uid','=',uid)]</field>
+            <field name="domain">[('type','=','mouth_daily'),('create_uid','=',uid)]
+            </field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     暂时没有工作报告

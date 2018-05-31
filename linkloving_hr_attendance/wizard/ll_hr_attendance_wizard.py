@@ -77,3 +77,19 @@ class HrAttendanceWizard(models.TransientModel):
             if not datas:
                 raise UserError(u'没找到相关数据')
             return self.env['report'].get_action(self, report_name, datas)
+
+    def update_attendance(self):
+        total_attendance = self.env['hr.attendance'].search([])
+        for attendance in total_attendance:
+            if attendance.check_out:
+                attendance.write({
+                    "rt_type": "0",
+                    "rt_is_on":"1",
+                })
+            else:
+                attendance.write({
+                    "rt_type": "0",
+                    "rt_is_on": "0",
+                })
+
+

@@ -3,6 +3,7 @@
 from odoo import fields, models, api, _, SUPERUSER_ID
 from itertools import groupby
 
+from odoo.exceptions import UserError
 from odoo.tools import float_compare, float_is_zero
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_compare, float_round
 from datetime import datetime
@@ -161,6 +162,14 @@ class SaleOrder(models.Model):
         if len(pickings) > 1:
             action['domain'] = [('id', 'in', pickings.ids), ('sale_order_type', '=', self._context['sale_type'])]
         return action
+
+    def action_confirm(self):
+        self.ensure_one()
+        for line in self.order_line:
+            if line.product_id.status == 'eol' and (line.product_id.virtual_available < line.product_qty):
+                raise UserError('%s 已停产且订购数量大于库存,不允许下单' % line.product_id.name)
+
+        return super(SaleOrder, self).action_confirm()
 
 
 class SaleOrderLine(models.Model):

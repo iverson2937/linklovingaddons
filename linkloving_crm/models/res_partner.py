@@ -29,23 +29,29 @@ def select_company(my_self, vals, type):
     if strip_str != (my_self[type] if my_self else ''):
         if strip_str:
             result = my_self.env['res.partner'].search(
-                [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
+                [(type, '=', strip_str.strip()), ('customer', '=', True),
+                 ('is_company', '=', True)])
             return result
 
 
 def action_crm_channel(my_self, body):
-    my_self.env['mail.channel'].search([('name', '=', '公海通知')]).message_post(body=body, subject=None,
+    my_self.env['mail.channel'].search([('name', '=', '公海通知')]).message_post(body=body,
+                                                                             subject=None,
                                                                              message_type='comment',
-                                                                             subtype='mail.mt_comment', parent_id=False,
+                                                                             subtype='mail.mt_comment',
+                                                                             parent_id=False,
                                                                              attachments=None,
-                                                                             content_subtype='html', **{'author_id': 3})
+                                                                             content_subtype='html',
+                                                                             **{
+                                                                                 'author_id': 3})
 
 
 def result_time_val(date_time):
     if len(date_time) > 1:
         result_date = date_time[0]
         for time_one in range(1, len(date_time)):
-            if datetime.strptime(date_time[time_one].split(' ')[0], '%Y-%m-%d') > datetime.strptime(
+            if datetime.strptime(date_time[time_one].split(' ')[0],
+                                 '%Y-%m-%d') > datetime.strptime(
                     result_date.split(' ')[0], '%Y-%m-%d'):
                 result_date = date_time[time_one]
         return result_date
@@ -59,17 +65,20 @@ class ResPartner(models.Model):
 
     _inherit = 'res.partner'
 
-    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True, default=AVAILABLE_PRIORITIES[0][0])
+    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'客户星级', index=True,
+                                default=AVAILABLE_PRIORITIES[0][0])
 
     detailed_address = fields.Char(string=u'地址', compute='_street_name')
 
     source = fields.Char(string=u'来源')
     continent = fields.Many2one('crm.continent', string=u'所属大洲')
     express_sample_record = fields.Char(string=u'快递账号')
-    interested_in_product = fields.Many2many('product.template', 'res_interested_in_product_template_ref',
+    interested_in_product = fields.Many2many('product.template',
+                                             'res_interested_in_product_template_ref',
                                              string=u'感兴趣产品')
 
-    product_series_ids = fields.Many2many('crm.product.series', 'res_product_series_product_template_ref',
+    product_series_ids = fields.Many2many('crm.product.series',
+                                          'res_product_series_product_template_ref',
                                           string=u'感兴趣系列')
 
     communication_identifier = fields.Char(string=u'其他沟通方式')
@@ -84,19 +93,26 @@ class ResPartner(models.Model):
     source_id = fields.Many2one('res.partner.source')
 
     customer_status = fields.Many2one('message.order.status', string=u'客户状态')
-    is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order', store=True)
+    is_order = fields.Boolean(string=u'订单记录', readonly=True, compute='_compute_is_order',
+                              store=True)
 
-    user_id = fields.Many2one('res.users', string='Salesperson', default=lambda self: self.env.user,
+    user_id = fields.Many2one('res.users', string='Salesperson',
+                              default=lambda self: self.env.user,
                               help='The internal user that is in charge of communicating with this contact if any.')
     team_id = fields.Many2one('crm.team', string='Sales Team', oldname='section_id',
-                              default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
+                              default=lambda self: self.env[
+                                  'crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid))
 
-    order_partner_question_count = fields.Integer(compute='_compute_order_partner_question', string=u'客户问题汇总')
+    order_partner_question_count = fields.Integer(
+        compute='_compute_order_partner_question', string=u'客户问题汇总')
 
-    partner_img_count = fields.Integer(compute='_compute_order_partner_question', string=u'客户照片')
+    partner_img_count = fields.Integer(compute='_compute_order_partner_question',
+                                       string=u'客户照片')
 
-    public_partners = fields.Selection([('public', u'公海'), ('buffer', u'缓冲区'), ('private', u'私有')], string=u'公海')
+    public_partners = fields.Selection(
+        [('public', u'公海'), ('buffer', u'缓冲区'), ('private', u'私有')], string=u'公海',
+        default='private')
 
     old_user_id = fields.Char(string=u'前销售员')
 
@@ -110,25 +126,33 @@ class ResPartner(models.Model):
 
     crm_partner_id = fields.Many2one('crm.res.partner', string='related partner')
 
-    crm_is_partner = fields.Boolean(related='crm_partner_id.crm_is_partner', string=u'是否线索客户')
+    crm_is_partner = fields.Boolean(related='crm_partner_id.crm_is_partner',
+                                    string=u'是否线索客户')
 
     im_tool = fields.Char(related='crm_partner_id.im_tool', string=u'即时通讯工具')
 
     customer_scale = fields.Selection(
-        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')],
+        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'),
+         ('5', u'500人以上')],
         related='crm_partner_id.customer_scale', string=u'规模')
 
-    customer_store_number = fields.Integer(related='crm_partner_id.customer_store_number', string=u'门店数量')
+    customer_store_number = fields.Integer(related='crm_partner_id.customer_store_number',
+                                           string=u'门店数量')
 
-    customer_store_product_type = fields.Char(related='crm_partner_id.customer_store_product_type', string=u'门店主营产品类型')
+    customer_store_product_type = fields.Char(
+        related='crm_partner_id.customer_store_product_type', string=u'门店主营产品类型')
 
-    customer_user_group = fields.Char(related='crm_partner_id.customer_user_group', string=u'用户群体')
+    customer_user_group = fields.Char(related='crm_partner_id.customer_user_group',
+                                      string=u'用户群体')
 
-    customer_social_platform = fields.Char(related='crm_partner_id.customer_social_platform', string=u'社交平台')
+    customer_social_platform = fields.Char(
+        related='crm_partner_id.customer_social_platform', string=u'社交平台')
 
-    customer_birthday = fields.Date(related='crm_partner_id.customer_birthday', string=u'生日')
+    customer_birthday = fields.Date(related='crm_partner_id.customer_birthday',
+                                    string=u'生日')
 
-    customer_sex = fields.Selection([('man', u'男'), ('woman', u'女')], related='crm_partner_id.customer_sex',
+    customer_sex = fields.Selection([('man', u'男'), ('woman', u'女')],
+                                    related='crm_partner_id.customer_sex',
                                     string=u'性别')
 
     customer_image = fields.Binary(u"照片",
@@ -136,15 +160,20 @@ class ResPartner(models.Model):
 
     customer_country_id = fields.Many2many('res.country', string=u'国家')  # 市场
     customer_continent = fields.Many2many('crm.continent', string=u'大洲')  # 市场
-    customer_is_world = fields.Boolean(related='crm_partner_id.customer_is_world', string=u'世界')  # 市场
+    customer_is_world = fields.Boolean(related='crm_partner_id.customer_is_world',
+                                       string=u'世界')  # 市场
 
     # customer_write_date = fields.Datetime(related='crm_partner_id.customer_write_date', string=u'最近操所时间')
 
-    customer_write_date = fields.Datetime(string=u'最近操所时间', compute="_compute_customer_write_date", store=True)
+    customer_write_date = fields.Datetime(string=u'最近操所时间',
+                                          compute="_compute_customer_write_date",
+                                          store=True)
 
-    customer_follow_up_date = fields.Date(related='crm_partner_id.customer_follow_up_date', string=u'最近跟进时间')
+    customer_follow_up_date = fields.Date(
+        related='crm_partner_id.customer_follow_up_date', string=u'最近跟进时间')
 
-    crm_is_partner_temporary = fields.Boolean(related='crm_partner_id.crm_is_partner_temporary', string=u'是否是客户')
+    crm_is_partner_temporary = fields.Boolean(
+        related='crm_partner_id.crm_is_partner_temporary', string=u'是否是客户')
 
     @api.multi
     def _compute_customer_write_date(self):
@@ -197,7 +226,8 @@ class ResPartner(models.Model):
 
                     if result_zh and result_us:
                         res_zh = self.env['res.partner'].search(
-                            [('name', 'ilike', result_zh), ('customer', '=', True), ('is_company', '=', True)])
+                            [('name', 'ilike', result_zh), ('customer', '=', True),
+                             ('is_company', '=', True)])
                         if self:
                             res_zh = res_zh - self
                         if res_zh:
@@ -208,12 +238,14 @@ class ResPartner(models.Model):
                                     return True
                     elif result_zh:
                         res_zh = self.env['res.partner'].search(
-                            [('name', '=', result_zh), ('customer', '=', True), ('is_company', '=', True)])
+                            [('name', '=', result_zh), ('customer', '=', True),
+                             ('is_company', '=', True)])
                         if res_zh:
                             return True
                     elif result_us:
                         res_us = self.env['res.partner'].search(
-                            [('name', 'ilike', self.fomate_name_vals(strip_str)), ('customer', '=', True),
+                            [('name', 'ilike', self.fomate_name_vals(strip_str)),
+                             ('customer', '=', True),
                              ('is_company', '=', True)])
                         if self:
                             res_us = res_us - self
@@ -225,7 +257,8 @@ class ResPartner(models.Model):
                                     return True
                 else:
                     result = self.env['res.partner'].search(
-                        [(type, '=', strip_str.strip()), ('customer', '=', True), ('is_company', '=', True)])
+                        [(type, '=', strip_str.strip()), ('customer', '=', True),
+                         ('is_company', '=', True)])
                     return result
 
     @api.model
@@ -285,7 +318,8 @@ class ResPartner(models.Model):
             crm_res_one = self.env['crm.res.partner'].create({})
             vals['crm_partner_id'] = crm_res_one.id
 
-        if not (self['company_type'] == 'company' and vals.get('company_type') == 'person'):
+        if not (self['company_type'] == 'company' and vals.get(
+                'company_type') == 'person'):
             if self['is_company'] or vals.get('is_company'):
                 for item_type in ['name', 'email']:
                     if self.select_company_new(vals, item_type):
@@ -294,13 +328,15 @@ class ResPartner(models.Model):
                             item_type_name = '名称 '
                         elif item_type == 'email':
                             item_type_name = '邮件 '
-                        raise UserError(u'此' + item_type_name + vals.get(item_type) + u'已绑定公司，请确认')
+                        raise UserError(
+                            u'此' + item_type_name + vals.get(item_type) + u'已绑定公司，请确认')
 
         if self['company_type'] == 'person' and vals.get('company_type') == 'company':
             for item_type in ['name', 'email']:
                 if not vals.get(item_type):
                     if self.select_company_new({item_type: self[item_type]}, item_type):
-                        raise UserError(u'此' + item_type + vals.get(item_type) + u'已绑定公司，请更换')
+                        raise UserError(
+                            u'此' + item_type + vals.get(item_type) + u'已绑定公司，请更换')
 
         if 'user_id' in vals:
             if vals.get('user_id'):
@@ -333,15 +369,21 @@ class ResPartner(models.Model):
     def _street_name(self):
         for record in self:
             record.detailed_address = ''
-            asd = (str(record.country_id.name) if type(record.country_id.name) == bool else (
+            asd = (str(record.country_id.name) if type(
+                record.country_id.name) == bool else (
                 record.country_id.name).encode("utf-8")) + (
-                      str(record.zip) if type(record.zip) == bool else (record.zip).encode("utf-8")) + (
-                      str(record.state_id.name) if type(record.state_id.name) == bool else (
+                      str(record.zip) if type(record.zip) == bool else (
+                      record.zip).encode("utf-8")) + (
+                      str(record.state_id.name) if type(
+                          record.state_id.name) == bool else (
                           record.state_id.name).encode(
                           "utf-8")) + (
-                      str(record.city) if type(record.city) == bool else (record.city).encode("utf-8")) + (
-                      str(record.street) if type(record.street) == bool else (record.street).encode("utf-8")) + (
-                      str(record.street2) if type(record.street2) == bool else (record.street2).encode("utf-8"))
+                      str(record.city) if type(record.city) == bool else (
+                      record.city).encode("utf-8")) + (
+                      str(record.street) if type(record.street) == bool else (
+                      record.street).encode("utf-8")) + (
+                      str(record.street2) if type(record.street2) == bool else (
+                      record.street2).encode("utf-8"))
 
             record.detailed_address = asd.replace("False", "")
 
@@ -350,9 +392,11 @@ class ResPartner(models.Model):
 
     @api.multi
     def _compute_remark_count(self):
-        activity_data = self.env['crm.remark.record'].read_group([('partner_id', 'in', self.ids)], ['partner_id'],
-                                                                 ['partner_id'])
-        mapped_data = {act['partner_id'][0]: act['partner_id_count'] for act in activity_data}
+        activity_data = self.env['crm.remark.record'].read_group(
+            [('partner_id', 'in', self.ids)], ['partner_id'],
+            ['partner_id'])
+        mapped_data = {act['partner_id'][0]: act['partner_id_count'] for act in
+                       activity_data}
         for partner in self:
             partner.remark_count = mapped_data.get(partner.id, 0)
 
@@ -404,7 +448,8 @@ class ResPartner(models.Model):
                 if not no_contact_time:
                     no_contact_time = partner_one.create_date
 
-                no_contact_time_difference = datetime.strptime(no_contact_time.split(' ')[0], '%Y-%m-%d')
+                no_contact_time_difference = datetime.strptime(
+                    no_contact_time.split(' ')[0], '%Y-%m-%d')
                 no_contact_time_date = now_time_date - no_contact_time_difference
 
                 # 判断开始
@@ -426,7 +471,8 @@ class ResPartner(models.Model):
                             partner_one.write({'public_partners': 'buffer'})
                             action_crm_channel(self, u'客户' + partner_one.name + u'进入警告期')
                     if interval_time.days < 0:
-                        if (no_contact_time_date.days - abs(interval_time.days)) > overdue_time_date:
+                        if (no_contact_time_date.days - abs(
+                                interval_time.days)) > overdue_time_date:
                             # '设置为公海 取消销售员绑定'
                             partner_one.write({'public_partners': 'public'})
                             partner_one.write({'user_id': ''})
@@ -440,7 +486,8 @@ class ResPartner(models.Model):
         partner_list = self.env['res.partner'].search(domain)
         for partner_one in partner_list:
             if partner_one.user_id:
-                partner_one.write({'public_partners': 'private', 'old_user_id': partner_one.user_id.id})
+                partner_one.write(
+                    {'public_partners': 'private', 'old_user_id': partner_one.user_id.id})
             else:
                 partner_one.write({'public_partners': 'public'})
 
@@ -531,8 +578,10 @@ class CrmProductSeries(models.Model):
     name = fields.Char(u'名称')
     detail = fields.Text(string=u'描述')
     crm_Parent_id = fields.Many2one('crm.product.series', string=u'上级')
-    crm_product_type = fields.Selection([('brand', u'品牌'), ('series', u'系列'), ('version', u'型号')], string=u'类型')
-    crm_Parent_ontomany_ids = fields.One2many('crm.product.series', 'crm_Parent_id', string=u'下级列表')
+    crm_product_type = fields.Selection(
+        [('brand', u'品牌'), ('series', u'系列'), ('version', u'型号')], string=u'类型')
+    crm_Parent_ontomany_ids = fields.One2many('crm.product.series', 'crm_Parent_id',
+                                              string=u'下级列表')
 
 
 class ChannelCrm(models.Model):
@@ -545,13 +594,15 @@ class ChannelCrm(models.Model):
 
     @api.multi
     @api.returns('self', lambda value: value.id)
-    def message_post(self, body='', subject=None, message_type='notification', subtype=None, parent_id=False,
+    def message_post(self, body='', subject=None, message_type='notification',
+                     subtype=None, parent_id=False,
                      attachments=None, content_subtype='html', **kwargs):
         # print kwargs.get('author_id')
         if (not kwargs.get('project')) and self.channel_type == 'chat':
             body = '【 聊天 】' + body
 
-        return super(ChannelCrm, self).message_post(body, subject, message_type, subtype, parent_id, attachments,
+        return super(ChannelCrm, self).message_post(body, subject, message_type, subtype,
+                                                    parent_id, attachments,
                                                     content_subtype, **kwargs)
 
 
@@ -565,7 +616,8 @@ class CrmIrAttachment(models.Model):
     def create(self, vals):
         if not (vals.get('res_model') or vals.get('res_id')):
             if self.env.context.get('active_model') == 'res.partner':
-                vals['partner_img_id'] = self.env.context.get('active_ids')[0] if self.env.context.get(
+                vals['partner_img_id'] = self.env.context.get('active_ids')[
+                    0] if self.env.context.get(
                     'active_ids')  else ''
 
         return super(CrmIrAttachment, self).create(vals)
@@ -604,7 +656,8 @@ class CrmModelLead2OpportunityPartner(models.TransientModel):
             self._convert_opportunity(values)
             for lead in leads:
                 if lead.partner_id and lead.partner_id.user_id != lead.user_id:
-                    self.env['res.partner'].browse(lead.partner_id.id).write({'user_id': lead.user_id.id})
+                    self.env['res.partner'].browse(lead.partner_id.id).write(
+                        {'user_id': lead.user_id.id})
 
         return leads[0].redirect_opportunity_view()
 
@@ -619,7 +672,8 @@ class CrmResPartner(models.Model):
     im_tool = fields.Char(string=u'即时通讯工具')
 
     customer_scale = fields.Selection(
-        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'), ('5', u'500人以上')], string=u'规模')
+        [('1', u'1-10人'), ('2', u'10-49人'), ('3', u'50-100人'), ('4', u'100-500人'),
+         ('5', u'500人以上')], string=u'规模')
 
     customer_store_number = fields.Integer(string=u'门店数量')
 

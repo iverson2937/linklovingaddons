@@ -29,7 +29,7 @@
 
                 <xpath expr="//field[@name='customer_status']" position="after">
                     <field name="is_order" invisible="1" attrs="{'invisible':[('customer','=', False)]}"/>
-                    <field name="crm_is_partner" attrs="{'invisible':[('customer','=', False)]}" string="线索客户"/>
+                    <field name="crm_is_partner" attrs="{'invisible':[('customer','=', False)]}" string="活动客户"/>
 
 
                     <field name="crm_is_partner_temporary" attrs="{'invisible':[('customer','=', False)]}"

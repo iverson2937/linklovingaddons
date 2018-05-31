@@ -218,9 +218,10 @@ class HrExpenseSheet(models.Model):
 
             self.to_approve_id = department.parent_id.manager_id.user_id.id
 
-            self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
+            self.write({'approve_ids': [(4, self.env.user.id)]})
 
-        create_remark_comment(self, u'2级审核')
+        create_remark_comment(self, u'审核通过')
+        self.message_post(body=u'审核通过')
 
     @api.multi
     def hr_expense_sheet_post(self):
