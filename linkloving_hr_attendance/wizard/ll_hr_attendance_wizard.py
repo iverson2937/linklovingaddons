@@ -25,8 +25,8 @@ class HrAttendanceWizard(models.TransientModel):
         for return_id in return_ids:
             returnDict[index] = {'data': {}, 'start_date': start_date, 'end_date': end_date}
             attendance = return_hr_attendance.sudo().search(
-                [("employee_id", "=", return_id['employee_id'][0]), ('write_date', '>=', start_date),
-                 ('write_date', '<=', end_date)])
+                [("employee_id", "=", return_id['employee_id'][0]), ('check_in', '>=', start_date),
+                 ('check_in', '<=', end_date)])
             time_arr = []
             if (len(attendance)):
                 for attendance_detail in attendance:
