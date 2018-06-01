@@ -624,10 +624,11 @@ class ProductAttachmentInfo(models.Model):
         type1 = info_dic.get("type")
         # info_dic["type"] = FILE_TYPE_DIC.get(type1 or '') or ''
         info_dic["type"] = type1.upper() if type1 else ''
-
-        c_uid = info_dic.get("create_uid")[0]
-        create_uid = self.env["res.users"].browse(c_uid)
-        info_dic["create_uid_name"] = create_uid.name
+        create_uid = self.env["res.users"]
+        if info_dic.get("create_uid"):
+            c_uid = info_dic.get("create_uid")[0]
+            create_uid = create_uid.browse(c_uid)
+            info_dic["create_uid_name"] = create_uid.name
 
         info_dic['is_delect_view'] = 'yes' if create_uid.id == self.env.uid else 'no',
         info_dic["is_checkbox_show"] = 'yes'
