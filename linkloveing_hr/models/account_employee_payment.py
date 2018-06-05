@@ -80,15 +80,15 @@ class AccountEmployeePayment(models.Model):
     company_id = fields.Many2one('res.company', default=lambda self: self.env.user.company_id)
 
     department_id = fields.Many2one('hr.department', compute='_get_department_id', store=True)
-    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', store=True)
+    to_approve_id = fields.Many2one('res.users')
 
-    @api.multi
-    @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
-    def _get_to_approve_id(self):
-
-        for sheet in self:
-            if sheet.to_approve_department_id:
-                sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
+    # @api.multi
+    # @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
+    # def _get_to_approve_id(self):
+    #
+    #     for sheet in self:
+    #         if sheet.to_approve_department_id:
+    #             sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
 
     approve_ids = fields.Many2many('res.users')
     apply_date = fields.Date(default=fields.Date.context_today)

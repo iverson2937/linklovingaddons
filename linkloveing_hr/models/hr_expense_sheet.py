@@ -175,15 +175,15 @@ class HrExpenseSheet(models.Model):
             if sheet.to_approve_id:
                 sheet.to_approve_department_id = sheet.to_approve_id.employee_ids[0].department_id.id
 
-    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', store=True)
-
-    @api.multi
-    @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
-    def _get_to_approve_id(self):
-
-        for sheet in self:
-            if sheet.to_approve_department_id:
-                sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
+    to_approve_id = fields.Many2one('res.users')
+    #
+    # @api.multi
+    # @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
+    # def _get_to_approve_id(self):
+    #
+    #     for sheet in self:
+    #         if sheet.to_approve_department_id:
+    #             sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
 
     state = fields.Selection([('draft', u'草稿'),
                               ('submit', 'Submitted'),
