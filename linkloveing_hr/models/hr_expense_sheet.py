@@ -200,60 +200,37 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def manager1_approve(self):
-        # if self.employee_id == self.employee_id.department_id.manager_id:
-        #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
-        # else:
         department = self.to_approve_department_id
-        if not department:
-            UserError(u'请设置该员工部门')
-        if not department.manager_id:
-            UserError(u'该员工所在部门未设置经理(审核人)')
+        state = 'manager1_approve'
         # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
-        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
-            self.to_approve_department_id = False
-            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
-        else:
-            if not department.parent_id.manager_id:
-                raise UserError(u'上级部门没有设置经理,请联系管理员')
-            self.to_approve_department_id = department.sudo().parent_id.id
-            self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
-
-        create_remark_comment(self, u'1级审核')
-
-    @api.multi
-    def manager2_approve(self):
-
-        department = self.to_approve_department_id
-        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
-            self.to_approve_department_id = False
-            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
-
-        else:
-            if not department.parent_id.manager_id:
-                raise UserError(u'上级部门没有设置经理,请联系管理员')
-
-            self.to_approve_department_id = department.parent_id.id
-
-            self.write({'approve_ids': [(4, self.env.user.id)]})
+        to_approve_department_id = department.get_to_approve_department(self.env.user.employee_ids[0])
+        if not to_approve_department_id or (department.allow_amount and self.total_amount < department.allow_amount):
+            state = 'approve'
+        self.write({
+            'state': state,
+            'approve_ids': [(4, self.env.user.id)],
+            'to_approve_department_id': to_approve_department_id
+        })
 
         create_remark_comment(self, u'审核通过')
         self.message_post(body=u'审核通过')
 
     @api.multi
+    def manager2_approve(self):
+        self.manager1_approve()
+
+    @api.multi
     def hr_expense_sheet_post(self):
         for exp in self:
+            state = 'submit'
             if not exp.expense_line_ids:
                 raise UserError(u'请填写报销明细')
             department = exp.sudo().department_id
-            if not department.manager_id:
-                raise UserError(u'请设置部门审核人')
-            if exp.employee_id == department.manager_id:
-                if not department.parent_id.manager_id:
-                    raise UserError(u'上级部门未设置审核人')
-                exp.to_approve_department_id = department.parent_id.id
-            else:
-                exp.to_approve_department_id = department.id
-            exp.write({'state': 'submit'})
+            to_approve_department_id = department.get_to_approve_department(exp.employee_id)
+            exp.to_approve_department_id = to_approve_department_id
+            if not to_approve_department_id:
+                state = 'approve'
+            exp.write({'state': state})
             create_remark_comment(exp, u'送审')
 
             JPushExtend.send_notification_push(audience=jpush.audience(
@@ -264,7 +241,7 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def manager3_approve(self):
 
-        self.manager2_approve()
+        self.manager1_approve()
 
     @api.multi
     def return_to_approve(self):
