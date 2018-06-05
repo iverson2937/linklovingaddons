@@ -80,7 +80,7 @@ class AccountEmployeePayment(models.Model):
     company_id = fields.Many2one('res.company', default=lambda self: self.env.user.company_id)
 
     department_id = fields.Many2one('hr.department', compute='_get_department_id', store=True)
-    to_approve_id = fields.Many2one('res.users')
+    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id')
 
     @api.multi
     def _get_to_approve_id(self):
