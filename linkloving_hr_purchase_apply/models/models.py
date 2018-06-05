@@ -108,7 +108,7 @@ class PurchaseApply(models.Model):
     to_approve_department_id = fields.Many2one('hr.department', readonly=True, string=u'待审核部门',
                                                compute='_get_to_approve_department', store=True)
 
-    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', store=True)
+    to_approve_id = fields.Many2one('res.users')
 
     @api.multi
     def _get_to_approve_department(self):
@@ -116,13 +116,13 @@ class PurchaseApply(models.Model):
             if sheet.to_approve_id:
                 sheet.to_approve_department_id = sheet.to_approve_id.employee_ids[0].department_id.id
 
-    @api.multi
-    @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
-    def _get_to_approve_id(self):
-
-        for sheet in self:
-            if sheet.to_approve_department_id:
-                sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
+    # @api.multi
+    # @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
+    # def _get_to_approve_id(self):
+    #
+    #     for sheet in self:
+    #         if sheet.to_approve_department_id:
+    #             sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
 
     @api.multi
     def hr_purchase_apply_post(self):
