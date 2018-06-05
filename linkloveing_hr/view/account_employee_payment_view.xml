@@ -70,7 +70,7 @@
                                 <field name="bank_account_id" string="Bank Account"
                                        context="{'default_partner_id':address_home_id}"/>
                                 <field name="address_home_id" invisible="1"/>
-                                <field name="department_id" string="Department" invisible="1"/>
+                                <field name="department_id" string="Department" invisible="0"/>
                                 <field name="to_approve_department_id" string="待审核部门" readonly="1"
                                        attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
                                 <field name="to_approve_id" string="Waiting Approve By" readonly="1"
