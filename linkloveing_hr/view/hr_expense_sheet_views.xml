@@ -81,6 +81,7 @@
                                 <field name="department_id" required="1" options="{'no_create':True}"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                                 <field name="employee_id" invisible="0" readonly="1"/>
+                                <field name="to_approve_department_id"/>
                                 <field name="to_approve_id"/>
                                 <field name="is_show" invisible="1"/>
                                 <field name="responsible_id" invisible="1"/>

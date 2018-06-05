@@ -17,7 +17,6 @@ class PurchaseApply(models.Model):
                                                                                       limit=1))
     approve_ids = fields.Many2many('res.users')
     department_id = fields.Many2one('hr.department')
-    to_approve_id = fields.Many2one('res.users')
     line_ids = fields.One2many('hr.purchase.apply.line', 'apply_id')
     untaxed_amount = fields.Float(string='Subtotal', store=True, compute='_compute_amount',
                                   digits=dp.get_precision('Account'))
@@ -57,11 +56,13 @@ class PurchaseApply(models.Model):
     ], default='draft', track_visibility='onchange')
     company_id = fields.Many2one('res.company')
 
+    @api.multi
     def _get_is_show(self):
-        is_show = False
-        if self.env.user.id == self.to_approve_id.id:
-            is_show = True
-        self.is_show = is_show
+        for r in self:
+            if self.to_approve_id and self.env.user.id == self.to_approve_id.id:
+                r.is_show = True
+            else:
+                r.is_show = False
 
     is_show = fields.Boolean(compute=_get_is_show)
     description = fields.Text()
@@ -74,7 +75,7 @@ class PurchaseApply(models.Model):
                 "申购单 %s 已经取消.<br/><ul class=o_timeline_tracking_value_list><li>原因<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (
                         sheet.name, reason))
             sheet.message_post(body=body)
-            sheet.to_approve_id = False
+            sheet.to_approve_department_id = False
             sheet.reject_reason = reason
 
         # 推送
@@ -96,9 +97,7 @@ class PurchaseApply(models.Model):
                 raise UserError('只可以删除草稿状态的采购申请.')
         return super(PurchaseApply, self).unlink()
 
-    @api.model
-    def create(self, vals):
-        return super(PurchaseApply, self).create(vals)
+
 
     @api.model
     def create(self, vals):
@@ -108,21 +107,39 @@ class PurchaseApply(models.Model):
         res = super(PurchaseApply, self).create(vals)
         return res
 
+    to_approve_department_id = fields.Many2one('hr.department', readonly=True, string=u'待审核部门',
+                                               compute='_get_to_approve_department')
+
+    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', readonly=True,
+
+                                    track_visibility='onchange')
+
+    @api.multi
+    def _get_to_approve_department(self):
+        for sheet in self:
+            if sheet.to_approve_id:
+                sheet.to_approve_department_id = sheet.to_approve_id.employee_ids[0].department_id.id
+
+    @api.multi
+    def _get_to_approve_id(self):
+
+        for sheet in self:
+            sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
+
     @api.multi
     def hr_purchase_apply_post(self):
         for exp in self:
             if not exp.line_ids:
                 raise UserError(u'请填写报销明细')
-
-            department = exp.department_id
-            state, to_approve_id = department.get_to_approve_id(exp.employee_id, exp.total_amount)
-            print to_approve_id
-            if not state:
-                state = 'submit'
-            exp.write({
-                'state': state,
-                'to_approve_id': to_approve_id
-            })
+            department = exp.sudo().department_id
+            if not department.manager_id:
+                raise UserError(u'请设置部门审核人')
+            if exp.employee_id == department.manager_id:
+                if not department.parent_id.manager_id:
+                    raise UserError(u'上级部门未设置审核人')
+                exp.to_approve_department_id = department.parent_id.id
+            else:
+                exp.to_approve_department_id = department.id
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.alias(exp.to_approve_id.id)
@@ -136,50 +153,50 @@ class PurchaseApply(models.Model):
     def manager1_approve(self):
         if not self.env.user.employee_ids.ids:
             raise UserError(u'该用户没有设置员工')
-        department = self.env.user.employee_ids.department_id
-        if not department:
-            UserError(u'请设置该员工部门')
-        state, to_approve_id = department.get_to_approve_id(self.env.user.employee_ids[0], self.total_amount)
-        if not state:
-            state = 'manager1_approve'
-        print 'd', to_approve_id
-        self.write({
-            'state': state,
-            'to_approve_id': to_approve_id,
-            'approve_ids': [(4, self.env.user.id)]
-        })
+        department = self.to_approve_department_id
+        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
+            self.to_approve_department_id = False
+            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        else:
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
+
+            self.to_approve_department_id = department.parent_id.id
+
+            self.write({'approve_ids': [(4, self.env.user.id)]})
+
 
     @api.multi
     def manager2_approve(self):
         if not self.env.user.employee_ids.ids:
             raise UserError(u'该用户没有设置员工')
-        department = self.env.user.employee_ids.department_id
-        if not department:
-            UserError(u'请设置该员工部门')
-        state, to_approve_id = department.get_to_approve_id(self.env.user.employee_ids[0], self.total_amount)
-        if not state:
-            state = 'manager2_approve'
-        self.write({
-            'state': state,
-            'to_approve_id': to_approve_id,
-            'approve_ids': [(4, self.env.user.id)]
-        })
+        department = self.to_approve_department_id
+        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
+            self.to_approve_department_id = False
+            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        else:
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
+
+            self.to_approve_department_id = department.parent_id.id
+
+            self.write({'approve_ids': [(4, self.env.user.id)]})
 
     @api.multi
     def manager3_approve(self):
         if not self.env.user.employee_ids.ids:
             raise UserError(u'该用户没有设置员工')
-        department = self.env.user.employee_ids.department_id
-        if not department:
-            UserError(u'请设置该员工部门')
-        state, to_approve_id = department.get_to_approve_id(self.env.user.employee_ids[0], self.total_amount)
-        if not state:
-            state = 'manager3_approve'
-        self.write({
-            'state': state,
-            'to_approve_id': to_approve_id,
-            'approve_ids': [(4, self.env.user.id)]
-        })
+        department = self.to_approve_department_id
+        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
+            self.to_approve_department_id = False
+            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        else:
+            if not department.parent_id.manager_id:
+                raise UserError(u'上级部门没有设置经理,请联系管理员')
+
+            self.to_approve_department_id = department.parent_id.id
+
+            self.write({'approve_ids': [(4, self.env.user.id)]})
 
     @api.multi
     def approve(self):
