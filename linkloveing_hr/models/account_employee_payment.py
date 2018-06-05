@@ -185,35 +185,33 @@ class AccountEmployeePayment(models.Model):
 
     @api.multi
     def submit(self):
-        self.state = 'confirm'
-        if not self.employee_id.department_id:
-            raise UserError('请设置员工所在部门')
-        department = self.employee_id.department_id
-        if not department.manager_id:
-            raise UserError(u'请设置部门审核人')
-        if self.employee_id == department.manager_id:
-            if not department.parent_id.manager_id:
-                raise UserError(u'上级部门未设置审核人')
-            self.to_approve_department_id = department.parent_id.id
-        else:
-            self.to_approve_department_id = department.id
+        state = 'confirm'
+        department = self.sudo().employee_id.department_id
+        to_approve_department_id = department.get_to_approve_department(self.employee_id)
+        self.to_approve_department_id = to_approve_department_id
+        if not to_approve_department_id:
+            state = 'approve'
+        self.write({'state': state})
 
         create_remark_comment(self, u"送审")
 
     @api.multi
     def manager1_approve(self):
         department = self.to_approve_department_id
-        if not department.parent_id or (department.allow_amount and self.amount < department.allow_amount):
-            self.to_approve_department_id = False
-            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        state = 'manager1_approve'
+        # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
+        to_approve_department_id = department.get_to_approve_department(self.env.user.employee_ids[0])
+        if not to_approve_department_id or (department.allow_amount and self.amount < department.allow_amount):
+            state = 'approve'
+        self.write({
+            'state': state,
+            'approve_ids': [(4, self.env.user.id)],
+            'to_approve_department_id': to_approve_department_id
+        })
 
-        else:
-            if not department.parent_id.manager_id:
-                raise UserError(u'上级部门没有设置经理,请联系管理员')
+        create_remark_comment(self, u'审核通过')
+        self.message_post(body=u'审核通过')
 
-            self.to_approve_department_id = department.parent_id.id
-
-            self.write({'approve_ids': [(4, self.env.user.id)]})
 
         create_remark_comment(self, u'审核通过')
 
