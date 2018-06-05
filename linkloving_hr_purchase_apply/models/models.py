@@ -108,9 +108,10 @@ class PurchaseApply(models.Model):
     to_approve_department_id = fields.Many2one('hr.department', readonly=True, string=u'待审核部门',
                                                compute='_get_to_approve_department', store=True)
 
-    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id')
+    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', store=True)
 
     @api.multi
+    @api.depends('to_approve_department_id')
     def _get_to_approve_department(self):
         for sheet in self:
             if sheet.to_approve_id:
