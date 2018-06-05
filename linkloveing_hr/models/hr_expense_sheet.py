@@ -178,7 +178,7 @@ class HrExpenseSheet(models.Model):
     to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', store=True)
 
     @api.multi
-    @api.depends('to_approve_department_id')
+    @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
     def _get_to_approve_id(self):
 
         for sheet in self:

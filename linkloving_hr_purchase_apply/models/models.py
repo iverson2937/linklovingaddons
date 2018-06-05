@@ -117,7 +117,7 @@ class PurchaseApply(models.Model):
                 sheet.to_approve_department_id = sheet.to_approve_id.employee_ids[0].department_id.id
 
     @api.multi
-    @api.depends('to_approve_department_id')
+    @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
     def _get_to_approve_id(self):
 
         for sheet in self:
