@@ -175,7 +175,7 @@ class AccountEmployeePayment(models.Model):
             })
 
     to_approve_department_id = fields.Many2one('hr.department', readonly=True, string=u'待审核部门',
-                                               compute='_get_to_approve_department')
+                                               compute='_get_to_approve_department', store=True)
 
     @api.multi
     def _get_to_approve_department(self):
