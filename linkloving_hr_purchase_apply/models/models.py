@@ -97,8 +97,6 @@ class PurchaseApply(models.Model):
                 raise UserError('只可以删除草稿状态的采购申请.')
         return super(PurchaseApply, self).unlink()
 
-
-
     @api.model
     def create(self, vals):
         if vals.get('name', 'New') == 'New':
@@ -108,11 +106,9 @@ class PurchaseApply(models.Model):
         return res
 
     to_approve_department_id = fields.Many2one('hr.department', readonly=True, string=u'待审核部门',
-                                               compute='_get_to_approve_department')
+                                               compute='_get_to_approve_department', store=True)
 
-    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', readonly=True,
-
-                                    track_visibility='onchange')
+    to_approve_id = fields.Many2one('res.users')
 
     @api.multi
     def _get_to_approve_department(self):
@@ -128,6 +124,7 @@ class PurchaseApply(models.Model):
 
     @api.multi
     def hr_purchase_apply_post(self):
+
         for exp in self:
             if not exp.line_ids:
                 raise UserError(u'请填写报销明细')
@@ -140,6 +137,7 @@ class PurchaseApply(models.Model):
                 exp.to_approve_department_id = department.parent_id.id
             else:
                 exp.to_approve_department_id = department.id
+            exp.state = 'submit'
 
         JPushExtend.send_notification_push(audience=jpush.audience(
             jpush.alias(exp.to_approve_id.id)
@@ -164,7 +162,6 @@ class PurchaseApply(models.Model):
             self.to_approve_department_id = department.parent_id.id
 
             self.write({'approve_ids': [(4, self.env.user.id)]})
-
 
     @api.multi
     def manager2_approve(self):
