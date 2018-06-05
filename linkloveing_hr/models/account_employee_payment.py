@@ -203,7 +203,7 @@ class AccountEmployeePayment(models.Model):
     @api.multi
     def manager1_approve(self):
         department = self.to_approve_department_id
-        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
+        if not department.parent_id or (department.allow_amount and self.amount < department.allow_amount):
             self.to_approve_department_id = False
             self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
 
