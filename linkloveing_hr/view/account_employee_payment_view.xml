@@ -242,8 +242,8 @@
 
 
             <!--<field name="context">{'default_payment_type':'outbound','default_partner_type':'employee'}</field>-->
-            <field name="domain">[('to_approve_id','=',uid)]</field>
             <field name="context">{'to_approve_id':True}</field>
+            <field name="domain">[('to_approve_department_id.manager_id.user_id','=',uid)]</field>
 
 
             <field name="help" type="html">

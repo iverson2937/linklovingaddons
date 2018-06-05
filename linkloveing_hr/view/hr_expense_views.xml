@@ -44,7 +44,9 @@
             <field name="res_model">hr.expense.sheet</field>
             <field name="view_mode">tree,kanban,form,pivot,graph</field>
             <field name="search_view_id" ref="hr_expense.view_hr_expense_sheet_filter"/>
-            <field name="domain">[('to_approve_id','=',uid),('state','not in',['approve','post','done'])]</field>
+            <field name="domain">[('to_approve_department_id.manager_id.user_id','=',uid),('state','not
+                in',['approve','post','done'])]
+            </field>
 
             <field name="context">{'to_approve_id':True}</field>
 
