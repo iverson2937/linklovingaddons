@@ -218,7 +218,11 @@ class LinkLovingEmployee(models.Model):
 
         if vals.get('is_create_account'):
             # 创建用户--》个人客户 并关联到员工
-            res = self.env['res.users'].create({'name': vals.get('name'), 'login': vals.get('work_email')})
+            res = self.env['res.users'].create(
+                {'name': vals.get('name'),
+                 'login': vals.get('work_email'),
+                 'email': vals.get('work_email')
+                 })
             # 设定初始的密码
             pass_wizard = self.env['change.password.wizard'].create({})
             self.env['change.password.user'].create({
