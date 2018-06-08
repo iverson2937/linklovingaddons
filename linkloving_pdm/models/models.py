@@ -626,7 +626,7 @@ class ProductAttachmentInfo(models.Model):
         info_dic["type"] = type1.upper() if type1 else ''
 
         c_uid = info_dic.get("create_uid")[0]
-        create_uid = self.env["res.users"].browse(c_uid)
+        create_uid = self.env["res.users"].sudo().browse(c_uid)
         info_dic["create_uid_name"] = create_uid.name
 
         info_dic['is_delect_view'] = 'yes' if create_uid.id == self.env.uid else 'no',
