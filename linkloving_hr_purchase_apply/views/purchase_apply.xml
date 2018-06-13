@@ -78,8 +78,11 @@
                                 <field name="total_amount" invisible="0" string="总计"/>
                             </group>
                             <group>
+                                <field name="to_approve_department_id" string="待审核部门"
+                                       attrs="{'invisible': [('to_approve_department_id', '=', False)]}" readonly="1"/>
+
                                 <field name="to_approve_id" string="待审核人"
-                                       attrs="{'invisible': [('to_approve_id', '=', False)]}"/>
+                                       attrs="{'invisible': [('to_approve_id', '=', False)]}" readonly="1"/>
 
                                 <field name="apply_date"/>
                             </group>

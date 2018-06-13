@@ -289,12 +289,20 @@ class MrpConfigSettingsI(models.TransientModel):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name, company_id)', 'Reference must be unique per Company!'),
+        ('qty_positive', 'check (product_qty > 0)', 'The quantity to produce must be positive!'),
+    ]
+
+
     is_secondary_produce = fields.Boolean(default=False)
     secondary_produce_time_ids = fields.One2many("production.time.record", 'production_id', )
 
-    # @api.model
-    # def create(self, vals):
-    #     return super(MrpProductionExtend, self).create(vals)
+    @api.model
+    def create(self, vals):
+        if vals.get('product_qty') == 0:
+            raise UserError('ddddddddddddd')
+        return super(MrpProductionExtend, self).create(vals)
 
     @api.multi
     def write(self, vals):

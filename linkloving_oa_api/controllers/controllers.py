@@ -4012,6 +4012,9 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/get_visit_list', type='json', auth='none', csrf=False, cors='*')
     def get_visit_list(self, **kw):
         today = request.jsonrequest.get("today")
+        manager = request.jsonrequest.get("manager")
+        admin = request.jsonrequest.get("admin")
+        team_list = request.jsonrequest.get("team_list")
         num = request.jsonrequest.get("num")
         mine = request.jsonrequest.get("mine")
         team_id = request.jsonrequest.get("team_id")
@@ -4029,7 +4032,13 @@ class LinklovingOAApi(http.Controller):
         one_days_after = datetime.timedelta(days=1)
         one_millisec_before = datetime.timedelta(milliseconds=1)  #
         domain = []
-        domain.append(('team', '=', team_id))
+        if admin:
+            print ''
+        else:
+            if manager == True and team_list:
+                domain.append(('team', 'in', team_list))
+            else:
+                domain.append(('team', '=', team_id))
         if todayTime:
             today_time = fields.datetime.strptime(todayTime, '%Y-%m-%d')
             today_time = today_time - one_millisec_before  # 今天的最后一秒
@@ -4108,39 +4117,58 @@ class LinklovingOAApi(http.Controller):
             imgs.append(url)
         return imgs
 
-    @http.route('/linkloving_oa_api/get_sale_team', type='json', auth='none', csrf=False, cors='*')
-    def get_sale_team(self, **kw):
-        uid = request.jsonrequest.get("uid")
-        user = request.env["res.users"].sudo().browse(uid)
+    @http.route('/linkloving_oa_api/get_all_sale_team', type='json', auth='none', csrf=False, cors='*')
+    def get_all_sale_team(self, **kw):
+        teams = request.env["crm.team"].sudo().search([])
         team_list=[]
-        for team in user.sale_team_id:
+        for team in teams:
             data = {
                 'team_id': team.id,
-                'team_name': team.name
+                'team_name': team.name,
+                'isChoose': False
             }
             team_list.append(data)
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=team_list)
 
+    #查询销售主管所在的销售团队
+    @http.route('/linkloving_oa_api/get_sale_team', type='json', auth='none', csrf=False, cors='*')
+    def get_sale_team(self, **kw):
+        uid = request.jsonrequest.get("uid")
+        teams = request.env["crm.team"].sudo().search([('user_id', '=', uid)])
+        team_list = []
+        for team in teams:
+            data = {
+                'team_id': team.id,
+                'team_name': team.display_name,
+                'isChoose': False
+              }
+            team_list.append(data)
+        return JsonResponse.send_response(STATUS_CODE_OK,
+                                          res_data=team_list)
+
+
+
     #查询一个销售团队的成员
     @http.route('/linkloving_oa_api/get_saleteam_person', type='json', auth='none', csrf=False, cors='*')
     def get_saleteam_person(self, **kw):
         team_id = request.jsonrequest.get("team_id")
-        domain = [('sale_team_id', '=', team_id)]
-        user = request.env["res.users"].sudo().search(domain)
-        user_list = []
-        bean = {
-            'user_id': -1,
-            'user_name': '全部',
-            'is_choose': True
-        }
-        user_list.append(bean)
-        for userBean in user:
-            data = {
-                'user_id': userBean.id,
-                'user_name': userBean.display_name,
-                'is_choose': False
+        if team_id:
+            domain = [('sale_team_id', '=', team_id)]
+            user = request.env["res.users"].sudo().search(domain)
+            user_list = []
+            bean = {
+                'user_id': -1,
+                'user_name': '全部',
+                'is_choose': True
             }
-            user_list.append(data)
-        return JsonResponse.send_response(STATUS_CODE_OK,
-                                          res_data=user_list)
+            user_list.append(bean)
+            for userBean in user:
+                data = {
+                    'user_id': userBean.id,
+                    'user_name': userBean.display_name,
+                    'is_choose': False
+                }
+                user_list.append(data)
+            return JsonResponse.send_response(STATUS_CODE_OK,
+                                              res_data=user_list)
