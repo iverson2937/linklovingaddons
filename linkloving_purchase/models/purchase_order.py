@@ -121,12 +121,12 @@ class PurchaseOrder(models.Model):
                                    line.product_qty if line.product_id.purchase_method == 'purchase' else line.qty_received,
                                    precision_digits=precision) >= 0 for line in order.order_line) and order.invoice_ids:
                 order.invoice_status = 'invoiced'
-            elif all(float_compare(line.qty_invoiced,
-                                   line.qty_received if line.product_id.purchase_method == 'purchase' else line.qty_received,
-                                   precision_digits=precision) >= 0 for line in
-                     order.order_line) and order.invoice_ids and not order.picking_ids.filtered(
-                lambda picking_id: picking_id.state not in ('cancel', 'done')):
-                order.invoice_status = 'invoiced'
+            # elif all(float_compare(line.qty_invoiced,
+            #                        line.qty_received if line.product_id.purchase_method == 'purchase' else line.qty_received,
+            #                        precision_digits=precision) >= 0 for line in
+            #          order.order_line) and order.invoice_ids and not order.picking_ids.filtered(
+            #     lambda picking_id: picking_id.state not in ('cancel', 'done')):
+            #     order.invoice_status = 'invoiced'
             else:
                 order.invoice_status = 'no'
 
