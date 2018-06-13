@@ -114,6 +114,7 @@ class ProductProduct(models.Model):
             bom_id = product.product_tmpl_id.bom_ids[0]
             mos = self.env["mrp.production"].search(
                 [('bom_id', '=', bom_id.id), ('state', 'not in', ['cancel', 'done'])])
+            procurement_to_op = self.env["procurement.order"]
             for mo in mos:
                 if mo.state in ['draft', 'confirmed', 'waiting_material']:
                     mo.action_cancel()
@@ -121,9 +122,11 @@ class ProductProduct(models.Model):
                         mo.procurement_ids.cancel()
                         mo.procurement_ids.move_dest_id.procurement_id.cancel()
                         mo.procurement_ids.move_dest_id.procurement_id.reset_to_confirmed()
-                        mo.procurement_ids.move_dest_id.procurement_id.run()
+                        procurement_to_op += mo.procurement_ids.move_dest_id.procurement_id
+                        # mo.procurement_ids.move_dest_id.procurement_id.run()
                     elif mo.procurement_ids:
-                        mo.procurement_ids.run()
+                        procurement_to_op += mo.procurement_ids
+                        # mo.procurement_ids.run()
                     else:
                         new_mo = mo.copy()
                         new_mo.state = "draft"
@@ -131,7 +134,8 @@ class ProductProduct(models.Model):
                                   'waiting_inspection_finish', 'waiting_rework', 'waiting_inventory_material',
                                   'waiting_warehouse_inspection', 'waiting_post_inventory']:
                     mo.is_bom_update = True
-
+            if procurement_to_op:
+                procurement_to_op.run()
         return {
             "type": "ir.actions.client",
             "tag": "action_notify",
