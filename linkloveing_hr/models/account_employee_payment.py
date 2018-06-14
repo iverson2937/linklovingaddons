@@ -203,6 +203,7 @@ class AccountEmployeePayment(models.Model):
         to_approve_department_id = department.get_to_approve_department(self.env.user.employee_ids[0])
         if not to_approve_department_id or (department.allow_amount and self.amount < department.allow_amount):
             state = 'approve'
+            to_approve_department_id = False
         self.write({
             'state': state,
             'approve_ids': [(4, self.env.user.id)],
