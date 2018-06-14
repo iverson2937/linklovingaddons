@@ -269,7 +269,7 @@ class linkloving_procurement_order_extend(models.Model):
                 # create the MO as SUPERUSER because the current user may not have the rights to do it
                 # (mto product launched by a sale for example)
                 vals = procurement._prepare_mo_vals(bom)
-                if vals["product_qty"] == 0:
+                if vals["product_qty"] <= 0:
                     print("dont need create mo")
                     return {procurement.id: 1}
                 production = ProductionSudo.create(vals)
