@@ -301,7 +301,9 @@
                 <xpath expr="//field[@name='name']" position="before">
                     <field name="validity_date"/>
                 </xpath>
-
+                <xpath expr="//field[@name='order_id']" position="after">
+                    <field name="pi_number"/>
+                </xpath>
             </field>
         </record>
 
@@ -313,7 +315,9 @@
             <field name="arch" type="xml">
 
 
+
                 <xpath expr="//field[@name='order_id']" position="before">
+                    <field name="pi_number"/>
                     <filter string="未发货完成" domain="[('shipping_status','!=', 'done'),('state','=', 'sale')]"/>
                 </xpath>
             </field>
