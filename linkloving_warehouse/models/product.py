@@ -399,7 +399,6 @@ class ProductTemplate(models.Model):
     last1_month_qty = fields.Float(string=u'1个月', copy=False)
     last2_month_qty = fields.Float(string=u'3个月', copy=False)
     last3_month_qty = fields.Float(string=u'6个月', copy=False)
-
     last1_month_consume_qty = fields.Float(string=u'1个月', copy=False)
     last3_month_consume_qty = fields.Float(string=u'3个月', copy=False)
     last6_month_consume_qty = fields.Float(string=u'6个月', copy=False)
@@ -553,6 +552,17 @@ class ProductTemplate(models.Model):
     location_y = fields.Char(related='product_variant_ids.location_y')
     name = fields.Char('Name', index=True, required=True, translate=False)
 
+    qty_available_month = fields.Float(compute='compute_available_month', store=True, string=u'可用月数')
+
+    @api.depends('stock_move_ids.state', 'last3_month_qty')
+    def compute_available_month(self):
+        res = self._compute_quantities_dict()
+        for product in self:
+            product_data = res[product.id]
+            if product_data['virtual_available']:
+                product.qty_available_month = product.last3_month_qty / (product_data['virtual_available'] * 3)
+
+
     @api.depends('stock_move_ids.state')
     def get_stock(self):
         res = self._compute_quantities_dict()
@@ -570,16 +580,6 @@ class ProductTemplate(models.Model):
         ('default_code_uniq1', 'unique (default_code)', _('Default Code already exist!')),
         # ('name_uniq', 'unique (name)', u'产品名称已存在!')
     ]
-
-    # @api.multi
-    # def write(self, vals):
-    #     if 'uom_id' in vals:
-    #         new_uom = self.env['product.uom'].browse(vals['uom_id'])
-    #         updated = self.filtered(lambda template: template.uom_id != new_uom)
-    #         done_moves = self.env['stock.move'].search(
-    #             [('product_id', 'in', updated.mapped('product_variant_ids').ids)], limit=1)
-    #
-    #     return super(models.Model, self).write(vals)
 
     @api.multi
     def toggle_active(self):

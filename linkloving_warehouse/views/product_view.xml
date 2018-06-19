@@ -21,6 +21,7 @@
                     <field name="stock" string="库存"/>
                     <field name="incoming_qty" string="在产"/>
                     <field name="forecast_qty" string="预测数量"/>
+
                     <field name="reordering_min_qty" string="最小"/>
                     <field name="reordering_max_qty" string="最大"/>
                     <!--<field name="order_point_active" string="订货规则开启"/>-->
@@ -127,6 +128,7 @@
                     <field name="incoming_qty" string="在产" info_field="mos_info" widget="popup_dialog_widget"/>
                     <field name="stock" string="库存"/>
                     <field name="forecast_qty"/>
+                    <field name="qty_available_month" string="可用月数"/>
 
                     <field name="reordering_min_qty" string="最小"/>
                     <field name="reordering_max_qty" string="最大"/>
