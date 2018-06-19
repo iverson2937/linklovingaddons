@@ -302,7 +302,7 @@
                     <field name="validity_date"/>
                 </xpath>
                 <xpath expr="//field[@name='order_id']" position="after">
-                    <field name="pi_number"/>
+                    <field name="pi_number" string="PI号码"/>
                 </xpath>
             </field>
         </record>
