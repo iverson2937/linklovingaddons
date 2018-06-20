@@ -560,8 +560,7 @@ class ProductTemplate(models.Model):
         for product in self:
             product_data = res[product.id]
             if product_data['virtual_available']:
-                product.qty_available_month = product.last2_month_qty / (product_data['virtual_available'] * 3)
-
+                product.qty_available_month = (product_data['virtual_available'] * 3) / product.last2_month_qty
 
     @api.depends('stock_move_ids.state')
     def get_stock(self):
