@@ -559,7 +559,7 @@ class ProductTemplate(models.Model):
         res = self._compute_quantities_dict()
         for product in self:
             product_data = res[product.id]
-            if product_data['virtual_available']:
+            if product_data['virtual_available'] and product.last2_month_qty:
                 product.qty_available_month = (product_data['virtual_available'] * 3) / product.last2_month_qty
 
     @api.depends('stock_move_ids.state')
