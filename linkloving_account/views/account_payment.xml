@@ -81,7 +81,7 @@
                                     <field name="name"/>
                                     <field name="number"/>
                                     <field name="state"/>
-                                    <field name="amount_total"/>
+                                    <field name="amount_total" sum="总计"/>
                                 </tree>
                             </field>
 
