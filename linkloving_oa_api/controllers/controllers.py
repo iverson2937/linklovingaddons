@@ -2719,6 +2719,7 @@ class LinklovingOAApi(http.Controller):
     # 员工签到签退 江苏若态
     @http.route('/linkloving_oa_api/employee_attendance', type='json', auth="none", csrf=False, cors='*')
     def employee_attendance(self, *kw):
+        raise UserError(u"请更新版本，到新江苏若态系统打卡")
         employee_id = request.jsonrequest.get("employee_id")
         attendance_off = request.jsonrequest.get("attendance_off")
         check_in = request.jsonrequest.get("check_in")
