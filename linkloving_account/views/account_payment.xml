@@ -73,6 +73,20 @@
                         <field name="remark" placeholder="备注"/>
 
                     </group>
+
+                    <notebook>
+                        <page>
+                            <field name="invoice_ids" readonly="1" string="对账单">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="number"/>
+                                    <field name="state"/>
+                                    <field name="amount_total" sum="总计"/>
+                                </tree>
+                            </field>
+
+                        </page>
+                    </notebook>
                 </xpath>
 
 

@@ -31,6 +31,15 @@ class AccountEmployeePayment(models.Model):
                                                                       ('payment_type', '=', 'inbound')])
     payment_reminding = fields.Float(related='employee_id.pre_payment_reminding')
 
+    to_approve_department_id = fields.Many2one('hr.department', readonly=True, string=u'待审核部门',
+                                               compute='_get_to_approve_department', store=True)
+
+    @api.multi
+    def _get_to_approve_department(self):
+        for sheet in self:
+            if sheet.to_approve_id:
+                sheet.to_approve_department_id = sheet.to_approve_id.employee_ids[0].department_id.id
+
     def _get_paid_amount(self):
         for record in self:
             record.paid_amount = sum(payment.amount for payment in record.payment_ids)
@@ -71,7 +80,16 @@ class AccountEmployeePayment(models.Model):
     company_id = fields.Many2one('res.company', default=lambda self: self.env.user.company_id)
 
     department_id = fields.Many2one('hr.department', compute='_get_department_id', store=True)
-    to_approve_id = fields.Many2one('res.users', track_visibility='onchange')
+    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', store=True)
+
+    @api.multi
+    @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
+    def _get_to_approve_id(self):
+
+        for sheet in self:
+            if sheet.to_approve_department_id:
+                sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
+
     approve_ids = fields.Many2many('res.users')
     apply_date = fields.Date(default=fields.Date.context_today)
     amount = fields.Float(string='Apply Amount')
@@ -156,51 +174,47 @@ class AccountEmployeePayment(models.Model):
                 'return_count': len(set(payment.return_ids.ids))
             })
 
+    to_approve_department_id = fields.Many2one('hr.department', readonly=True, string=u'待审核部门',
+                                               compute='_get_to_approve_department', store=True)
+
+    @api.multi
+    def _get_to_approve_department(self):
+        for sheet in self:
+            if sheet.to_approve_id:
+                sheet.to_approve_department_id = sheet.to_approve_id.employee_ids[0].department_id.id
+
     @api.multi
     def submit(self):
-        self.state = 'confirm'
-        if not self.employee_id.department_id:
-            raise UserError('请设置员工所在部门')
-
-        if self.employee_id == self.employee_id.department_id.manager_id:
-            department = self.employee_id.department_id
-            if not department.parent_id or (department.allow_amount and self.amount < department.allow_amount):
-                self.write({'state': 'approve'})
-            else:
-                if not self.employee_id.department_id.parent_id.manager_id:
-                    raise UserError(u'上级部门未设置审核人')
-                self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
-        else:
-            if not self.employee_id.department_id.manager_id:
-                manager_id = self.employee_id.department_id.parent_id.manager_id
-            else:
-                manager_id = self.employee_id.department_id.manager_id
-            self.to_approve_id = manager_id.user_id.id
+        state = 'confirm'
+        department = self.sudo().employee_id.department_id
+        to_approve_department_id = department.get_to_approve_department(self.employee_id)
+        self.to_approve_department_id = to_approve_department_id
+        if not to_approve_department_id:
+            state = 'approve'
+        self.write({'state': state})
 
         create_remark_comment(self, u"送审")
 
     @api.multi
     def manager1_approve(self):
-        # if self.employee_id == self.employee_id.department_id.manager_id:
-        #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
-        # else:
-        department = self.to_approve_id.employee_ids.department_id
-        if not department:
-            UserError(u'请设置该员工部门')
-        if not department.manager_id:
-            UserError(u'该员工所在部门未设置经理(审核人)')
-        if not department.parent_id or (department.allow_amount and self.amount < department.allow_amount):
-            self.to_approve_id = False
-            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
+        department = self.to_approve_department_id
+        state = 'manager1_approve'
+        # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
+        to_approve_department_id = department.get_to_approve_department(self.env.user.employee_ids[0])
+        if not to_approve_department_id or (department.allow_amount and self.amount < department.allow_amount):
+            state = 'approve'
+            to_approve_department_id = False
+        self.write({
+            'state': state,
+            'approve_ids': [(4, self.env.user.id)],
+            'to_approve_department_id': to_approve_department_id
+        })
 
-        else:
-            if not department.parent_id.manager_id:
-                raise UserError(u'上级部门没有设置经理,请联系管理员')
-            self.to_approve_id = department.parent_id.manager_id.user_id.id
+        create_remark_comment(self, u'审核通过')
+        self.message_post(body=u'审核通过')
 
-            self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
 
-        create_remark_comment(self, u'1级审核')
+        create_remark_comment(self, u'审核通过')
 
     @api.multi
     def create_message_post(self, body_str):
@@ -215,28 +229,12 @@ class AccountEmployeePayment(models.Model):
 
     @api.multi
     def manager2_approve(self):
-        department = self.to_approve_id.employee_ids.department_id
-        if not department:
-            UserError(u'请设置该员工部门')
-        if not department.manager_id:
-            UserError(u'该员工所在部门未设置经理(审核人)')
-        if not department.parent_id or (department.allow_amount and self.amount < department.allow_amount):
-            self.to_approve_id = False
-            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
-
-        else:
-            if not department.parent_id.manager_id:
-                raise UserError(u'上级部门没有设置经理,请联系管理员')
-            self.to_approve_id = department.parent_id.manager_id.user_id.id
-
-            self.write({'state': 'manager2_approve', 'approve_ids': [(4, self.env.user.id)]})
-
-        create_remark_comment(self, u'2级审核')
+        self.manager1_approve()
 
     @api.multi
     def manager3_approve(self):
 
-        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)], 'to_approve_id': False})
+        self.manager1_approve()
 
     @api.multi
     def post(self):

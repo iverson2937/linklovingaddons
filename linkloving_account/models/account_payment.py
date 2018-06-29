@@ -394,7 +394,7 @@ class AccountPayment(models.Model):
                 transfer_debit_aml = rec._create_transfer_entry(amount)
                 (transfer_credit_aml + transfer_debit_aml).reconcile()
             # add by allen
-            for balance in rec.invoice_ids.balance_ids:
+            for balance in rec.mapped('invoice_ids.balance_ids'):
                 balance.state = 1
             state = 'posted'
             if self.partner_type == 'customer' and self.payment_type == 'inbound':

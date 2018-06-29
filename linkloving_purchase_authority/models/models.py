@@ -34,6 +34,11 @@ class AccountPaymentRegister(models.Model):
             elif p.state == 'manager' and self.env.user.has_group(
                     'linkloving_purchase_authority.purchase_manager_plus'):
                 p.can_reject = True
+            elif p.state == 'confirm' and self.env.user.has_group(
+                    'linkloving_purchase_authority.purchase_manager_plus'):
+                p.can_reject = True
+            elif p.state == 'confirm' and self.env.user.has_group('linkloving_purchase_authority.purchase_manager_1'):
+                p.can_reject = True
             else:
                 p.can_reject = False
 

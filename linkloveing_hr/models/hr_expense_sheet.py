@@ -4,7 +4,6 @@ import json
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
-
 import jpush
 from JPush import JPushExtend
 
@@ -150,13 +149,13 @@ class HrExpenseSheet(models.Model):
             self.write({'state': 'post'})
         return res
 
-    # FIXME:USE BETTER WAY TO HIDE THE BUTTON
+    @api.multi
     def _get_is_show(self):
-
-        if self._context.get('uid') == self.to_approve_id.id:
-            self.is_show = True
-        else:
-            self.is_show = False
+        for sheet in self:
+            if sheet.to_approve_id and self.env.uid == self.to_approve_id.id:
+                sheet.is_show = True
+            else:
+                sheet.is_show = False
 
     is_show = fields.Boolean(compute=_get_is_show)
 
@@ -167,7 +166,24 @@ class HrExpenseSheet(models.Model):
                 for line in sheet.account_payment_line_ids:
                     line.unlink()
 
-    to_approve_id = fields.Many2one('res.users', readonly=True, track_visibility='onchange')
+    to_approve_department_id = fields.Many2one('hr.department', readonly=True, string=u'待审核部门',
+                                               compute='_get_to_approve_department', store=True)
+
+    @api.multi
+    def _get_to_approve_department(self):
+        for sheet in self:
+            if sheet.to_approve_id:
+                sheet.to_approve_department_id = sheet.to_approve_id.employee_ids[0].department_id.id
+
+    to_approve_id = fields.Many2one('res.users', compute='_get_to_approve_id', store=True)
+
+    @api.multi
+    @api.depends('to_approve_department_id', 'to_approve_department_id.manager_id')
+    def _get_to_approve_id(self):
+
+        for sheet in self:
+            if sheet.to_approve_department_id:
+                sheet.to_approve_id = sheet.to_approve_department_id.manager_id.sudo().user_id
 
     state = fields.Selection([('draft', u'草稿'),
                               ('submit', 'Submitted'),
@@ -184,66 +200,37 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def manager1_approve(self):
-        # if self.employee_id == self.employee_id.department_id.manager_id:
-        #     self.to_approve_id = self.employee_id.department_id.parent_id.manager_id.user_id.id
-        # else:
-        department = self.to_approve_id.employee_ids.department_id
-        if not department:
-            UserError(u'请设置该员工部门')
-        if not department.manager_id:
-            UserError(u'该员工所在部门未设置经理(审核人)')
+        department = self.to_approve_department_id
+        state = 'manager1_approve'
         # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
-        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
-            self.to_approve_id = False
-            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
-        else:
-            if not department.parent_id.manager_id:
-                raise UserError(u'上级部门没有设置经理,请联系管理员')
-            self.to_approve_id = department.sudo().parent_id.manager_id.user_id.id
-            self.write({'state': 'manager1_approve', 'approve_ids': [(4, self.env.user.id)]})
-
-        create_remark_comment(self, u'1级审核')
-
-    @api.multi
-    def manager2_approve(self):
-
-        department = self.to_approve_id.employee_ids.department_id
-        if not department.parent_id or (department.allow_amount and self.total_amount < department.allow_amount):
-            self.to_approve_id = False
-            self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)]})
-
-        else:
-            if not department.parent_id.manager_id:
-                raise UserError(u'上级部门没有设置经理,请联系管理员')
-
-            self.to_approve_id = department.parent_id.manager_id.user_id.id
-
-            self.write({'approve_ids': [(4, self.env.user.id)]})
+        to_approve_department_id = department.get_to_approve_department(self.env.user.employee_ids[0])
+        if not to_approve_department_id or (department.allow_amount and self.total_amount < department.allow_amount):
+            state = 'approve'
+            to_approve_department_id = False
+        self.write({
+            'state': state,
+            'approve_ids': [(4, self.env.user.id)],
+            'to_approve_department_id': to_approve_department_id
+        })
 
         create_remark_comment(self, u'审核通过')
         self.message_post(body=u'审核通过')
 
     @api.multi
+    def manager2_approve(self):
+        self.manager1_approve()
+
+    @api.multi
     def hr_expense_sheet_post(self):
         for exp in self:
+            state = 'submit'
             if not exp.expense_line_ids:
                 raise UserError(u'请填写报销明细')
-            state = 'submit'
             department = exp.sudo().department_id
-            if exp.employee_id == department.manager_id:
-                # 报销金额小于部门允许金额直接通过
-                if not department.parent_id or (
-                            department.allow_amount and exp.total_amount < department.allow_amount):
-                    state = 'approve'
-                    exp.write({'state': 'approve'})
-                else:
-                    if not department.parent_id.manager_id:
-                        raise UserError(u'上级部门未设置审核人')
-                    exp.to_approve_id = department.parent_id.manager_id.user_id.id
-            else:
-                if not department.manager_id:
-                    raise UserError(u'请设置部门审核人')
-                exp.to_approve_id = department.manager_id.user_id.id
+            to_approve_department_id = department.get_to_approve_department(exp.employee_id)
+            exp.to_approve_department_id = to_approve_department_id
+            if not to_approve_department_id:
+                state = 'approve'
             exp.write({'state': state})
             create_remark_comment(exp, u'送审')
 
@@ -255,7 +242,7 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def manager3_approve(self):
 
-        self.write({'state': 'approve', 'approve_ids': [(4, self.env.user.id)], 'to_approve_id': False})
+        self.manager1_approve()
 
     @api.multi
     def return_to_approve(self):
@@ -293,7 +280,7 @@ class HrExpenseSheet(models.Model):
     def write(self, vals):
 
         if vals.get('state') == 'cancel':
-            self.to_approve_id = False
+            self.to_approve_department_id = False
 
         return super(HrExpenseSheet, self).write(vals)
 

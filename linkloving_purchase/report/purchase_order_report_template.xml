@@ -174,8 +174,8 @@
                 <div class="col-xs-12">
                     <div class="col-xs-6 text-left" style="padding:40px;">
                         <strong>填写人:</strong>
-                        <img t-if="o.create_uid.employee_ids"
-                             t-att-src="'data:image/png;base64,%s' % o.create_uid.employee_ids[0].purchase_signature"
+                        <img t-if="o.user_id.employee_ids"
+                             t-att-src="'data:image/png;base64,%s' % o.user_id.employee_ids[0].purchase_signature"
                              style="position:absolute; z-index:2;top: 0;width: 48%;"/>
                     </div>
                     <div class="col-xs-6 text-left" style="padding:40px;">

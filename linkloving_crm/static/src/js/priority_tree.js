@@ -40,6 +40,8 @@ odoo.define('linkloving_crm.list_viewsss', function (require) {
         _format: function (row_data, options) {
             var value = '';
             var result = ' ';
+
+            console.log('dddddddddddd')
             var value = row_data['priority']['value'];
             if (value) {
                 for (var i = 0; i < value; i++) {
