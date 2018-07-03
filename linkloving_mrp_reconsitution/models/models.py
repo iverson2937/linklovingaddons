@@ -277,7 +277,7 @@ class linkloving_procurement_order_extend(models.Model):
                 # (mto product launched by a sale for example)
                 vals = procurement._prepare_mo_vals(bom)
                 _logger.warning("dont need create mo, %d-------%s" % (vals.get('product_id'), vals.get('product_qty')))
-                if vals["product_qty"] <= 0:
+                if float_compare(vals["product_qty"], 0.0, precision_rounding=procurement.product_uom.rounding) <= 0:
                     print("dont need create mo")
                     return {procurement.id: 1}
                 production = ProductionSudo.create(vals)
