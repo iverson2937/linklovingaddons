@@ -3,6 +3,9 @@
 from collections import defaultdict
 
 from psycopg2._psycopg import OperationalError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 from odoo import models, fields, api, _, registry
 from odoo.exceptions import UserError
@@ -29,6 +32,10 @@ class linkloving_production_extend1(models.Model):
 
     origin_sale_id = fields.Many2one("sale.order", string=u"源销售单据名称")
     origin_mo_id = fields.Many2one("mrp.production", string=u"源生产单据名称")
+
+    @api.model
+    def create(self, vals):
+        return super(linkloving_production_extend1, self).create(vals)
 
 
 class linkloving_purchase_order_extend(models.Model):
@@ -269,6 +276,7 @@ class linkloving_procurement_order_extend(models.Model):
                 # create the MO as SUPERUSER because the current user may not have the rights to do it
                 # (mto product launched by a sale for example)
                 vals = procurement._prepare_mo_vals(bom)
+                _logger.warning("dont need create mo, %d-------%s" % (vals.get('product_id'), vals.get('product_qty')))
                 if vals["product_qty"] <= 0:
                     print("dont need create mo")
                     return {procurement.id: 1}
