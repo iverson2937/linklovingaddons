@@ -277,7 +277,7 @@ class linkloving_procurement_order_extend(models.Model):
                 # (mto product launched by a sale for example)
                 vals = procurement._prepare_mo_vals(bom)
                 if float_compare(vals["product_qty"], 0.0, precision_rounding=0.00001) < 0 or float_is_zero(
-                        vals["product_qty"], precision_digits=2):
+                        vals["product_qty"], precision_digits=0.01):
                     _logger.warning(
                         "no create, %d-------%s" % (vals.get('product_id'), vals.get('product_qty')))
                     return {procurement.id: 1}
