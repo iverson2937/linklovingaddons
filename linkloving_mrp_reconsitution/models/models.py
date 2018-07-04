@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 from odoo import models, fields, api, _, registry
 from odoo.exceptions import UserError
 from odoo.osv import expression
-from odoo.tools import float_compare, float_round, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import float_compare, float_round, DEFAULT_SERVER_DATETIME_FORMAT, float_is_zero
 
 
 class linkloving_product_extend(models.Model):
@@ -276,10 +276,13 @@ class linkloving_procurement_order_extend(models.Model):
                 # create the MO as SUPERUSER because the current user may not have the rights to do it
                 # (mto product launched by a sale for example)
                 vals = procurement._prepare_mo_vals(bom)
-                _logger.warning("dont need create mo, %d-------%s" % (vals.get('product_id'), vals.get('product_qty')))
-                if float_compare(vals["product_qty"], 0.0, precision_rounding=0.00001) <= 0:
-                    print("dont need create mo")
+                if float_compare(vals["product_qty"], 0.0, precision_rounding=0.00001) < 0 or float_is_zero(
+                        vals["product_qty"], precision_digits=2):
+                    _logger.warning(
+                        "no create, %d-------%s" % (vals.get('product_id'), vals.get('product_qty')))
                     return {procurement.id: 1}
+                _logger.warning(
+                    "creating, %d-------%s" % (vals.get('product_id'), vals.get('product_qty')))
                 production = ProductionSudo.create(vals)
                 res[procurement.id] = production.id
                 procurement.message_post(body=_("Manufacturing Order <em>%s</em> created.") % (production.name))
