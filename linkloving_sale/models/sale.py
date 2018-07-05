@@ -174,7 +174,7 @@ class SaleOrder(models.Model):
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
-
+    pi_number = fields.Char(related='order_id.pi_number')
     product_specs = fields.Text(string=u'Product Specification', related='product_id.product_specs')
     inner_spec = fields.Char(related='product_id.inner_spec')
     inner_code = fields.Char(related='product_id.inner_code')
