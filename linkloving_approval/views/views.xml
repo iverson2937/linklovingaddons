@@ -65,5 +65,12 @@
         <!-- This Menu Item must have a parent and an action -->
         <menuitem id="approval_pdm" name="我的审核" parent="approval_pdm_cate" action="show_pdm_approval_action"
                   sequence="0"/>
+
+        <record id="group_start_stop_show" model="res.groups">
+            <field name="name">工程启用权限</field>
+            <!--<field name="category_id" ref="base.module_category_hidden"/>-->
+        </record>
+
+
     </data>
 </openerp>

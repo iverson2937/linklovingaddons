@@ -153,12 +153,16 @@ class ApprovalCenter(models.TransientModel):
 
         attach_list = []
         for atta in attatchments:
+
+            temp_show=False
+            if self.env.ref('linkloving_approval.group_start_stop_show').id in self.env.user.groups_id.ids:
+                temp_show=True
             attach_list.append(
                 dict(self.env['product.attachment.info'].convert_attachment_info(atta),
                      **{'checkbox_type': self.type, 'create_date': atta.get('create_date'),
                         'tag_flow_id': atta.get('tag_type_flow_id')[0] if atta.get('tag_type_flow_id') else '',
                         'tag_is_remote_path': 'TRUE' if atta.get('remote_path') else 'FALSE',
-                        'is_product_view': False if product_view_new else True}))
+                        'is_product_view': False if product_view_new else True, 'temp_is_show_stop_start':temp_show}))
 
         length = self.env[self.res_model].search_count(expression.AND([domain, domain_my]))
 
