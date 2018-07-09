@@ -3,7 +3,6 @@
     <data>
 
 
-
         <record id="view_account_invoice_form_inherit" model="ir.ui.view">
             <field name="name">invoice.form.workflow.inherit</field>
             <field name="model">account.invoice</field>
@@ -11,8 +10,10 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//field[@name='date_due']" position="after">
-                    <field name="payment_ids" widget="many2many_tags" string="付款申请单" readonly="1" attrs="{'invisible':[('payment_ids','=',False)]}"/>
+                    <field name="payment_ids" widget="many2many_tags" string="付款申请单" readonly="1"
+                           attrs="{'invisible':[('payment_ids','=',False)]}"/>
                 </xpath>
+
 
 
             </field>
@@ -35,7 +36,8 @@
             <field name="arch" type="xml">
                 <!-- add state field in header -->
                 <xpath expr="//field[@name='state']" position="before">
-                    <field name="remain_apply_balance" string="To Apply" groups="purchase.group_purchase_user" sum="Total amount"/>
+                    <field name="remain_apply_balance" string="To Apply" groups="purchase.group_purchase_user"
+                           sum="Total amount"/>
                 </xpath>
             </field>
         </record>

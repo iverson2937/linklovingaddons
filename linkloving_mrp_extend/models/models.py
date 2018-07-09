@@ -292,10 +292,6 @@ class MrpProductionExtend(models.Model):
     is_secondary_produce = fields.Boolean(default=False)
     secondary_produce_time_ids = fields.One2many("production.time.record", 'production_id', )
 
-    # @api.model
-    # def create(self, vals):
-    #     return super(MrpProductionExtend, self).create(vals)
-
     @api.multi
     def write(self, vals):
         if 'state' in vals and vals['state'] == 'waiting_material' and self.bom_id.state not in ('draft', 'release'):
@@ -350,6 +346,7 @@ class MrpProductionExtend(models.Model):
             'domain': [('id', 'in', self.return_material_order_ids.ids)],
             'target': 'current',
         }
+
     def action_see_scrap_moves(self):
         self.ensure_one()
         action = self.env.ref('linkloving_mrp_extend.action_mrp_production_scrap_moves').read()[0]
@@ -486,7 +483,6 @@ class MrpProductionExtend(models.Model):
     is_pending = fields.Boolean()
     ####
 
-
     # @api.multi
     # def _compute_origin_sale_order_id(self):
     #     def get_parent_move(move):
@@ -554,7 +550,6 @@ class MrpProductionExtend(models.Model):
     # @api.multi
     # def _compute_bom_remark(self):
     #     for production in self:
-
 
     @api.multi
     def _compute_sale_remark(self):
@@ -1269,10 +1264,10 @@ class MrpProductionProduceExtend(models.TransientModel):
                 lambda x: x.product_id.id == self.production_id.product_id.id)
             if copy_moves:
                 new_move = copy_moves[0].copy(default={'quantity_done': qty,
-                                                   'ordered_qty': qty,
-                                                   'product_uom_qty': qty,
-                                                   'production_id': self.production_id.id
-                                                   })
+                                                       'ordered_qty': qty,
+                                                       'product_uom_qty': qty,
+                                                       'production_id': self.production_id.id
+                                                       })
             else:  # stock——move 被意外取消
                 new_move = self.production_id._generate_finished_moves()
                 new_move.quantity_done = qty
@@ -1384,6 +1379,7 @@ class ReturnOfMaterial(models.Model):
             return self.search_read(domain, limit=1)
         else:
             return self.search(domain, limit=1)
+
     @api.multi
     def do_return(self):
         """
@@ -1642,6 +1638,7 @@ class SimStockMove(models.Model):
             result.append((sim.id, name))
         return result
 
+
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
 
@@ -1670,7 +1667,6 @@ class ReturnMaterialLine(models.Model):
                                                               ('material', '原材料'),
                                                               ('real_semi_finished', '半成品')],
                                     required=False, compute="_compute_product_type")
-
 
     @api.multi
     def create_scraps(self):
@@ -1710,6 +1706,7 @@ class ReturnMaterialLine(models.Model):
                 'scrap_qty': scrap_qty
             })
         scrap_env.do_scrap()
+
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
@@ -2036,8 +2033,8 @@ class StcokPickingExtend(models.Model):
                         for pack in pick.pack_operation_ids:
                             if pack.product_id and pack.product_id.tracking != 'none':
                                 raise UserError(
-                                        _(
-                                            'Some products require lots/serial numbers, so you need to specify those first!'))
+                                    _(
+                                        'Some products require lots/serial numbers, so you need to specify those first!'))
                     raise UserError(u"此次入库数量为0, 请选择全部入库或者退回!")
                 # view = self.env.ref('stock.view_immediate_transfer')
                 # wiz = self.env['stock.immediate.transfer'].create({'pick_id': pick.id})
@@ -2100,7 +2097,7 @@ class StcokPickingExtend(models.Model):
                 confirmation._process(cancel_backorder=pick.is_cancel_backorder)
             # 既有完成又有可用的单子, 肯定有问题的!!!
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
-                            move.state == "assigned" for move in pick.move_lines):
+                    move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
             if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
                 raise UserError(u"出货数量不能全部为0 %s" % pick.id)

@@ -70,6 +70,8 @@ class MrpBom(models.Model):
             #         for line in lines:
             #             if line.procurement_ids.filtered(lambda x: x.state not in ('cancel', 'done')):
             #                 raise UserError(_(u'销售单 %s 未发完货,不可以修改BOM,请联系销售取消相关销售单') % (line.order_id.name,))
+            if self.state == 'review_ing':
+                raise UserError('Bom 在审核中,请先让审核人退回，再做修改')
 
             if self.state not in ('new', 'updated', 'deny', 'cancel'):
                 if not self.review_id:

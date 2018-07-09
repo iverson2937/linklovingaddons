@@ -43,7 +43,8 @@ class MrpBom(models.Model):
     @api.multi
     def _compute_has_right_to_review(self):
         for info in self:
-            if self.env.user.id in info.review_id.who_review_now.user_ids.ids and info.state in ['review_ing']:
+            if self.env.user.id in info.review_id.who_review_now.user_ids.ids and info.state in ['review_ing', 'cancel',
+                                                                                                 'deny']:
                 info.has_right_to_review = True
 
     def convert_bom_info(self):
