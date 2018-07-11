@@ -117,7 +117,8 @@ class MrpBomLine(models.Model):
     is_highlight = fields.Boolean()
 
     def set_bom_line_product_bom_released(self):
-        self.bom_id.state = 'release'
+        if not self.bom_id.review_id.review_line_ids.filtered(lambda x: x.state == 'waiting_review'):
+            self.bom_id.state = 'release'
         # line.bom_id.product_tmpl_id.apply_bom_update()
 
         if self.child_line_ids:
@@ -156,7 +157,6 @@ class MrpBomLine(models.Model):
                     'current_review_id': self.env.user.id,
                     'state': 'updated',
                 })
-
 
         return line_id
 
