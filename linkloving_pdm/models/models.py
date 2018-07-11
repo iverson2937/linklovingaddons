@@ -48,7 +48,10 @@ class ReviewProcess(models.Model):
     def _compute_process_line_review_now(self):
         for process in self:
             waiting_review_line = process.review_line_ids.filtered(lambda x: x.state == 'waiting_review')
+
             if waiting_review_line:
+                if len(waiting_review_line) > 1:
+                    raise UserError(u'审核异常请联系管理员')
                 process.process_line_review_now = waiting_review_line[0]
             else:
                 process.process_line_review_now = None
