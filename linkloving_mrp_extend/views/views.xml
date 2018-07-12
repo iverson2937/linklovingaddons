@@ -170,6 +170,7 @@
                     <filter name='release' string="退回的BOM" domain="[('state', '=', 'deny')]"/>
                     <filter name="my_bom" string="待提交" domain="[('current_review_id', '=', uid),
                       ('state', 'in',['waiting_release', 'cancel', 'deny', 'new', 'updated'])]"/>
+                    <filter name="inactive_bom" string="含归档材料的bom" domain="[]"/>
                 </xpath>
 
 

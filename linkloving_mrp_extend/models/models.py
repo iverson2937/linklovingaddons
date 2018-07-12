@@ -14,6 +14,7 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import float_compare, math
 from odoo.addons import decimal_precision as dp
+from lxml import etree
 
 
 class MrpBomExtend(models.Model):
@@ -88,6 +89,22 @@ class MrpBomExtend(models.Model):
                                     'original_qty': quantity, 'parent_line': parent_line}))
 
         return boms_done, lines_done
+
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        res = super(MrpBomExtend, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
+                                                        submenu=submenu)
+        # 重写search view,更新search条件
+        if view_type == 'search':
+            doc = etree.XML(res['arch'])
+            xpath = "//filter[@name='inactive_bom']"
+
+            for node in doc.xpath(xpath):
+                domain = [('bom_line_ids.product_id.active', '=', False)]
+                node.set('domain', repr(domain))
+            res['arch'] = etree.tostring(doc)
+
+        return res
 
 
 class MrpBomLineExtend(models.Model):
