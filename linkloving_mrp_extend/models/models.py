@@ -16,6 +16,10 @@ from odoo.tools import float_compare, math
 from odoo.addons import decimal_precision as dp
 from lxml import etree
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
 
 class MrpBomExtend(models.Model):
     _inherit = 'mrp.bom'
@@ -2249,6 +2253,20 @@ class StockPackOperationExtend(models.Model):
     rejects_qty = fields.Float(string=u"不良品", default=0)
     receivied_qty = fields.Float(string=u'收到的数量', compute='_compute_receivied_qty',
                                  digits=dp.get_precision('Product Unit of Measure'))
+
+    @api.multi
+    def write(self, vals):
+        if 'qty_done' in vals:
+            _logger.warning(u"**********修改*********************:%s,%s", str(self.id), vals['qty_done'])
+
+        return super(StockPackOperationExtend, self).write(vals)
+
+    @api.multi
+    def unlink(self):
+        for r in self:
+            _logger.warning(u"**********删除*********************:%s,", str(r.id))
+
+        return super(StockPackOperationExtend, self).unlink()
     # accept_qty = fields.Float(string=u'良品', compute='_compute_accept_qty')
 
 
