@@ -49,8 +49,8 @@ class ReviewProcess(models.Model):
         for process in self:
             waiting_review_line = process.review_line_ids.filtered(lambda x: x.state == 'waiting_review')
 
-            if waiting_review_line and process.res_model == 'mrp.bom':
-                if len(waiting_review_line) > 1:
+            if waiting_review_line:
+                if len(waiting_review_line) > 1 and process.res_model == 'mrp.bom':
                     raise UserError(u'审核异常请联系管理员')
                 process.process_line_review_now = waiting_review_line[0]
             else:
