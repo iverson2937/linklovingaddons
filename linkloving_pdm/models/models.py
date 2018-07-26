@@ -1181,6 +1181,8 @@ class TagFlowUpdate(models.TransientModel):
             new_name = new_flow.name.split(' ')[0]
         else:
             new_name = new_flow.name
+        if not new_name:
+            new_name = ''
 
         new_flow.write(
             {'name': new_name + ' 副本' + str(product_attachment.flow_version), 'tag_approval_process_ids': (
