@@ -1180,10 +1180,13 @@ class TagFlowUpdate(models.TransientModel):
         all_flow_parnter.insert(flow_index + 1, self.add_parnter_id.id)
         product_attachment = self.env['product.attachment.info'].browse(int(self._context.get('info_id')))
 
+
         if product_attachment.flow_version > 1:
             new_name = new_flow.name.split(' ')[0]
         else:
             new_name = new_flow.name
+        if not new_name:
+            new_name = ''
 
         new_flow.write(
             {'name': new_name + ' 副本' + str(product_attachment.flow_version), 'tag_approval_process_ids': (
