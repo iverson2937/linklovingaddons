@@ -3099,7 +3099,7 @@ class LinklovingOAApi(http.Controller):
             })
         datas = []
         datas.append({
-            "name":'组织架构',
+            "name": '若态科技',
             "id":False,
             "child": data,
             "employees":self.get_employee_by_department(False),
