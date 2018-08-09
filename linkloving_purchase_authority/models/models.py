@@ -79,6 +79,6 @@ class AccountPaymentRegister(models.Model):
         """
 
         if self._context.get('manager'):
-            return [('state', '=', 'manager')]
+            return [('state', 'in', ('manager','posted'))]
         else:
             return super(AccountPaymentRegister, self)._needaction_domain_get()
