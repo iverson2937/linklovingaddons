@@ -581,6 +581,7 @@ class CreateOrderPointWizard(models.TransientModel):
         import os
         os.chdir('/opt/odoo/odoo10/odoo/linklovingaddons/')
         os.system('sudo git pull')
+        os.popen("sudo -S %s" % ('git pull'), 'w').write('linkloving*0707')
         os.system('sudo supervisorctl restart diy10')
 
 
