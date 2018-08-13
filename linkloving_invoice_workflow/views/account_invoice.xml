@@ -278,7 +278,7 @@
                     <button name="action_post" type="object" states="draft,proforma2" string="提交" class="oe_highlight"
                             groups="sale.sale_order_personal_rule,purchase.group_purchase_user"/>
                     <button name="action_reject" type="object" states="validate" string="退回"
-                            groups="sales_team.group_sale_salesman_all_leads,purchase.group_purchase_manager"/>
+                            groups="sales_team.group_sale_salesman_all_leads,purchase.group_purchase_manager,linkloving_purchase_authority.purchase_manager_1"/>
                     <button name="action_invoice_open" type="object" states="validate" string="Validate"
                             class="oe_highlight"
                             groups="sales_team.group_sale_salesman_all_leads,purchase.group_purchase_manager"/>
