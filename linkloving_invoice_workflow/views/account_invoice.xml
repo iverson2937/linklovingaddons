@@ -272,7 +272,6 @@
                 <xpath expr="//button[@name='action_invoice_cancel']" position="replace">
                     <button name="action_invoice_draft" states="cancel" string="Set to Draft" type="object"
                             groups="purchase.group_purchase_user"/>
-view_invoice_supplier_form
                 </xpath>
                 <xpath expr="//button[@name='action_invoice_open']" position="replace">
                     <button name="action_post" type="object" states="draft,proforma2" string="提交" class="oe_highlight"
