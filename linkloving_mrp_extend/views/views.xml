@@ -347,7 +347,7 @@
 
                 <xpath expr="//header/button[@name='open_produce_product'][1]" position="replace">
                     <button name="open_produce_product"
-                            attrs="{'invisible': ['|', '|', ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in', ('progress')), ('routing_id', '!=', False)]}"
+                            attrs="{'invisible': [('state', 'not in', ('progress'))]}"
                             string="产出" type="object" class="oe_highlight"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>
