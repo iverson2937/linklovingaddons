@@ -3086,17 +3086,26 @@ class LinklovingOAApi(http.Controller):
         # 获取组织架构 :
     @http.route('/linkloving_oa_api/get_all_department', type='json', auth="none", csrf=False, cors='*')
     def get_all_department(self, *kw):
-        parent_department = request.env['hr.department'].sudo().search([("parent_id", "=", False)])
+        department= request.env['hr.department'].sudo().search([("parent_id", "=", False)])
         data = []
-        data_child_ids = self.get_childs_department(parent_department)
-        data.append({
-            "name":parent_department.name,
-            "id":parent_department.id,
-            "child": data_child_ids,
-            "employees":self.get_employee_by_department(parent_department.id),
-            "childEmployeeNumber":  self.get_childs_employee_number(parent_department),
+        for parent_department in department:
+            data_child_ids = self.get_childs_department(parent_department)
+            data.append({
+                "name":parent_department.name,
+                "id":parent_department.id,
+                "child": data_child_ids,
+                "employees":self.get_employee_by_department(parent_department.id),
+                "childEmployeeNumber":  self.get_childs_employee_number(parent_department),
+            })
+        datas = []
+        datas.append({
+            "name": '若态科技',
+            "id":False,
+            "child": data,
+            "employees":self.get_employee_by_department(False),
+            "childEmployeeNumber":  self.get_childs_employee_number_by_id(False),
         })
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=datas)
 
 
     def get_employee_by_department(self,department_id):
@@ -3125,6 +3134,15 @@ class LinklovingOAApi(http.Controller):
         if obj.child_ids:
             for department in obj.child_ids:
                 number +=self.get_childs_employee_number(department)
+        return number
+
+    def get_childs_employee_number_by_id(self, obj_id):
+        number =len(request.env['hr.employee'].sudo().search([("department_id", "=", obj_id)]))
+        objs = request.env['hr.employee'].sudo().search([("department_id", "=", obj_id)])
+        for obj in objs:
+            if obj.child_ids:
+                for department in obj.child_ids:
+                    number +=self.get_childs_employee_number(department)
         return number
 
     #  XD 我的请假

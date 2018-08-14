@@ -69,10 +69,10 @@ class PurchaseOrder(models.Model):
             else:
                 order.invoiced_amount = invoiced_amount
 
-    @api.depends('product_count', 'order_line.qty_received')
+    @api.depends('product_count', 'order_line.qty_received', 'state')
     def _compute_shipping_rate(self):
         for r in self:
-            if r.product_count:
+            if r.product_count and r.state == 'purchase':
                 qtys = sum(line.qty_received for line in r.order_line)
                 r.shipping_rate = (qtys / r.product_count) * 100.0
             if r.is_shipped:

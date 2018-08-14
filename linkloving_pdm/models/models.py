@@ -48,7 +48,10 @@ class ReviewProcess(models.Model):
     def _compute_process_line_review_now(self):
         for process in self:
             waiting_review_line = process.review_line_ids.filtered(lambda x: x.state == 'waiting_review')
+
             if waiting_review_line:
+                if len(waiting_review_line) > 1 and process.res_model == 'mrp.bom':
+                    raise UserError(u'审核异常请联系管理员')
                 process.process_line_review_now = waiting_review_line[0]
             else:
                 process.process_line_review_now = None
@@ -1176,6 +1179,7 @@ class TagFlowUpdate(models.TransientModel):
         flow_index = all_flow_parnter.index(self.now_parnter_id.id)
         all_flow_parnter.insert(flow_index + 1, self.add_parnter_id.id)
         product_attachment = self.env['product.attachment.info'].browse(int(self._context.get('info_id')))
+
 
         if product_attachment.flow_version > 1:
             new_name = new_flow.name.split(' ')[0]

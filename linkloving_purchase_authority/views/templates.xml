@@ -40,7 +40,7 @@
         <field name="res_model">account.payment.register</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('payment_type','=',1),('state','=','manager')]</field>
+        <field name="domain">[('payment_type','=',1),('state','in',('manager','posted'))]</field>
         <field name="context">{'default_payment_type':1,'manager':True}</field>
         <field name="view_ids" eval="[(5,0,0),
             (0,0,{'view_mode':'tree', 'view_id': ref('linkloving_account.account_payment_register_tree')}),

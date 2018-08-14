@@ -23,7 +23,7 @@
 
                 <xpath expr="//tree" position="replace">
                     <tree fonts="bold:message_unread==True" default_order="create_date desc"
-                          colors="grey:state=='cancel';blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')"
+                          decoration-danger="(state not in ('cancel','purchase')) and handle_date &lt; current_date"
                           string="采购单">
                         <field name="message_unread" invisible="1"/>
                         <field name="name" string="单号"/>
@@ -31,6 +31,9 @@
                         <field name="product_count" string="汇总数量"/>
                         <field name="amount_total" string="汇总金额"/>
                         <field name="product_id" string="产品"/>
+                        <field name="handle_date" string="交期" widget="date"/>
+                        <field name="shipping_status" invisible="1"/>
+
                         <field name="shipping_rate" widget="progressbar"/>
                         <field name="state"/>
                         <field name="invoice_status" string="对账单状态"/>

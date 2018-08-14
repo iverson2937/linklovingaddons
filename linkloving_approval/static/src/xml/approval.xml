@@ -255,6 +255,8 @@
                             </t>
                         </t>
 
+
+
                         <t t-if="item_files.state[0] == 'released' &amp;&amp; item_files.is_able_to_use== true">
                             <div class="stop_one_document" style="padding-top: 6px;">
                                  <t t-if="item_files.is_show_outage == true ">
@@ -262,12 +264,20 @@
                                      <span style="color:red;">使用中</span>
 
                                  </t>
+
+
                                 <t t-if="item_files.is_show_outage == false ">
+                                    <t t-if="item_files.temp_is_show_stop_start == true">
                                     <button class="btn btn-default outage_document_file on" data="on" data-toggle="tooltip" data-placement="left" title="点击使用">启用</button>
+                                    </t>
                                     <span style="color:red;">已停用</span>
                                  </t>
+
+
                             </div>
                         </t>
+
+
 
                     </div>
                 </div>
