@@ -41,16 +41,18 @@ class AccountPaymentRegister(models.Model):
                 p.can_reject = True
             else:
                 p.can_reject = False
-
+    # 审核人
     to_approve_ids = fields.Many2many('res.users', compute='get_to_approve_id')
 
     @api.multi
     def get_to_approve_id(self):
         for payment in self:
+            # 提交状态，一级审核权限的人审核
             if payment.state == 'posted':
                 group = self.env.ref('linkloving_purchase_authority.purchase_manager_1')
                 payment.to_approve_ids = group.users.filtered(lambda x: x.id != SUPERUSER_ID)
                 payment.has_to_approve_ids = True
+            # 经理审核，二级审核权限的人审核
             elif payment.state == 'manager':
                 group = self.env.ref('linkloving_purchase_authority.purchase_manager_plus')
                 payment.to_approve_ids = group.users.filtered(lambda x: x.id != SUPERUSER_ID)
@@ -79,6 +81,6 @@ class AccountPaymentRegister(models.Model):
         """
 
         if self._context.get('manager'):
-            return [('state', '=', 'manager')]
+            return [('state', 'in', ('manager','posted'))]
         else:
             return super(AccountPaymentRegister, self)._needaction_domain_get()
