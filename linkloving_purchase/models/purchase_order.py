@@ -217,6 +217,8 @@ class PurchaseOrderLine(models.Model):
             line.to_ship_qty = line.product_qty - line.qty_received
 
     to_ship_qty = fields.Float(compute=_compute_to_ship_qty, string='欠货数量')
+    qty_available=fields.Float(related='product_id.qty_available',string=u'库存')
+    virtual_available=fields.Float(related='product_id.virtual_available',string=u'预测数量')
 
     @api.depends('product_qty', 'qty_received', 'qty_to_invoice', 'qty_invoiced')
     def _compute_shipping_status(self):

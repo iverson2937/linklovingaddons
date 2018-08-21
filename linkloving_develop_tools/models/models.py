@@ -577,24 +577,17 @@ class CreateOrderPointWizard(models.TransientModel):
         })
 
     def unlink_useless_supplier_info(self):
-
-        import os
-        os.chdir('/opt/odoo/odoo10/odoo/linklovingaddons/')
-        os.popen("sudo -S %s" % ('git pull'), 'w').write('linkloving*0707')
-        os.system('sudo supervisorctl restart diy10')
-
-
-        # products = self.env['product.template'].search([('purchase_ok', '=', True)])
-        # for product in products:
-        #     if product.seller_ids:
-        #         for s in product.seller_ids:
-        #             line = self.env['purchase.order.line'].search(
-        #                 [('product_id', '=', s.product_tmpl_id.product_variant_ids[0].id),
-        #                  ('partner_id', '=', s.name.id),
-        #                  ('state', 'in', ['purchase', 'done'])])
-        #             if not line and len(product.seller_ids) > 1:
-        #                 _logger.warning("delete, %d-------%s" % (s.id, s.name.name))
-        #                 s.unlink()
+        products = self.env['product.template'].search([('purchase_ok', '=', True)])
+        for product in products:
+            if product.seller_ids:
+                for s in product.seller_ids:
+                    line = self.env['purchase.order.line'].search(
+                        [('product_id', '=', s.product_tmpl_id.product_variant_ids[0].id),
+                         ('partner_id', '=', s.name.id),
+                         ('state', 'in', ['purchase', 'done'])])
+                    if not line and len(product.seller_ids) > 1:
+                        _logger.warning("delete, %d-------%s" % (s.id, s.name.name))
+                        s.unlink()
 
     def set_standard_price_from_subcompany(self):
         """

@@ -108,7 +108,7 @@ class SaleOrder(models.Model):
         ('invoiced', u'已对账完成'),
         ('to invoice', u'待对账'),
         ('no', u'没有要对账的')
-    ], string=u'对账单状态', compute='_get_invoiced', store=True, readonly=True)
+    ], string=u'对账状态', compute='_get_invoiced', store=True, readonly=True)
     shipping_status = fields.Selection([
         ('no', u'待出货'),
         ('part_shipping', u'部分出货'),
@@ -206,7 +206,7 @@ class SaleOrderLine(models.Model):
         ('invoiced', u'已对账完成'),
         ('to invoice', u'待对账'),
         ('no', u'未发货')
-    ], string=u'对账单状态', compute='_compute_invoice_status', store=True, readonly=True, default='no')
+    ], string=u'对账状态', compute='_compute_invoice_status', store=True, readonly=True, default='no')
     shipping_status = fields.Selection([
         ('no', u'待出货'),
         ('part_shipping', u'部分出货'),

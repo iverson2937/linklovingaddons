@@ -597,3 +597,7 @@ class ProductTemplate(models.Model):
         action = super(ProductTemplate, self).action_view_stock_moves()
         action['context'] = dict({'search_default_done': 1}, **action['context'])
         return action
+
+    active = fields.Boolean('Active', default=True,
+                            track_visibility='onchange',
+                            help="If unchecked, it will allow you to hide the product without removing it.")

@@ -101,6 +101,14 @@
                 <xpath expr="//tree/field[@name='date_planned']" position="replace">
                     <field name="date_planned" string="交期" widget="date"/>
                 </xpath>
+                <xpath expr="//tree/field[@name='account_analytic_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='analytic_tag_ids']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+
                 <xpath expr="//tree/field[@name='product_uom']" position="attributes">
                     <attribute name="options">{'no_create':True}</attribute>
                 </xpath>
@@ -125,6 +133,7 @@
 
                 <xpath expr="//tree/field[@name='product_id']" position="after">
                     <field name="product_specs" readonly="1"/>
+                    <field name="qty_available"/>
                 </xpath>
 
                 <xpath expr="//tree/field[@name='taxes_id']" position="attributes">
