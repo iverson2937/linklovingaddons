@@ -69,10 +69,10 @@ class PurchaseOrder(models.Model):
             else:
                 order.invoiced_amount = invoiced_amount
 
-    @api.depends('product_count', 'order_line.qty_received')
+    @api.depends('product_count', 'order_line.qty_received', 'state')
     def _compute_shipping_rate(self):
         for r in self:
-            if r.product_count:
+            if r.product_count and r.state == 'purchase':
                 qtys = sum(line.qty_received for line in r.order_line)
                 r.shipping_rate = (qtys / r.product_count) * 100.0
             if r.is_shipped:
@@ -217,6 +217,8 @@ class PurchaseOrderLine(models.Model):
             line.to_ship_qty = line.product_qty - line.qty_received
 
     to_ship_qty = fields.Float(compute=_compute_to_ship_qty, string='欠货数量')
+    qty_available=fields.Float(related='product_id.qty_available',string=u'库存')
+    virtual_available=fields.Float(related='product_id.virtual_available',string=u'预测数量')
 
     @api.depends('product_qty', 'qty_received', 'qty_to_invoice', 'qty_invoiced')
     def _compute_shipping_status(self):

@@ -14,6 +14,11 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import float_compare, math
 from odoo.addons import decimal_precision as dp
+from lxml import etree
+
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class MrpBomExtend(models.Model):
@@ -88,6 +93,22 @@ class MrpBomExtend(models.Model):
                                     'original_qty': quantity, 'parent_line': parent_line}))
 
         return boms_done, lines_done
+
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        res = super(MrpBomExtend, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
+                                                        submenu=submenu)
+        # 重写search view,更新search条件
+        if view_type == 'search':
+            doc = etree.XML(res['arch'])
+            xpath = "//filter[@name='inactive_bom']"
+
+            for node in doc.xpath(xpath):
+                domain = [('bom_line_ids.product_id.active', '=', False)]
+                node.set('domain', repr(domain))
+            res['arch'] = etree.tostring(doc)
+
+        return res
 
 
 class MrpBomLineExtend(models.Model):
@@ -2099,8 +2120,8 @@ class StcokPickingExtend(models.Model):
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
                     move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
-            if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
-                raise UserError(u"出货数量不能全部为0 %s" % pick.id)
+            # if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
+            #     raise UserError(u"出货数量不能全部为0 %s" % pick.id)
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成
@@ -2232,6 +2253,20 @@ class StockPackOperationExtend(models.Model):
     rejects_qty = fields.Float(string=u"不良品", default=0)
     receivied_qty = fields.Float(string=u'收到的数量', compute='_compute_receivied_qty',
                                  digits=dp.get_precision('Product Unit of Measure'))
+
+    @api.multi
+    def write(self, vals):
+        if 'qty_done' in vals:
+            _logger.warning(u"**********修改*********************:%s,%s", str(self.id), vals['qty_done'])
+
+        return super(StockPackOperationExtend, self).write(vals)
+
+    @api.multi
+    def unlink(self):
+        for r in self:
+            _logger.warning(u"**********删除*********************:%s,", str(r.id))
+
+        return super(StockPackOperationExtend, self).unlink()
     # accept_qty = fields.Float(string=u'良品', compute='_compute_accept_qty')
 
 

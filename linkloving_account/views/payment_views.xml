@@ -190,8 +190,8 @@
                     <field name="partner_id"/>
                     <field name="create_uid"/>
                     <field name="create_date"/>
-                    <field name="remark"/>
                     <field name="state" string="状态"/>
+                    <field name="remark"/>
                 </tree>
             </field>
         </record>

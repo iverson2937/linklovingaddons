@@ -21,7 +21,7 @@ import odoo
 import odoo.modules.registry
 from models import LinklovingGetImageUrl, JPushExtend
 
-from odoo import fields,exceptions
+from odoo import fields, exceptions
 from odoo.osv import expression
 from odoo.tools import float_compare, SUPERUSER_ID, werkzeug, os, safe_eval
 from odoo.tools.translate import _
@@ -113,7 +113,7 @@ class LinklovingOAApi(http.Controller):
         data = []
         data.append({
             'continent': (obj.continent.display_name or '') + (obj.country_id.display_name or '') + (
-                obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
+                    obj.state_id.name or '') + (obj.city or '') + (obj.street2 or '') + (obj.street or ''),
         })
         return data
 
@@ -220,13 +220,14 @@ class LinklovingOAApi(http.Controller):
                      'product_uom': order_line.product_uom.name,
                      'specs': order_line.product_id.product_specs,  # 规格
                      'price_unit': order_line.price_unit,  # 单价
+                     'qty_available': order_line.qty_available,  # 库存
                      'product_qty': order_line.product_qty,  # 数量
                      'price_subtotal': order_line.price_subtotal,  # 小计
                      'qty_invoiced': order_line.qty_invoiced,  # 开单数量
                      'qty_received': order_line.qty_received,  # 已接收数量
                      'price_tax': order_line.taxes_id.name,  # 税金
                      'shipping_rate': (
-                         order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty else 0,
+                             order_line.qty_received * 100 / order_line.product_qty) if order_line.product_qty else 0,
                      'id': order_line.order_id.product_id.id
                      }
                 )
@@ -1283,7 +1284,7 @@ class LinklovingOAApi(http.Controller):
             'country': obj.country_id.display_name or '',
             'name': obj.display_name,
             'address': (obj.country_id.display_name or '') + (obj.state_id.name or '') + (obj.city or '') + (
-                obj.street2 or '') + (obj.street or ''),
+                    obj.street2 or '') + (obj.street or ''),
             'phone': obj.phone or '',
             'crm_source': obj.crm_source_id.display_name or '',  # 来源
             'source': obj.source_id.display_name or '',  # 渠道
@@ -1867,7 +1868,7 @@ class LinklovingOAApi(http.Controller):
     # 获取所有联系人
     @http.route('/linkloving_oa_api/get_all_employees', type='json', auth="none", csrf=False, cors='*')
     def get_all_employees(self, *kw):
-        employees = request.env['hr.employee'].sudo().search([],order='id asc')
+        employees = request.env['hr.employee'].sudo().search([], order='id asc')
         data = []
         for employee in employees:
             data.append(self.change_employee_to_json(employee))
@@ -2706,16 +2707,13 @@ class LinklovingOAApi(http.Controller):
                     "check_in": attendance.new_check_in,
                     "check_out": attendance.check_out or '',
                     "company_name": attendance.company_name or '',
-                    "company_off_name":attendance.company_off_name or '',
+                    "company_off_name": attendance.company_off_name or '',
                     "attendance_on_ids": self.get_attendance_img_url(attendance.attendance_on_ids.ids),
                     "attendance_off_ids": self.get_attendance_off_img_url(attendance.attendance_off_ids.ids),
                     "is_location_on": attendance.is_location_on,
                     "is_location_off": attendance.is_location_off,
                 })
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
-
-
-
 
     # 员工签到签退 江苏若态#
     @http.route('/linkloving_oa_api/employee_attendance', type='json', auth="none", csrf=False, cors='*')
@@ -2750,7 +2748,8 @@ class LinklovingOAApi(http.Controller):
                     "device_version": device_version,
                     "open_id": open_id,
                 })
-            domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "=", employee_id)]
+            domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end),
+                      ("employee_id", "=", employee_id)]
             attendance_list = request.env['hr.attendance'].sudo().search(domain)
             data = []
             for attendance in attendance_list:
@@ -2791,7 +2790,7 @@ class LinklovingOAApi(http.Controller):
                     "check_in": attendance.new_check_in,
                     "check_out": attendance.check_out or '',
                     "company_name": attendance.company_name or '',
-                    "company_off_name":attendance.company_off_name or '',
+                    "company_off_name": attendance.company_off_name or '',
                     # "attendance_ids": attendance.attendance_ids,
                     "attendance_on_ids": self.get_attendance_img_url(attendance.attendance_on_ids.ids),
                     "attendance_off_ids": self.get_attendance_off_img_url(attendance.attendance_off_ids.ids),
@@ -2800,10 +2799,9 @@ class LinklovingOAApi(http.Controller):
                 })
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-
-    #erp、diy获取所有员工的考勤信息
+    # erp、diy获取所有员工的考勤信息
     @http.route('/linkloving_oa_api/get_employee_attendance', type='json', auth="none", csrf=False, cors='*')
-    def get_employee_attendance(self,*kw):
+    def get_employee_attendance(self, *kw):
         day_start = request.jsonrequest.get("day_start")
         day_end = request.jsonrequest.get("day_end")
         user_id = request.jsonrequest.get("user_id")
@@ -2845,7 +2843,7 @@ class LinklovingOAApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_OK, res_data={"total": len(data),
                                                                         "attendance_on": len(attendance)})
 
-    def get_department_childs(self,obj):
+    def get_department_childs(self, obj):
         data = []
         if obj.child_ids:
             for department in obj.child_ids:
@@ -2856,9 +2854,7 @@ class LinklovingOAApi(http.Controller):
                     self.get_department_childs(department)
         return data
 
-
-
-    #判断用户是否是当前部门的管理员
+    # 判断用户是否是当前部门的管理员
     @http.route('/linkloving_oa_api/get_is_department', type='json', auth="none", csrf=False, cors='*')
     def get_is_department(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
@@ -2878,7 +2874,7 @@ class LinklovingOAApi(http.Controller):
             else:
                 return JsonResponse.send_response(STATUS_CODE_OK, res_data={"is_manager": False})
 
-    #获取蓝牙考勤机列表
+    # 获取蓝牙考勤机列表
     @http.route('/linkloving_oa_api/get_ble_device', type='json', auth="none", csrf=False, cors='*')
     def get_ble_device(self, *kw):
         devices = request.env['linkloving.ble.device'].sudo().search([])
@@ -2890,20 +2886,20 @@ class LinklovingOAApi(http.Controller):
             })
         return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
 
-    #模拟绑定
+    # 模拟绑定
     @http.route('/linkloving_oa_api/bind_employee', type='json', auth="none", csrf=False, cors='*')
     def bind_employee(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
         request_url = request.jsonrequest.get("request_url")
         user_employee = request.env['hr.employee'].sudo().search([("id", "=", employee_id)])
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={
-            "id":user_employee.id,
-            "name":user_employee.name,
+            "id": user_employee.id,
+            "name": user_employee.name,
             "user_ava": LinklovingGetImageUrl.get_img_url(user_employee.user_id, "res.users", "image_medium"),
-            "request_url":request_url,
+            "request_url": request_url,
         })
 
-    #考勤定位补打卡
+    # 考勤定位补打卡
     @http.route('/linkloving_oa_api/location_attendance', type='json', auth="none", csrf=False, cors='*')
     def location_attendance(self, *kw):
         employee_id = request.jsonrequest.get("employee_id")
@@ -2953,7 +2949,8 @@ class LinklovingOAApi(http.Controller):
                             'attendance_image': img,
                         })
                         new_attendance.attendance_on_ids = [(4, wo_img_id.id)]
-            domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end), ("employee_id", "=", employee_id)]
+            domain = [("new_check_in", ">", day_start), ("new_check_in", "<", day_end),
+                      ("employee_id", "=", employee_id)]
             attendance_list = request.env['hr.attendance'].sudo().search(domain)
             data = []
             for attendance in attendance_list:
@@ -2962,7 +2959,7 @@ class LinklovingOAApi(http.Controller):
                     "check_in": attendance.new_check_in,
                     "check_out": attendance.check_out or '',
                     "company_name": attendance.company_name or '',
-                    "company_off_name":attendance.company_off_name or '',
+                    "company_off_name": attendance.company_off_name or '',
                 })
             return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
         else:
@@ -3012,8 +3009,8 @@ class LinklovingOAApi(http.Controller):
                     "check_in": attendance.new_check_in,
                     "check_out": attendance.check_out or '',
                     "company_name": attendance.company_name or '',
-                    "company_off_name":attendance.company_off_name or '',
-                    "attendance_on_ids":self.get_attendance_img_url(attendance.attendance_on_ids.ids),
+                    "company_off_name": attendance.company_off_name or '',
+                    "attendance_on_ids": self.get_attendance_img_url(attendance.attendance_on_ids.ids),
                     "attendance_off_ids": self.get_attendance_off_img_url(attendance.attendance_off_ids.ids),
                     "is_location_on": attendance.is_location_on,
                     "is_location_off": attendance.is_location_off,
@@ -3025,7 +3022,7 @@ class LinklovingOAApi(http.Controller):
         imgs = []
         for img_id in worker_id:
             url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
-                    request.httprequest.host_url, str(img_id), 'linkloving.hr.attendance.image', 'attendance_image')
+                request.httprequest.host_url, str(img_id), 'linkloving.hr.attendance.image', 'attendance_image')
             imgs.append(url)
         return imgs
 
@@ -3034,10 +3031,9 @@ class LinklovingOAApi(http.Controller):
         imgs = []
         for img_id in worker_id:
             url = '%slinkloving_app_api/get_worker_image?worker_id=%s&model=%s&field=%s' % (
-                    request.httprequest.host_url, str(img_id), 'linkloving.hr.attendance.off.image', 'attendance_image')
+                request.httprequest.host_url, str(img_id), 'linkloving.hr.attendance.off.image', 'attendance_image')
             imgs.append(url)
         return imgs
-
 
     # 获取部门内员工打卡情况
     @http.route('/linkloving_oa_api/get_department_employee_attendance', type='json', auth="none", csrf=False, cors='*')
@@ -3069,62 +3065,79 @@ class LinklovingOAApi(http.Controller):
             [("id", "in", data_attendance)])
         employee_un_attendance = request.env['hr.employee'].sudo().search(
             [("id", "in", data)])
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data={"un_attendance": self.change_kq_employee_to_json(employee_un_attendance),
-                                                                    "attendance": self.change_kq_employee_to_json(employee_attendance)})
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data={
+            "un_attendance": self.change_kq_employee_to_json(employee_un_attendance),
+            "attendance": self.change_kq_employee_to_json(employee_attendance)})
 
-    def change_kq_employee_to_json(self,objs):
+    def change_kq_employee_to_json(self, objs):
         data = []
         for obj in objs:
             data.append({
-                "user_ava":self.get_img_url(obj.id, "hr.employee", "image_medium",
-                                            obj.write_date.replace("-", "").replace(" ", "").replace(":", "")),
-                "name":obj.name
+                "user_ava": self.get_img_url(obj.id, "hr.employee", "image_medium",
+                                             obj.write_date.replace("-", "").replace(" ", "").replace(":", "")),
+                "name": obj.name
             })
         return data
 
-
         # 获取组织架构 :
+
     @http.route('/linkloving_oa_api/get_all_department', type='json', auth="none", csrf=False, cors='*')
     def get_all_department(self, *kw):
-        parent_department = request.env['hr.department'].sudo().search([("parent_id", "=", False)])
+        department = request.env['hr.department'].sudo().search([("parent_id", "=", False)])
         data = []
-        data_child_ids = self.get_childs_department(parent_department)
-        data.append({
-            "name":parent_department.name,
-            "id":parent_department.id,
-            "child": data_child_ids,
-            "employees":self.get_employee_by_department(parent_department.id),
-            "childEmployeeNumber":  self.get_childs_employee_number(parent_department),
+        for parent_department in department:
+            data_child_ids = self.get_childs_department(parent_department)
+            data.append({
+                "name": parent_department.name,
+                "id": parent_department.id,
+                "child": data_child_ids,
+                "employees": self.get_employee_by_department(parent_department.id),
+                "childEmployeeNumber": self.get_childs_employee_number(parent_department),
+            })
+        datas = []
+        datas.append({
+            "name": '若态科技',
+            "id": False,
+            "child": data,
+            "employees": self.get_employee_by_department(False),
+            "childEmployeeNumber": self.get_childs_employee_number_by_id(False),
         })
-        return JsonResponse.send_response(STATUS_CODE_OK, res_data=data)
+        return JsonResponse.send_response(STATUS_CODE_OK, res_data=datas)
 
-
-    def get_employee_by_department(self,department_id):
+    def get_employee_by_department(self, department_id):
         data = []
         user_employees = request.env['hr.employee'].sudo().search([("department_id", "=", department_id)])
         for user_employee in user_employees:
             data.append(self.change_employee_to_json(user_employee))
         return data
 
-
     def get_childs_department(self, obj):
         child_data = []
         if obj.child_ids:
             for department in obj.child_ids:
                 child_data.append({
-                    "name":department.name,
-                    "id":department.id,
+                    "name": department.name,
+                    "id": department.id,
                     "child": self.get_childs_department(department),
-                    "employees":self.get_employee_by_department(department.id),
-                    "childEmployeeNumber":  self.get_childs_employee_number(department),
+                    "employees": self.get_employee_by_department(department.id),
+                    "childEmployeeNumber": self.get_childs_employee_number(department),
                 })
         return child_data
 
     def get_childs_employee_number(self, obj):
-        number =len(request.env['hr.employee'].sudo().search([("department_id", "=", obj.id)]))
+        number = len(request.env['hr.employee'].sudo().search([("department_id", "=", obj.id)]))
         if obj.child_ids:
             for department in obj.child_ids:
-                number +=self.get_childs_employee_number(department)
+                number += self.get_childs_employee_number(department)
+        return number
+
+    def get_childs_employee_number_by_id(self, obj_id):
+        number = len(request.env['hr.employee'].sudo().search([("department_id", "=", obj_id)]))
+        objs = request.env['hr.employee'].sudo().search([("department_id", "=", obj_id)])
+        for obj in objs:
+            if obj.child_ids:
+                for department in obj.child_ids:
+                    number += self.get_childs_employee_number(department)
         return number
 
     #  XD 我的请假
@@ -4075,11 +4088,11 @@ class LinklovingOAApi(http.Controller):
                     'num': len(visitList)
                 }
             return JsonResponse.send_response(STATUS_CODE_OK,
-                                            res_data=data)
+                                              res_data=data)
 
         else:
             return JsonResponse.send_response(STATUS_CODE_OK,
-                                            res_data=visit_list)
+                                              res_data=visit_list)
 
     @classmethod
     def changeVisit_to_json(cls, visitBean):
@@ -4122,7 +4135,7 @@ class LinklovingOAApi(http.Controller):
     @http.route('/linkloving_oa_api/get_all_sale_team', type='json', auth='none', csrf=False, cors='*')
     def get_all_sale_team(self, **kw):
         teams = request.env["crm.team"].sudo().search([])
-        team_list=[]
+        team_list = []
         for team in teams:
             data = {
                 'team_id': team.id,
@@ -4133,7 +4146,7 @@ class LinklovingOAApi(http.Controller):
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=team_list)
 
-    #查询销售主管所在的销售团队
+    # 查询销售主管所在的销售团队
     @http.route('/linkloving_oa_api/get_sale_team', type='json', auth='none', csrf=False, cors='*')
     def get_sale_team(self, **kw):
         uid = request.jsonrequest.get("uid")
@@ -4144,14 +4157,12 @@ class LinklovingOAApi(http.Controller):
                 'team_id': team.id,
                 'team_name': team.display_name,
                 'isChoose': False
-              }
+            }
             team_list.append(data)
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=team_list)
 
-
-
-    #查询一个销售团队的成员
+    # 查询一个销售团队的成员
     @http.route('/linkloving_oa_api/get_saleteam_person', type='json', auth='none', csrf=False, cors='*')
     def get_saleteam_person(self, **kw):
         team_id = request.jsonrequest.get("team_id")
