@@ -160,7 +160,7 @@
                                         <form string="Sales Order Lines">
                                             <group>
                                                 <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
-                                                <field name="product_id" string="产品" readonly="0"/>
+                                                <field name="product_id" string="产品" readonly="0" required="1"/>
                                                 <field name="inner_code" string="国内简码" readonly="1" invisible="1"/>
                                                 <field name="inner_spec" string="国内类型" readonly="1" invisible="1"/>
                                                 <field name="reserve_qty" invisible="1"/>
@@ -178,7 +178,7 @@
                                         <tree string="Sales Order Lines" editable="bottom">
                                             <field name="reference_bom" readonly="1" string="参考BOM" invisible="1"/>
                                             <field name="product_id" options="{'no_create': True}" string="产品"
-                                                   readonly="0"/>
+                                                   readonly="0" required="1"/>
                                             <field name="inner_code" string="国内简码" readonly="1" invisible="1"/>
                                             <field name="inner_spec" string="国内类型" readonly="1" invisible="1"/>
 
