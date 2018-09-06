@@ -35,15 +35,7 @@ class ProductProduct(models.Model):
 
     is_move_in_recent = fields.Boolean(string=u"近期是否移动过")
 
-    def compute_has_bom_line_ids(self):
-        products=self.env['product.template'].search([])
-        for p in products:
-            line = self.env['mrp.bom.line'].search([('product_id', '=', p.product_variant_ids[0].id)])
-            if line:
-                print line
-                p.has_bom_line_lines = True
-            else:
-                p.has_bom_line_lines = False
+
 
     @api.multi
     def create_reorder_rule(self, min_qty=0.0, max_qty=0.0, qty_multiple=1.0, overwrite=False):
@@ -117,6 +109,16 @@ def getMonthFirstDayAndLastDay(year=None, month=None, period=None):
 
 class CreateOrderPointWizard(models.TransientModel):
     _name = "create.order.point"
+
+    def compute_has_bom_line_ids(self):
+        products=self.env['product.template'].search([])
+        for p in products:
+            line = self.env['mrp.bom.line'].search([('product_id', '=', p.product_variant_ids[0].id)])
+            if line:
+                print line
+                p.has_bom_line_lines = True
+            else:
+                p.has_bom_line_lines = False
 
     def compute_shipping_date(self):
         sale_orders = self.env['sale.order'].search([('validity_date', '=', False)])
