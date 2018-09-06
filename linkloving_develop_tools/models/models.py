@@ -116,7 +116,7 @@ class CreateOrderPointWizard(models.TransientModel):
             try:
                 line = self.env['mrp.bom.line'].search([('product_id', '=', p.product_variant_ids[0].id)])
             except Exception, e:
-                print p.display_name
+                _logger.warning("delete, %d-------%s" % (p.id, p.display_name))
             # if line:
             #     p.has_bom_line_lines = True
             # else:
