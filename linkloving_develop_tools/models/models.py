@@ -113,13 +113,14 @@ class CreateOrderPointWizard(models.TransientModel):
     def compute_has_bom_line_ids(self):
         products=self.env['product.template'].search([])
         for p in products:
-            print p.display_name
-            print p.id
-            line = self.env['mrp.bom.line'].search([('product_id', '=', p.product_variant_ids[0].id)])
-            if line:
-                p.has_bom_line_lines = True
-            else:
-                p.has_bom_line_lines = False
+            try:
+                line = self.env['mrp.bom.line'].search([('product_id', '=', p.product_variant_ids[0].id)])
+            except Exception, e:
+                print p.display_name
+            # if line:
+            #     p.has_bom_line_lines = True
+            # else:
+            #     p.has_bom_line_lines = False
 
     def compute_shipping_date(self):
         sale_orders = self.env['sale.order'].search([('validity_date', '=', False)])
