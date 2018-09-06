@@ -113,6 +113,7 @@ class CreateOrderPointWizard(models.TransientModel):
     def compute_has_bom_line_ids(self):
         products=self.env['product.template'].search([])
         for p in products:
+            print p.display_name
             line = self.env['mrp.bom.line'].search([('product_id', '=', p.product_variant_ids[0].id)])
             if line:
                 print line
