@@ -282,6 +282,102 @@ class LinklovingCrm(http.Controller):
 
         return json.dumps({'state': 0, 'data_list': data_list})
 
+    # 获取 漏斗
+    @http.route('/rt_crm/get_all_crm_stage/', auth='public', csrf=False)
+    def get_all_crm_stage(self, **kw):
+
+        data_list = []
+
+        domain = []
+
+        crm_stage_list = http.request.env['crm.stage'].sudo().search(domain)
+
+        for pa_one in crm_stage_list:
+            print pa_one.name
+            val = {
+                'name': pa_one.name,
+                'probability': pa_one.probability,
+                'on_change': pa_one.on_change,
+                'requirements': pa_one.requirements,
+                'team_id': pa_one.team_id.name,
+                'fold': pa_one.fold,
+                'full_name_ids': [label_one.name for label_one in pa_one.full_name_ids],
+            }
+
+            data_list.append(val)
+
+        return json.dumps({'state': 0, 'data_list': data_list})
+
+    # 获取 商机
+    @http.route('/rt_crm/get_all_crm_lead/', auth='public', csrf=False)
+    def get_all_crm_lead(self, **kw):
+
+        data_list = []
+
+        domain = [('type', '=', 'opportunity')]
+
+        crm_lead_list = http.request.env['crm.lead'].sudo().search(domain)
+
+        for pa_one in crm_lead_list:
+            print pa_one.name
+
+            data_list.append(lead_to_json(pa_one))
+
+        return json.dumps({'state': 0, 'data_list': data_list})
+
+    # 获取 公害规则
+    @http.route('/rt_crm/get_all_crm_mutual/', auth='public', csrf=False)
+    def get_all_crm_mutual(self, **kw):
+
+        data_list = []
+
+        domain = []
+
+        crm_lead_list = http.request.env['crm.mutual.customer'].sudo().search(domain)
+
+        for pa_one in crm_lead_list:
+            print pa_one.name
+
+            val = {
+                'name': pa_one.name,
+                'category_id': [cat_one.name for cat_one in pa_one.category_id],
+                'description': pa_one.description,
+                'effective_time': pa_one.effective_time,
+                'customer_ids': [cus_one.name for cus_one in pa_one.customer_ids],
+            }
+
+            data_list.append(val)
+
+        return json.dumps({'state': 0, 'data_list': data_list})
+
+
+def lead_to_json(pa_one):
+    messages_data = []
+    if pa_one.message_ids:
+        messages_data = [
+            {'body': msg.body,
+             'message_label_ids': [label.name for label in
+                                   msg.messages_label_ids]} for
+            msg in pa_one.message_ids]
+    val = {
+        'name': pa_one.name,
+
+        'partner_id': pa_one.partner_id.name,
+        'user_id': pa_one.user_id.name,
+        'team_id': pa_one.team_id.name,
+        'product_series_ids': [ser_one.name for ser_one in pa_one.product_series_ids],
+        'message_ids': messages_data,
+        'stage_id': pa_one.stage_id.name,
+
+        'planned_revenue': pa_one.planned_revenue,
+        'probability': pa_one.probability,
+        'date_deadline': pa_one.date_deadline,
+        'priority': pa_one.priority,
+        'description': pa_one.description,
+
+    }
+    return val
+
 
 def partner_to_json(pa_one):
     messages_data = []
