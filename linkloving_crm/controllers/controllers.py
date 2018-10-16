@@ -447,6 +447,8 @@ def partner_to_json(pa_one):
         'customer_image': pa_one.customer_image,
         'mobile': pa_one.mobile,
 
+        'supplier': pa_one.supplier,
+
     }
     return val
 
