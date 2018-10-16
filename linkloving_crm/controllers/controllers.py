@@ -177,6 +177,15 @@ class LinklovingCrm(http.Controller):
                       ('parent_id', '!=',
                        True if kw.get('parent_id') == 'True' else False)]
 
+        if kw.get('supplier_contacts'):
+            domain = [('supplier', '=', True),
+                      ('parent_id', '!=', False)]
+
+        if kw.get('supplier'):
+            domain = [('supplier', '=', True),
+                      ('is_company', '=', True),
+                      ('parent_id', '=', False)]
+
         partner_list = http.request.env['res.partner'].sudo().search(domain)
 
         for pa_one in partner_list:
@@ -396,7 +405,7 @@ def partner_to_json(pa_one):
         'crm_source_id': pa_one.crm_source_id.name,
         'customer_status': pa_one.customer_status.name,
         'team_id': pa_one.team_id.name,
-        'user_id': pa_one.user_id.name,
+        'user_id': pa_one.po_user_id.name if pa_one.supplier else pa_one.user_id.name,
         'source_id': pa_one.source_id.name,
         'product_series_ids': [series_one.name for series_one in
                                pa_one.product_series_ids],
