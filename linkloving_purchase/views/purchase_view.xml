@@ -215,8 +215,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='hide_cancelled']" position="after">
 
-                    <filter name="no_shipping" string="待出货" domain="[('shipping_status', '!=', 'no')]"/>
-                    <filter name="part_shipping" string="部分出货" domain="[('shipping_status', '!=', 'part_shipping')]"/>
+                    <filter name="no_shipping" string="待出货" domain="[('shipping_status', '=', 'no')]"/>
+                    <filter name="part_shipping" string="部分出货" domain="[('shipping_status', '=', 'part_shipping')]"/>
 
                 </xpath>
             </field>
