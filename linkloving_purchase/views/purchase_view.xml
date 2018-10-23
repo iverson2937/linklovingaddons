@@ -215,7 +215,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='hide_cancelled']" position="after">
 
-                    <filter name="shipping_not_done" string="未出货完成" domain="[('shipping_status', '!=', 'done')]"/>
+                    <filter name="no_shipping" string="待出货" domain="[('shipping_status', '!=', 'no')]"/>
+                    <filter name="part_shipping" string="部分出货" domain="[('shipping_status', '!=', 'part_shipping')]"/>
 
                 </xpath>
             </field>
@@ -328,7 +329,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='date_planned']" position="attributes">
-                    <attribute name="invisible">0</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='product_qty']" position="attributes">
                     <attribute name="invisible">1</attribute>
@@ -342,6 +343,7 @@
                     <field name="qty_invoiced" string="开单数量"/>
                     <field name="shipping_status" string="出货状态"/>
                     <field name="invoice_status"/>
+                    <field name="handle_date"/>
                 </xpath>
             </field>
         </record>
