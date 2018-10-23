@@ -1189,7 +1189,7 @@ class TagFlowUpdate(models.TransientModel):
             new_name = ''
 
         new_flow.write(
-            {'name': new_name + ' 副本' + str(product_attachment.flow_version), 'tag_approval_process_ids': (
+            {'name': (new_name if new_flow.name else '')  + ' 副本' + str(product_attachment.flow_version), 'tag_approval_process_ids': (
                 [(0, 0, {'tag_id': new_flow.id, 'tag_approval_process_partner': p}) for p in all_flow_parnter]),
              'is_copy': True})
 
