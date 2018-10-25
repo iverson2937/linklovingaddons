@@ -201,6 +201,8 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def manager1_approve(self):
         department = self.to_approve_department_id
+        if self.state == 'approve':
+            return
         state = 'manager1_approve'
         # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
         to_approve_department_id = department.get_to_approve_department(self.env.user.employee_ids[0])
