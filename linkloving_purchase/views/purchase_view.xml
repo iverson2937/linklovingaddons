@@ -30,9 +30,9 @@
                         <field name="partner_id"/>
                         <field name="product_count" string="汇总数量"/>
                         <field name="amount_total" string="汇总金额"/>
-                        <field name="product_id" string="产品"/>
+                        <!--<field name="product_id" string="产品"/>-->
                         <field name="handle_date" string="交期" widget="date"/>
-                        <field name="shipping_status" invisible="1"/>
+                        <!--<field name="shipping_status" invisible="1"/>-->
 
                         <field name="shipping_rate" widget="progressbar"/>
                         <field name="state"/>
