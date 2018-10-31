@@ -30,7 +30,7 @@ class RtOrderImport(http.Controller):
                     'product_uom_qty': line.product_uom_qty.name,
                     'price_unit': line.price_unit,
                     'tax_id': line.tax_id.name,
-                }) for line in sale_id.line_ids]
+                }) for line in sale_id.order_line]
             })
 
         except Exception, e:
