@@ -7,9 +7,7 @@ class RtOrderImport(http.Controller):
     @http.route('/rt_web/get_sale_order', auth='none', type='json', csrf=False, methods=['POST'])
     def get_sale_order(self, **kw):
         print 'ddddddddddddddddddddddd'
-        db = request.jsonrequest.get("db")  # 所选账套
-        request.session.db = db  # 设置账套
-        request.params["db"] = db
+
 
         vals = request.jsonrequest.get("so_number")  # 需要查询的产品数据
         print vals
