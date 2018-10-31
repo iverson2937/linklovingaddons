@@ -653,7 +653,7 @@ odoo.define('linkloving_product_query.product_query', function (require) {
 //     });
 
     return {
-        DataImport: DataImport,
+        // DataImport: DataImport,
     }
 
 });

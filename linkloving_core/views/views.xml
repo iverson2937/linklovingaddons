@@ -10,6 +10,8 @@
                 <script type="text/javascript" src="/linkloving_core/static/src/js/tree_view.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/notify.js"/>
                 <script type="text/javascript" src="/linkloving_core/static/src/js/search_input_bug.js"/>
+                <script type="text/javascript" src="/linkloving_core/static/src/js/archive_confirm.js"/>
+
 
                 <link rel="stylesheet" href="linkloving_core/static/src/css/bootstrap-table.min.css"/>
 

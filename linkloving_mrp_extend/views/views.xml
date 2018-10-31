@@ -170,6 +170,7 @@
                     <filter name='release' string="退回的BOM" domain="[('state', '=', 'deny')]"/>
                     <filter name="my_bom" string="待提交" domain="[('current_review_id', '=', uid),
                       ('state', 'in',['waiting_release', 'cancel', 'deny', 'new', 'updated'])]"/>
+                    <filter name="inactive_bom" string="含归档材料的bom" domain="[]"/>
                 </xpath>
 
 
@@ -347,7 +348,7 @@
 
                 <xpath expr="//header/button[@name='open_produce_product'][1]" position="replace">
                     <button name="open_produce_product"
-                            attrs="{'invisible': ['|', '|', ('availability', 'not in', ['partially_available', 'assigned']), ('state', 'not in', ('progress')), ('routing_id', '!=', False)]}"
+                            attrs="{'invisible': [('state', 'not in', ('progress'))]}"
                             string="产出" type="object" class="oe_highlight"
                             groups="linkloving_mrp_extend.group_charge_produce"/>
                 </xpath>

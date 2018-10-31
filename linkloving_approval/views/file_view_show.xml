@@ -32,26 +32,8 @@
                         remote_path[0] = '';
                         }
                         console.log(remote_path);
-                        if (type == 'OTHER' || type == 'DESIGN') {
-                        $.ajax({
-                        type: "GET",
-                        url: "http://localhost:8088/downloadfile?remotefile=" + remote_path,
-                        success: function (data) {
-                        console.log(data);
-                        if (data.result == '1') {
-                        alert(target, "已下载至指定目录");
-                        }
-                        else if (data.result == '2') {
-                        alert(target, "下载失败, 未选择存储路径");
-                        }
-                        else {
-                        alert(target, "下载失败");
-                        }
-                        },
-                        error: function (error) {
-                        alert(target, "下载失败,请检查是否打开了代理软件");
-                        }
-                        })
+                        if (type == 'TRUE') {
+                        alert('该类型文件暂不支持下载旧版本...')
                         } else {
                         window.location.href = '/download_file/?download=true &amp;id=' + new_file_id;
 
@@ -85,12 +67,12 @@
                                                 </span>
 
 
-                                                <t t-if="item_files['is_able_to_use'] == true">
+                                                <!--<t t-if="item_files['is_able_to_use'] == true">-->
                                                     <button class="btn btn-primary document_download"
                                                             style="position: absolute;right:0;top:0;"
                                                             t-att-data="item_files['type']">下载
                                                     </button>
-                                                </t>
+                                                <!--</t>-->
 
                                             </div>
                                             <div style="margin: 10px 0;">文件：

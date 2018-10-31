@@ -14,6 +14,11 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import float_compare, math
 from odoo.addons import decimal_precision as dp
+from lxml import etree
+
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class MrpBomExtend(models.Model):
@@ -88,6 +93,22 @@ class MrpBomExtend(models.Model):
                                     'original_qty': quantity, 'parent_line': parent_line}))
 
         return boms_done, lines_done
+
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        res = super(MrpBomExtend, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
+                                                        submenu=submenu)
+        # 重写search view,更新search条件
+        if view_type == 'search':
+            doc = etree.XML(res['arch'])
+            xpath = "//filter[@name='inactive_bom']"
+
+            for node in doc.xpath(xpath):
+                domain = [('bom_line_ids.product_id.active', '=', False)]
+                node.set('domain', repr(domain))
+            res['arch'] = etree.tostring(doc)
+
+        return res
 
 
 class MrpBomLineExtend(models.Model):
@@ -289,20 +310,8 @@ class MrpConfigSettingsI(models.TransientModel):
 class MrpProductionExtend(models.Model):
     _inherit = "mrp.production"
 
-    _sql_constraints = [
-        ('name_uniq', 'unique(name, company_id)', 'Reference must be unique per Company!'),
-        ('qty_positive', 'check (product_qty > 0)', 'The quantity to produce must be positive!'),
-    ]
-
-
     is_secondary_produce = fields.Boolean(default=False)
     secondary_produce_time_ids = fields.One2many("production.time.record", 'production_id', )
-
-    @api.model
-    def create(self, vals):
-        if vals.get('product_qty') == 0:
-            raise UserError('ddddddddddddd')
-        return super(MrpProductionExtend, self).create(vals)
 
     @api.multi
     def write(self, vals):
@@ -358,6 +367,7 @@ class MrpProductionExtend(models.Model):
             'domain': [('id', 'in', self.return_material_order_ids.ids)],
             'target': 'current',
         }
+
     def action_see_scrap_moves(self):
         self.ensure_one()
         action = self.env.ref('linkloving_mrp_extend.action_mrp_production_scrap_moves').read()[0]
@@ -494,7 +504,6 @@ class MrpProductionExtend(models.Model):
     is_pending = fields.Boolean()
     ####
 
-
     # @api.multi
     # def _compute_origin_sale_order_id(self):
     #     def get_parent_move(move):
@@ -562,7 +571,6 @@ class MrpProductionExtend(models.Model):
     # @api.multi
     # def _compute_bom_remark(self):
     #     for production in self:
-
 
     @api.multi
     def _compute_sale_remark(self):
@@ -1277,10 +1285,10 @@ class MrpProductionProduceExtend(models.TransientModel):
                 lambda x: x.product_id.id == self.production_id.product_id.id)
             if copy_moves:
                 new_move = copy_moves[0].copy(default={'quantity_done': qty,
-                                                   'ordered_qty': qty,
-                                                   'product_uom_qty': qty,
-                                                   'production_id': self.production_id.id
-                                                   })
+                                                       'ordered_qty': qty,
+                                                       'product_uom_qty': qty,
+                                                       'production_id': self.production_id.id
+                                                       })
             else:  # stock——move 被意外取消
                 new_move = self.production_id._generate_finished_moves()
                 new_move.quantity_done = qty
@@ -1392,6 +1400,7 @@ class ReturnOfMaterial(models.Model):
             return self.search_read(domain, limit=1)
         else:
             return self.search(domain, limit=1)
+
     @api.multi
     def do_return(self):
         """
@@ -1650,6 +1659,7 @@ class SimStockMove(models.Model):
             result.append((sim.id, name))
         return result
 
+
 class ReturnMaterialLine(models.Model):
     _name = 'return.material.line'
 
@@ -1678,7 +1688,6 @@ class ReturnMaterialLine(models.Model):
                                                               ('material', '原材料'),
                                                               ('real_semi_finished', '半成品')],
                                     required=False, compute="_compute_product_type")
-
 
     @api.multi
     def create_scraps(self):
@@ -1718,6 +1727,7 @@ class ReturnMaterialLine(models.Model):
                 'scrap_qty': scrap_qty
             })
         scrap_env.do_scrap()
+
 
 class HrEmployeeExtend(models.Model):
     _inherit = 'hr.employee'
@@ -2044,8 +2054,8 @@ class StcokPickingExtend(models.Model):
                         for pack in pick.pack_operation_ids:
                             if pack.product_id and pack.product_id.tracking != 'none':
                                 raise UserError(
-                                        _(
-                                            'Some products require lots/serial numbers, so you need to specify those first!'))
+                                    _(
+                                        'Some products require lots/serial numbers, so you need to specify those first!'))
                     raise UserError(u"此次入库数量为0, 请选择全部入库或者退回!")
                 # view = self.env.ref('stock.view_immediate_transfer')
                 # wiz = self.env['stock.immediate.transfer'].create({'pick_id': pick.id})
@@ -2108,10 +2118,10 @@ class StcokPickingExtend(models.Model):
                 confirmation._process(cancel_backorder=pick.is_cancel_backorder)
             # 既有完成又有可用的单子, 肯定有问题的!!!
             elif any(move.state in ["done"] for move in pick.move_lines) and any(
-                            move.state == "assigned" for move in pick.move_lines):
+                    move.state == "assigned" for move in pick.move_lines):
                 raise UserError(u"库存异动单异常,请联系管理员解决")
-            if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
-                raise UserError(u"出货数量不能全部为0 %s" % pick.id)
+            # if sum(pick.pack_operation_product_ids.mapped("qty_done")) == 0:
+            #     raise UserError(u"出货数量不能全部为0 %s" % pick.id)
         return super(StcokPickingExtend, self).to_stock()
 
     # 分拣完成
@@ -2243,6 +2253,20 @@ class StockPackOperationExtend(models.Model):
     rejects_qty = fields.Float(string=u"不良品", default=0)
     receivied_qty = fields.Float(string=u'收到的数量', compute='_compute_receivied_qty',
                                  digits=dp.get_precision('Product Unit of Measure'))
+
+    @api.multi
+    def write(self, vals):
+        if 'qty_done' in vals:
+            _logger.warning(u"**********修改*********************:%s,%s", str(self.id), vals['qty_done'])
+
+        return super(StockPackOperationExtend, self).write(vals)
+
+    @api.multi
+    def unlink(self):
+        for r in self:
+            _logger.warning(u"**********删除*********************:%s,", str(r.id))
+
+        return super(StockPackOperationExtend, self).unlink()
     # accept_qty = fields.Float(string=u'良品', compute='_compute_accept_qty')
 
 
