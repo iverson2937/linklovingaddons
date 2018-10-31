@@ -1796,10 +1796,10 @@ class LinklovingOAApi(http.Controller):
         shengou = request.env['hr.purchase.apply'].sudo(user_id).search(domain,
                                                                         order='id desc')
         shengou.hr_purchase_apply_post()
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.alias(shengou.to_approve_id.id)
-        ), notification=shengou.name,
-            body=_("申购单：%s 等待审核！") % (shengou.name))
+        # JPushExtend.send_notification_push(audience=jpush.audience(
+        #     jpush.alias(shengou.to_approve_id.id)
+        # ), notification=shengou.name,
+        #     body=_("申购单：%s 等待审核！") % (shengou.name))
         return JsonResponse.send_response(STATUS_CODE_OK, res_data={"success": 1})
 
     # 搜索申购单

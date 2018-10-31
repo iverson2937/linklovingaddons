@@ -201,6 +201,8 @@ class HrExpenseSheet(models.Model):
     @api.multi
     def manager1_approve(self):
         department = self.to_approve_department_id
+        if self.state == 'approve':
+            return
         state = 'manager1_approve'
         # 如果没有上级部门，或者报销金额小于该部门的允许最大金额
         to_approve_department_id = department.get_to_approve_department(self.env.user.employee_ids[0])
@@ -234,10 +236,10 @@ class HrExpenseSheet(models.Model):
             exp.write({'state': state})
             create_remark_comment(exp, u'送审')
 
-            JPushExtend.send_notification_push(audience=jpush.audience(
-                jpush.alias(exp.to_approve_id.id)
-            ), notification=exp.expense_no,
-                body=_("报销单：%s 等待审核") % (self.expense_no))
+            # JPushExtend.send_notification_push(audience=jpush.audience(
+            #     jpush.alias(exp.to_approve_id.id)
+            # ), notification=exp.expense_no,
+            #     body=_("报销单：%s 等待审核") % (self.expense_no))
 
     @api.multi
     def manager3_approve(self):
@@ -258,10 +260,10 @@ class HrExpenseSheet(models.Model):
             sheet.message_post(body=body)
             sheet.reject_reason = reason
 
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.alias(sheet.create_uid.id)
-        ), notification=_("报销单：%s被拒绝") % (sheet.expense_no),
-            body=_("原因：%s") % (reason))
+        # JPushExtend.send_notification_push(audience=jpush.audience(
+        #     jpush.alias(sheet.create_uid.id)
+        # ), notification=_("报销单：%s被拒绝") % (sheet.expense_no),
+        #     body=_("原因：%s") % (reason))
 
     @api.multi
     def create_message_post(self, body_str):

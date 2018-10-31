@@ -1013,10 +1013,10 @@ class LinklovingAppApi(http.Controller):
         mrp_production = mrp_production_model.sudo(LinklovingAppApi.CURRENT_USER()).search([('id', '=', order_id)])[0]
         mrp_production.sudo(request.context.get("uid") or SUPERUSER_ID).write({'state': 'prepare_material_ing'})
 
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ), notification=mrp_production.product_id.name,
-            body=_("Qty:%d,Already start picking！") % (mrp_production.product_qty))
+        # JPushExtend.send_notification_push(audience=jpush.audience(
+        #     jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+        # ), notification=mrp_production.product_id.name,
+        #     body=_("Qty:%d,Already start picking！") % (mrp_production.product_qty))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=LinklovingAppApi.model_convert_to_dict(order_id, request))
@@ -1107,10 +1107,10 @@ class LinklovingAppApi(http.Controller):
                 mrp_production.write(
                     {'state': 'finish_prepare_material'})
 
-                JPushExtend.send_notification_push(audience=jpush.audience(
-                    jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-                ), notification=mrp_production.product_id.name,
-                    body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
+                # JPushExtend.send_notification_push(audience=jpush.audience(
+                #     jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+                # ), notification=mrp_production.product_id.name,
+                #     body=_("Qty:%d,Finish picking！") % (mrp_production.product_qty))
         except Exception, e:
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
@@ -1266,11 +1266,11 @@ class LinklovingAppApi(http.Controller):
             #     else:
             #         raise UserError(u"未找到对应的数据")
 
-            JPushExtend.send_notification_push(audience=jpush.audience(
-                jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
-            ),
-                notification=mrp_production.product_id.name,
-                body=u"数量:%d, %s" % (mrp_production.qty_produced, mrp_production.state))
+            # JPushExtend.send_notification_push(audience=jpush.audience(
+            #     jpush.tag(LinklovingAppApi.get_jpush_tags("qc"))
+            # ),
+            #     notification=mrp_production.product_id.name,
+            #     body=u"数量:%d, %s" % (mrp_production.qty_produced, mrp_production.state))
 
             mrp_production.worker_line_ids.change_worker_state('outline')
 
@@ -1321,9 +1321,9 @@ class LinklovingAppApi(http.Controller):
                                               res_data={'error': u"未找到对应的品检单"})
         feedback.sudo(request.context.get("uid") or SUPERUSER_ID).action_start_qc()
 
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ), notification=feedback.production_id.product_id.name, body=_("Qty:%d,QC start") % (feedback.qty_produced))
+        # JPushExtend.send_notification_push(audience=jpush.audience(
+        #     jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+        # ), notification=feedback.production_id.product_id.name, body=_("Qty:%d,QC start") % (feedback.qty_produced))
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=self.convert_qc_feedback_to_json(feedback))
 
@@ -1363,9 +1363,7 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
 
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ), notification=feedback.production_id.product_id.name, body=_("Qty:%d,QC finish") % (feedback.qty_produced))
+        # JPushExt/edback.production_id.product_id.name, body=_("Qty:%d,QC finish") % (feedback.qty_produced))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=self.convert_qc_feedback_to_json(feedback))
@@ -1639,11 +1637,11 @@ class LinklovingAppApi(http.Controller):
             return JsonResponse.send_response(STATUS_CODE_ERROR,
                                               res_data={"error": e.name})
 
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
-        ),
-            notification=feedback.production_id.product_id.name,
-            body=_("Qty:%d,Post Inventory Finish") % (feedback.qty_produced))
+        # JPushExtend.send_notification_push(audience=jpush.audience(
+        #     jpush.tag(LinklovingAppApi.get_jpush_tags("produce"))
+        # ),
+        #     notification=feedback.production_id.product_id.name,
+        #     body=_("Qty:%d,Post Inventory Finish") % (feedback.qty_produced))
 
         return JsonResponse.send_response(STATUS_CODE_OK,
                                           res_data=self.convert_qc_feedback_to_json(feedback))
@@ -4798,10 +4796,10 @@ class LinklovingAppApi(http.Controller):
                 'assign_uid': assign_uid,
                 'issue_state': "process",
             })
-            JPushExtend.send_notification_push(audience=jpush.audience(
-                jpush.alias(assign_uid)
-            ), notification="有新的工单待处理",
-                body=_("【工单】%s给你指派了工单：%s") % (user.name, work_order.name))
+            # JPushExtend.send_notification_push(audience=jpush.audience(
+            #     jpush.alias(assign_uid)
+            # ), notification="有新的工单待处理",
+            #     body=_("【工单】%s给你指派了工单：%s") % (user.name, work_order.name))
             return JsonResponse.send_response(STATUS_CODE_OK)
         elif action_type == "check":
             work_order_record_model = request.env['linkloving.work.order.record']
