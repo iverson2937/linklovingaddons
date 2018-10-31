@@ -23,8 +23,9 @@ class RtOrderImport(http.Controller):
                 'partner_shipping_id': sale_id.partner_invoice_id.name,
                 'confirmation_date': sale_id.confirmation_date,
                 'pi_number': sale_id.pi_number,
+                'tax_id':sale_id.tax_id.name,
                 'date_order': sale_id.validity_date,
-                'sale_note': '',
+                'sale_note': sale_id.remark,
                 'line_ids': [{
                     'product_id': line.product_id.name,
                     'product_uom_qty': line.product_uom_qty,
