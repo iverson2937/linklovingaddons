@@ -25,12 +25,12 @@ class RtOrderImport(http.Controller):
                 'pi_number': sale_id.pi_number,
                 'date_order': sale_id.validity_date,
                 'sale_note': '',
-                'line_ids': [(0, 0, {
+                'line_ids': [{
                     'product_id': line.product_id.name,
                     'product_uom_qty': line.product_uom_qty,
                     'price_unit': line.price_unit,
                     'tax_id': line.tax_id.name,
-                }) for line in sale_id.order_line]
+                } for line in sale_id.order_line]
             })
 
         except Exception, e:
