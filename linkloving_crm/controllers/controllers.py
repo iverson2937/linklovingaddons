@@ -359,6 +359,29 @@ class LinklovingCrm(http.Controller):
 
         return json.dumps({'state': 0, 'data_list': data_list})
 
+    # 获取团队
+    @http.route('/rt_crm/get_partner_message/', auth='public', csrf=False)
+    def get_partner_message(self, **kw):
+
+        # request.session.authenticate(u'20170714', 'peter.wang@robotime.com', '123456')
+
+        partner_one = http.request.env["res.partner"].search(
+            [('name', '=', kw.get('name')), ('customer', '=', True),
+             ('is_company', '=', True)])
+
+        if partner_one:
+            if len(partner_one.ids) > 1:
+                partner_one = partner_one[0]
+
+            messages_data = []
+            if partner_one.message_ids:
+                messages_data = [
+                    {'body': msg.body, 'message_label_ids': [label.name for label in
+                                                             msg.messages_label_ids]} for
+                    msg in partner_one.message_ids]
+
+        return json.dumps({'state': 0, 'data_list': messages_data})
+
 
 def lead_to_json(pa_one):
     messages_data = []
