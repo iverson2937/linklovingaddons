@@ -365,7 +365,7 @@ class LinklovingCrm(http.Controller):
 
         # request.session.authenticate(u'20170714', 'peter.wang@robotime.com', '123456')
 
-        partner_one = http.request.env["res.partner"].search(
+        partner_one = http.request.env["res.partner"].sudo().search(
             [('name', '=', kw.get('name')), ('customer', '=', True),
              ('is_company', '=', True)])
 
