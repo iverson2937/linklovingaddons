@@ -20,7 +20,7 @@ class RtOrderImport(http.Controller):
             data_return.update({
                 'partner_id': sale_id.partner_id.name,
                 'partner_invoice_id': sale_id.partner_invoice_id.name,
-                'partner_shipping_id': sale_id.partner_invoice_id.name,
+                'partner_shipping_id': sale_id.partner_shipping_id.name,
                 'confirmation_date': sale_id.confirmation_date,
                 'pi_number': sale_id.pi_number,
                 'tax_id':sale_id.tax_id.name,
