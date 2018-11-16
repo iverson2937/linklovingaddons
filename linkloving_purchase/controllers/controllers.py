@@ -24,7 +24,7 @@ class RtOrderImport(http.Controller):
                 'remark': purchase_id.remark,
                 'line_ids': [{
                     'product_id': line.product_id.name,
-                    'product_uom_qty': line.product_uom_qty,
+                    'product_qty': line.product_qty,
                     'price_unit': line.price_unit,
                     'tax_id': line.tax_id.name,
                 } for line in purchase_id.order_line]
