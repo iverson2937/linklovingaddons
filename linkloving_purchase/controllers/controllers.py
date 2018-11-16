@@ -27,7 +27,7 @@ class RtOrderImport(http.Controller):
                     'name': line.name,
                     'product_qty': line.product_qty,
                     'price_unit': line.price_unit,
-                    'tax_id': line.taxes_id.name,
+                    'tax_id': line.taxes_id.amount,
                 } for line in purchase_id.order_line]
             })
 
