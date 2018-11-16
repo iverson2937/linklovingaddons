@@ -19,7 +19,6 @@ class RtOrderImport(http.Controller):
         try:
             data_return.update({
                 'partner_id': purchase_id.partner_id.name,
-                'confirmation_date': purchase_id.confirmation_date,
                 'tax_id':purchase_id.tax_id.name,
                 'date_planned': purchase_id.handle_date,
                 'remark': purchase_id.remark,
