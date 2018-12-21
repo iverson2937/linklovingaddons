@@ -19,11 +19,12 @@ class RtOrderImport(http.Controller):
         try:
             data_return.update({
                 'partner_id': purchase_id.partner_id.name,
-                'tax_id':purchase_id.tax_id.amount,
+                'tax_id': purchase_id.tax_id.amount,
                 'date_planned': purchase_id.handle_date,
                 'remark': purchase_id.remark,
                 'line_ids': [{
                     'product_id': line.product_id.name,
+                    'default_code': line.product_id.default_code,
                     'name': line.name,
                     'product_qty': line.product_qty,
                     'price_unit': line.price_unit,
