@@ -120,8 +120,8 @@ class LinklovingPdm(http.Controller):
         tag_name = request.jsonrequest.get('tag_name')
         prefetch_codes = request.jsonrequest.get('prefetch_codes')
 
-        old_tag_id = request.env['tag.info'].search([('name', '=', tag_name)])
-        Info = request.env['product.attachment.info']
+        old_tag_id = request.env['tag.info'].sudo().search([('name', '=', tag_name)])
+        Info = request.env['product.attachment.info'].sudo()
         infos = Info.search(
                 [('product_tmpl_id.default_code', 'in', prefetch_codes), ('tag_type_id', '=', old_tag_id.id),
                  ('state', '=', 'released'), ('is_show_outage', '=', True)])
