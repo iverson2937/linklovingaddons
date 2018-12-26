@@ -113,3 +113,27 @@ class LinklovingPdm(http.Controller):
                                                               ('type', '=', kw.get('type'))])
 
         return {'data': max(attachs.mapped("version")) + 1 if attachs.mapped("version") else 1}
+
+    @http.route('/file_migration', type='json', auth='none', csrf=False)
+    def file_migration(self, **kw):
+
+        tag_name = request.jsonrequest.get('tag_name')
+        prefetch_codes = request.jsonrequest.get('prefetch_codes')
+
+        old_tag_id = request.env['tag.info'].search([('name', '=', tag_name)])
+        Info = request.env['product.attachment.info']
+        infos = Info.search(
+                [('product_tmpl_id.default_code', 'in', prefetch_codes), ('tag_type_id', '=', old_tag_id.id),
+                 ('state', '=', 'released'), ('is_show_outage', '=', True)])
+        data = []
+        for info in infos:
+            data.append({
+                'is_able_to_use': info.is_able_to_use,
+                'default_code': info.product_tmpl_id.default_code,
+                'remote_path': info.remote_path,
+                'file_name': info.file_name,
+                'version': info.version,
+                'remark': info.remark,
+            })
+
+        return data
