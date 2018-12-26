@@ -10,11 +10,9 @@ class HrExpense(models.Model):
     allow_amount = fields.Float(string='允许最大金额')
 
     def get_to_approve_department(self, employee_id):
-        if not self.manager_id:
-            raise UserError('请联系管理员设置部门负责人')
+        if self and not self.manager_id:
+            raise UserError('请联系管理员设置%s部门负责人' % self.name)
         if self.manager_id == employee_id:
-            if not self.manager_id:
-                raise UserError('请联系管理员设置部门负责人')
             if not self.parent_id:
                 return False
             return self.parent_id.get_to_approve_department(employee_id)

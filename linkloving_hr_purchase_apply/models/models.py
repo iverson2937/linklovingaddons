@@ -79,10 +79,10 @@ class PurchaseApply(models.Model):
             sheet.reject_reason = reason
 
         # 推送
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.alias(sheet.create_uid.id)
-        ), notification=_("申购单：%s被拒绝") % (sheet.name),
-            body=_("原因：%s") % (reason))
+        # JPushExtend.send_notification_push(audience=jpush.audience(
+        #     jpush.alias(sheet.create_uid.id)
+        # ), notification=_("申购单：%s被拒绝") % (sheet.name),
+        #     body=_("原因：%s") % (reason))
 
     @api.multi
     def create_message_post(self, body_str):
@@ -137,10 +137,10 @@ class PurchaseApply(models.Model):
             if not to_approve_department_id:
                 state = 'approve'
             exp.write({'state': state})
-        JPushExtend.send_notification_push(audience=jpush.audience(
-            jpush.alias(exp.to_approve_id.id)
-        ), notification=exp.name,
-            body=_("申购单：%s 等待审核！") % (exp.name))
+        # JPushExtend.send_notification_push(audience=jpush.audience(
+        #     jpush.alias(exp.to_approve_id.id)
+        # ), notification=exp.name,
+        #     body=_("申购单：%s 等待审核！") % (exp.name))
 
     def reset_hr_purchase_apply(self):
         self.hr_purchase_apply_post()

@@ -1,108 +1,109 @@
 <openerp>
     <data>
-        <!--<record id="linkloving_work_order_form" model="ir.ui.view">-->
-            <!--<field name="name">linkloving.work.order</field>-->
-            <!--<field name="model">linkloving.work.order</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form>-->
-                    <!--<header>-->
-                        <!--<field name="issue_state" widget="statusbar"-->
-                               <!--statusbar_visible="draft,unaccept,process,check,done"/>-->
-                    <!--</header>-->
-                    <!--<sheet>-->
-                    <!--<div class="oe_title">-->
-                            <!--<h1>-->
-                                <!--<field name="name" readonly="1"/>-->
-                            <!--</h1>-->
-                        <!--</div>-->
-                    <!--<group>-->
-                    <!--<group>-->
-                        <!--<field name="description" string="描述"/>-->
-                        <!--<field name="create_date" string="创建时间"/>-->
-                    <!--</group>-->
-                    <!--<group>-->
-                        <!--<field name="assign_uid" string="指派人"/>-->
-                        <!--<field name="tag_ids" string="标签" widget="many2many_tags"/>-->
-                        <!--&lt;!&ndash;<field name="attachments" widget="image"/>&ndash;&gt;-->
-                    <!--</group>-->
-                <!--</group>-->
-                        <!--<notebook>-->
-                            <!--<page string="图片">-->
-                                <!--<field name="attachments">-->
-                                    <!--<tree>-->
-                                        <!--<field name="work_order_image" widget="tree_image_preview"/>-->
-                                    <!--</tree>-->
-                                <!--</field>-->
-                            <!--</page>-->
-                        <!--</notebook>-->
-                    <!--</sheet>-->
-                <!--</form>-->
-            <!--</field>-->
-        <!--</record>-->
+        <record id="linkloving_work_order_form" model="ir.ui.view">
+            <field name="name">linkloving.work.order</field>
+            <field name="model">linkloving.work.order</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="issue_state" widget="statusbar"
+                               statusbar_visible="draft,unaccept,process,check,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="description" string="描述"/>
+                                <field name="create_date" string="创建时间"/>
+                            </group>
+                            <group>
+                                <field name="assign_uid" string="指派人"/>
+                                <field name="tag_ids" string="标签"
+                                       widget="many2many_tags"/>
+                                <!--<field name="attachments" widget="image"/>-->
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="图片">
+                                <field name="attachments">
+                                    <tree>
+                                        <field name="work_order_image"
+                                               widget="tree_image_preview"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-        <!--<record id="linkloving_work_order_tag_form" model="ir.ui.view">-->
-            <!--<field name="name">linkloving.work.order.tag</field>-->
-            <!--<field name="model">linkloving.work.order.tag</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form>-->
-                    <!--<sheet>-->
-                    <!--<div class="oe_title">-->
-                            <!--<h1>-->
-                                <!--<field name="name" readonly="1"/>-->
-                            <!--</h1>-->
-                        <!--</div>-->
-                    <!--<group>-->
-                        <!--<field name="tag_ids" string="标签" widget="many2many_tags"/>-->
-                    <!--</group>-->
-                    <!--</sheet>-->
-                <!--</form>-->
-            <!--</field>-->
-        <!--</record>-->
+        <record id="linkloving_work_order_tag_form" model="ir.ui.view">
+            <field name="name">linkloving.work.order.tag</field>
+            <field name="model">linkloving.work.order.tag</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <!--<group>-->
+                            <!--<field name="tag_ids" string="标签" widget="many2many_tags"/>-->
+                        <!--</group>-->
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-        <!--<record id="linkloving_work_order_tree" model="ir.ui.view">-->
-            <!--<field name="name">linkloving.work.order</field>-->
-            <!--<field name="model">linkloving.work.order</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<tree>-->
-                    <!--<field name="name" string="标题"/>-->
-                    <!--<field name="description" string="描述" />-->
-                    <!--<field name="issue_state" string="状态"/>-->
-                    <!--<field name="create_date" string="创建时间"/>-->
-                <!--</tree>-->
-            <!--</field>-->
-        <!--</record>-->
+        <record id="linkloving_work_order_tree" model="ir.ui.view">
+            <field name="name">linkloving.work.order</field>
+            <field name="model">linkloving.work.order</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="标题"/>
+                    <field name="description" string="描述"/>
+                    <field name="issue_state" string="状态"/>
+                    <field name="create_date" string="创建时间"/>
+                </tree>
+            </field>
+        </record>
 
-        <!--<record id="linkloving_work_order_tag_tree" model="ir.ui.view">-->
-            <!--<field name="name">linkloving.work.order.tag</field>-->
-            <!--<field name="model">linkloving.work.order.tag</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<tree>-->
-                    <!--<field name="name" string="类别" />-->
-                <!--</tree>-->
-            <!--</field>-->
-        <!--</record>-->
+        <record id="linkloving_work_order_tag_tree" model="ir.ui.view">
+            <field name="name">linkloving.work.order.tag</field>
+            <field name="model">linkloving.work.order.tag</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="类别"/>
+                </tree>
+            </field>
+        </record>
 
-        <!--<record model="ir.actions.act_window" id="work_order_setting_action">-->
-            <!--<field name="name">标签设置</field>-->
-            <!--<field name="type">ir.actions.act_window</field>-->
-            <!--<field name="res_model">linkloving.work.order.tag</field>-->
-            <!--<field name="view_mode">tree,form</field>-->
-            <!--<field name="domain">[('parent_id','=',False)]</field>-->
-        <!--</record>-->
+        <record model="ir.actions.act_window" id="work_order_setting_action">
+            <field name="name">标签设置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">linkloving.work.order.tag</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('parent_id','=',False)]</field>
+        </record>
 
-        <!--<record model="ir.actions.act_window" id="work_order_list_action">-->
-            <!--<field name="name">工单列表</field>-->
-            <!--<field name="type">ir.actions.act_window</field>-->
-            <!--<field name="res_model">linkloving.work.order</field>-->
-            <!--<field name="view_mode">tree,form</field>-->
+        <record model="ir.actions.act_window" id="work_order_list_action">
+            <field name="name">工单列表</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">linkloving.work.order</field>
+            <field name="view_mode">tree,form</field>
 
-        <!--</record>-->
-        <!--<menuitem id="work_order_root" name="工单" sequence="10"/>-->
-        <!--<menuitem id="work_order_tag_setting" name="标签设置" parent="work_order_root" action="work_order_setting_action" sequence="2"/>-->
-        <!--<menuitem id="work_order_list" name="工单列表" parent="work_order_root" action="work_order_list_action" sequence="3"/>-->
-
-
-
+        </record>
+        <menuitem id="work_order_root" name="工单" sequence="10" action="work_order_list_action"/>
+        <menuitem id="work_order_tag_setting" name="标签设置" parent="work_order_root"
+                  action="work_order_setting_action" sequence="2"/>
+        <menuitem id="work_order_list" name="工单列表" parent="work_order_root"
+                  action="work_order_list_action" sequence="3"/>
 
 
     </data>
