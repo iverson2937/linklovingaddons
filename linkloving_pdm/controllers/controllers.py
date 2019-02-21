@@ -124,7 +124,7 @@ class LinklovingPdm(http.Controller):
         Info = request.env['product.attachment.info'].sudo()
         data = []
         for deco in prefetch_codes:
-            p_id = self.env['product.template'].search([('default_code', '=', deco)])
+            p_id = request.env['product.template'].sudo().search([('default_code', '=', deco)])
             info = Info.search(
                     [('product_tmpl_id', '=', p_id.id), ('type', '=', tag_name),
                      ('state', '=', 'released'), ('is_show_outage', '=', True)])
