@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import json
+import logging
 
 import werkzeug
 
@@ -125,6 +126,7 @@ class LinklovingPdm(http.Controller):
         data = []
         for deco in prefetch_codes:
             p_id = request.env['product.template'].sudo().search([('default_code', '=', deco)])
+            logging.info(str(p_id) + tag_name)
             info = Info.search(
                     [('product_tmpl_id', '=', p_id.id), ('type', '=', tag_name),
                      ('state', '=', 'released'), ('is_show_outage', '=', True)])
