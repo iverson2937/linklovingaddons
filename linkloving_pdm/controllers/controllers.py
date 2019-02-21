@@ -122,11 +122,11 @@ class LinklovingPdm(http.Controller):
 
         # old_tag_id = request.env['tag.info'].sudo().search([('name', '=', tag_name)])
         Info = request.env['product.attachment.info'].sudo()
-        infos = Info.search(
-                [('product_tmpl_id.default_code', 'in', prefetch_codes), ('type', '=', tag_name),
-                 ('state', '=', 'released'), ('is_show_outage', '=', True)])
         data = []
-        for info in infos:
+        for deco in prefetch_codes:
+            info = Info.search(
+                    [('product_tmpl_id.default_code', '=', deco), ('type', '=', tag_name),
+                     ('state', '=', 'released'), ('is_show_outage', '=', True)])
             data.append({
                 'is_able_to_use': info.is_able_to_use,
                 'default_code': info.product_tmpl_id.default_code,
@@ -135,5 +135,18 @@ class LinklovingPdm(http.Controller):
                 'version': info.version,
                 'remark': info.remark,
             })
+        # infos = Info.search(
+        #         [('product_tmpl_id.default_code', 'in', prefetch_codes), ('type', '=', tag_name),
+        #          ('state', '=', 'released'), ('is_show_outage', '=', True)])
+        # data = []
+        # for info in infos:
+        #     data.append({
+        #         'is_able_to_use': info.is_able_to_use,
+        #         'default_code': info.product_tmpl_id.default_code,
+        #         'remote_path': info.remote_path,
+        #         'file_name': info.file_name,
+        #         'version': info.version,
+        #         'remark': info.remark,
+        #     })
 
         return data
