@@ -128,7 +128,7 @@ class LinklovingPdm(http.Controller):
             p_id = request.env['product.template'].sudo().search([('default_code', '=', deco)])
             logging.info(str(p_id) + tag_name)
             info = Info.search(
-                    [('product_tmpl_id', '=', p_id.id), ('type', '=', tag_name),
+                    [('product_tmpl_id', '=', p_id.id), ('type', 'in', [tag_name.lower(), tag_name.upper()]),
                      ('state', '=', 'released'), ('is_show_outage', '=', True)])
             if info:
                 data.append({
