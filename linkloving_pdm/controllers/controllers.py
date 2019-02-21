@@ -127,10 +127,10 @@ class LinklovingPdm(http.Controller):
         for deco in prefetch_codes:
             p_id = request.env['product.template'].sudo().search([('default_code', '=', deco)])
             logging.info(str(p_id) + tag_name)
-            info = Info.search(
+            infos = Info.search(
                     [('product_tmpl_id', '=', p_id.id), ('type', 'in', [tag_name.lower(), tag_name.upper()]),
                      ('state', '=', 'released'), ('is_show_outage', '=', True)])
-            if info:
+            for info in infos.filtered(lambda x: x.is_able_to_use):
                 data.append({
                     'is_able_to_use': info.is_able_to_use,
                     'default_code': info.product_tmpl_id.default_code,
